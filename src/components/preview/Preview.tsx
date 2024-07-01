@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import mobileFrame from '../../assets/callScreen.png';
 import notch from '../../assets/notch.png';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
+import Loader from '../loader/Loader';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 const Container = styled.div`
   display: flex;
@@ -111,13 +114,19 @@ const FlashMessageContent = styled.p`
 
 const Preview: React.FC = () => {
   const navigate = useNavigate();
+  const { statusMessage, signatureMessage , globalShowModal} = useSelector((state: RootState) => state.dashboard);
+  const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
+  
 
   const handleBack = () => {
     navigate(-1);
   };
 
+
+  const flashMessageToShow = activeTab.toLocaleLowerCase() === 'signature' ? signatureMessage : statusMessage
   return (
     <Container>
+      {/* {Loader && <Loader/>} */}
       <Header>
         <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
         <Title>Preview</Title>
@@ -131,7 +140,7 @@ const Preview: React.FC = () => {
             <FlashMessageContainer>
               <FlashMessageTitle>Flash Message</FlashMessageTitle>
               <FlashMessageContent>
-                Henry, Sales Manager, Set your status message
+                {flashMessageToShow}
               </FlashMessageContent>
             </FlashMessageContainer>
           </PreviewContent>

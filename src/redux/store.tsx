@@ -6,6 +6,7 @@ import DashboardSlice from './slices/DashboardSlice';
 import LoaderSlice from './slices/LoaderSlice';
 import SignatureTabsSlice from './slices/SignatureTabsSlice';
 import UserTypeSlice from './slices/UserTypeSlice';
+import PrivacyPolicySlice from './slices/PrivacyPolicySlice';
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +16,8 @@ export const store = configureStore({
     dashboard:DashboardSlice,
     loader:LoaderSlice,
     signatureTabs:SignatureTabsSlice,
-    user:UserTypeSlice
+    user:UserTypeSlice,
+    terms:PrivacyPolicySlice
   },
 });
 

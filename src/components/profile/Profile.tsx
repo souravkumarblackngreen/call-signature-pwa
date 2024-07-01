@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import profilePic from '../../assets/profilePic.jpg'; // Replace with your profile picture path
 import AccountBoxSharpIcon from '@mui/icons-material/AccountBoxSharp';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
 import { RootState } from '../../redux/store';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import Loader from '../loader/Loader';
+import axios from 'axios';
+import { setSubscriptionDate,setNextRenewal,setSubscriptionPlan,setPhoneNo} from '../../redux/slices/ProfileSlice';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -92,17 +95,62 @@ justify-content: center;
 width: 100%;
 `
 
+
+
+
 const Profile: React.FC = () => {
+    
+
     const navigate = useNavigate();
-    const { SubscriptionPlan, SubscriptionDate ,NextRenewal } = useSelector((state: RootState) => state.profile);
+    const { SubscriptionPlan, SubscriptionDate ,NextRenewal ,PhoneNo} = useSelector((state: RootState) => state.profile);
+    const { token,userId } = useSelector((state: RootState) => state.user);
+    const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
+    const profileUrl = "/user/profile"
+    const dispatch = useDispatch();
+    const [loader, setLoader] = useState<boolean>(false);
 
     const handleBack = () => {
         navigate(-1);
     };
 
+    const getUserProfile = async () => {
+      setLoader(true);
+      try {
+        const response = await axios.get(baseUrl+profileUrl,{
+          headers: {
+            Authorization:  `Bearer ${token}`,
+            langCode: 'en',
+        },
+        });
+        setLoader(false);
+        const{
+          planStartDate,
+          planEndDate,
+          userId,
+          amount
+
+          } = response.data.response 
+        console.log(planStartDate        ,'profile');
+        dispatch(setPhoneNo(userId))
+        dispatch(setSubscriptionDate(planStartDate))
+        dispatch(setNextRenewal(planEndDate))
+        dispatch(setSubscriptionPlan(amount))
+
+      } catch (error: any) {
+        setLoader(false);
+       
+      }
+    };
+    useEffect(() => {
+
+      getUserProfile();
+    }, []);
+
+    
     console.log(SubscriptionDate)
     return (
         <Container>
+          {loader && <Loader/>}
             <HeaderContainer>
                 <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
                 <Header>
@@ -112,7 +160,7 @@ const Profile: React.FC = () => {
 
             <ProfileCard>
                 <AccountBoxSharpIcon fontSize='large'/>
-                <PhoneNumber>+91 9876543210</PhoneNumber>
+                <PhoneNumber>{PhoneNo}</PhoneNumber>
                 <InfoContainer>
                     <InfoLabel>Subscription Plan:</InfoLabel>
                     <InfoValue>{SubscriptionPlan}</InfoValue>

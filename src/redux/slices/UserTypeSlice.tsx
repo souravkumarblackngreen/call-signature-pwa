@@ -4,6 +4,7 @@ interface userType {
   token: string;
   refreshToken: string;
   userId: string;
+  firstTimeModal:boolean;
 }
 
 const initialState: userType = {
@@ -11,6 +12,7 @@ const initialState: userType = {
   token: "",
   userId: "",
   refreshToken: "",
+  firstTimeModal:true,
 };
 
 const userSlice = createSlice({
@@ -30,10 +32,13 @@ const userSlice = createSlice({
     setRefreshToken: (state, action: PayloadAction<string>) => {
       state.refreshToken = action.payload;
     },
+    setFirstTimeModal: (state, action: PayloadAction<boolean>) => {
+        state.firstTimeModal = action.payload;
+      },
     resetUserState: () => initialState,
   },
 });
 
-export const { setUserType, setToken, setUserId, resetUserState,setRefreshToken } =
+export const { setUserType, setToken, setUserId, resetUserState,setRefreshToken, setFirstTimeModal } =
   userSlice.actions;
 export default userSlice.reducer;

@@ -89,9 +89,10 @@ interface ModalProps {
   message?: string;
   subMessage?:string;
   type?:string;
+  modalTitle?:string;
 }
 
-const Modal: React.FC<ModalProps> = ({ show, onClose, message , subMessage, type }) => {
+const Modal: React.FC<ModalProps> = ({ show, onClose, message , subMessage, type, modalTitle }) => {
   if (!show) {
     return null;
   }
@@ -103,7 +104,7 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, message , subMessage, type
         <IconContainer>
           {type == 'error'? <PiSmileySad style={{'width':'48px','height':'48px'}}/> :<FaCheck style={{'width':'48px','height':'48px'}} /> }
         </IconContainer>
-        <Title>{type == 'error' ? "Oops!" :"Successfully Subscribe"}</Title>
+        <Title>{type == 'error' ? "Oops!" :(modalTitle || "Successfully Subscribe")}</Title>
         <Message>{message||'Seems like there was a problem with your request.'}</Message>
         <SubMessage>{subMessage || 'Please try again later.'}</SubMessage>
         <StyledCloseButton onClick={onClose}>Close</StyledCloseButton>

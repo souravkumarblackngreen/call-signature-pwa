@@ -95,11 +95,10 @@ width: 100%;
 `
 
 
-const text = "Welcome to [Your Company Name] (“Company”, “we”, “our”, “us”)! As you have just clicked our Terms of Service, please pause, grab a cup of coffee and carefully read the following pages. It will take you approximately 20 minutes.\n\nThese Terms of Service (“Terms”, “Terms of Service”) govern your use of our web pages located at [Your Website URL] operated by [Your Company Name].\n\nOur Privacy Policy also governs your use of our Service and explains how we collect, safeguard and disclose information that results from your use of our web pages.\n\nYour agreement with us includes these Terms and our Privacy Policy (“Agreements”). You acknowledge that you have read and understood Agreements and agree to be bound by them.\n\nIf you do not agree with (or cannot comply with) Agreements, then you may not use the Service, but please let us know by emailing at [Your Contact Email] so we can try to find a solution. These Terms apply to all visitors, users and others who wish to access or use Service.\n\n"
 
 const TermsNconditions: React.FC = () => {
     const navigate = useNavigate();
-    const { SubscriptionPlan, SubscriptionDate ,NextRenewal } = useSelector((state: RootState) => state.profile);
+    const { termsncondition} = useSelector((state: RootState) => state.terms);
 
     const handleBack = () => {
         navigate(-1);
@@ -116,7 +115,7 @@ const TermsNconditions: React.FC = () => {
             </HeaderContainer>
 
             <ContentCard>
-                <p>{text+'ljdfslkjflksaj lfajs lajsfdlk jafl  lsdfjlkjasf llf jfljsdl How Many Paragraphs Is 150 Words? 150 words is about 0.75-1.5 paragraphs for essays or 1-3 for easier reading (to allow skimming). A paragraph length typically has 100-200 words and 5-6'}</p>
+                <p>{termsncondition}</p>
             </ContentCard>
         </Container>
     );

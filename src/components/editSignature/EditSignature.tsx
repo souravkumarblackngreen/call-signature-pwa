@@ -10,6 +10,9 @@ import SignatrueTabs from '../signatureTabs/SignatureTabs';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setStatusMessage, setSignatureMessage } from '../../redux/slices/DashboardSlice';
+import axios from 'axios';
+import { resolve } from 'path';
+import Loader from '../loader/Loader';
 
 const Container = styled.div`
   display: flex;
@@ -114,7 +117,7 @@ const Button = styled.button<{ primary?: boolean }>`
   cursor: pointer;
   flex: 1;
   margin: 0 5px;
-  width:;
+  width:16rem;
 `;
 
 const filteredWords = [ 'fraud', 'spam'];
@@ -123,11 +126,17 @@ const EditSignature: React.FC = () => {
   
   const { statusMessage, signatureMessage , globalShowModal} = useSelector((state: RootState) => state.dashboard);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
+  const { token,userId } = useSelector((state: RootState) => state.user);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [loader, setLoader] = useState<boolean>(false);
   const [showModal,setShowModal] = useState(false);
   const [modalType,setModalType] = useState('error');
   const [modalMessage, setModalMessage] = useState('');
+  const [modalTitle, setModalTitle] = useState('')
   const [modalSubMessage, setModalSubMessage] = useState('')
+  const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
+  const updateSignature="/signature/update";
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -135,8 +144,32 @@ const EditSignature: React.FC = () => {
     setSidebarOpen(!isSidebarOpen);
   };
 
-  const handleSaveToTemplates = () => {
+  const handleSaveToTemplates = async() => {
     // Implement save to templates logic
+    setLoader(true)
+    const response = await axios.post(
+      baseUrl + "/signature/update",
+      {
+       
+        signatureLangCode: 'en',
+        text: activeTab.toLocaleLowerCase() === "signature" ? signatureMessage : statusMessage,
+        signatureType: activeTab.toLocaleLowerCase() === "signature" ? "BUSINESS_CARD" : "STATUS",
+        department: "HR",
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // Assuming the content type is JSON
+        },
+      }
+    );
+    setLoader(false)
+    setShowModal(true)
+    setModalType('success')
+    setModalTitle(`Successfull `)
+    setModalMessage(`Your ${activeTab} is Saved successfully.  `)
+    setModalSubMessage(' ')
+    
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -171,7 +204,8 @@ const EditSignature: React.FC = () => {
   const flashMessageToShow = activeTab.toLocaleLowerCase() === 'signature' ? signatureMessage : statusMessage
   return (
     <Container>
-      <Modal show={showModal} onClose={closeModal} message={modalMessage} subMessage={modalSubMessage} type={modalType}/>
+      {loader && <Loader/>}
+      <Modal modalTitle={modalTitle} show={showModal} onClose={closeModal} message={modalMessage} subMessage={modalSubMessage} type={modalType}/>
       <Header>
         <HamburgerMenu onClick={toggleSidebar}>☰</HamburgerMenu>
         <CallSignatureHeader>

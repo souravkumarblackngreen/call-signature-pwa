@@ -23,7 +23,7 @@ const App: React.FC = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/filter-keywords" element={<FilterKeywords />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/termsNcoditions" element={<TermsNconditions />} />
+        <Route path="/termsNconditions" element={<TermsNconditions />} />
         <Route path="/edit-signature" element={<EditSignature />} />
         <Route path="/preview" element={<Preview />} />
         <Route path="/faq" element={<FAQ />} />

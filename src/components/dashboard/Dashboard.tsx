@@ -5,10 +5,14 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import logo from '../../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../redux/store';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import axios from "axios";
 import Modal from '../modal/Modal';
 import SignatrueTabs from '../signatureTabs/SignatureTabs';
+import { setStatusMessage, setSignatureMessage } from '../../redux/slices/DashboardSlice';
+import { setFirstTimeModal } from '../../redux/slices/UserTypeSlice';
+import { setPrivacy, setTerms } from '../../redux/slices/PrivacyPolicySlice';
+import Loader from '../loader/Loader';
 
 const Container = styled.div`
   display: flex;
@@ -137,115 +141,134 @@ const BusinessCardTitleText = styled.p`
 
 const Dashboard: React.FC = () => {
 
-    const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const [showModal,setShowModal] = useState(false);
-    const [modalMessage, setModalMessage] = useState('');
-    const [modalSubMessage, setModalSubMessage] = useState('');
-    const [modalType, setModalType] = useState('');
-    const [flashMessage,setFlashMessage] = useState('Henry, Sales Manager, I am here to scam you')
-    const [loader, setLoader] = useState<boolean>(false);
-    const [signatureTemplates, setSignatureTemplates] = useState<string[]>([]);
-    const [statusTemplates, setStatusTemplates] = useState<string[]>([]);
-    const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
-    const loginUrl = "/api/login"
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalSubMessage, setModalSubMessage] = useState('');
+  const [modalType, setModalType] = useState('');
+  const [flashMessage, setFlashMessage] = useState('Henry, Sales Manager, I am here to scam you')
+  const [loader, setLoader] = useState<boolean>(false);
+  const [signatureTemplates, setSignatureTemplates] = useState<string[]>([]);
+  const [statusTemplates, setStatusTemplates] = useState<string[]>([]);
+  const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
+  const loginUrl = "/api/login"
+  const privacyContent = "/api/privacy-content";
 
-    const { statusMessage, signatureMessage , globalShowModal} = useSelector((state: RootState) => state.dashboard);
-    const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
-    const { token,userId } = useSelector((state: RootState) => state.user);
+  const { statusMessage, signatureMessage, globalShowModal, } = useSelector((state: RootState) => state.dashboard);
+  const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
+  const { token, userId, firstTimeModal } = useSelector((state: RootState) => state.user);
 
-    
-  console.log(token,'token') 
-    
-    const navigate = useNavigate()
+  const dispatch = useDispatch();
 
-    const toggleSidebar = () => {
-        setSidebarOpen(!isSidebarOpen);
-    };
 
-    useEffect(() => {
-       
-        getTemplate()
-        showSucessSubscriber()
-    }, [])
+  console.log(token, 'token')
 
-    const login = async ()=>{
-      const response = await axios.post(baseUrl+loginUrl,{
-        'userName':'sourav.kumar@blackngreen.com',
-        'password':'Sourav@123'
+  const navigate = useNavigate()
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen);
+  };
+
+  useEffect(() => {
+
+    getTemplate()
+    getTermsNcondition()
+    showSucessSubscriber()
+  }, [])
+
+  const getTermsNcondition = async () => {
+    setLoader(true)
+    const response = await axios.get(baseUrl + privacyContent, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        langCode: 'en',
+      },
+
+    })
+    const { privacyPolicy, tearmsAndCondition } = response.data.response
+    setLoader(false)
+    dispatch(setPrivacy(privacyPolicy))
+    dispatch(setTerms(tearmsAndCondition))
+
+  }
+
+
+  const showSucessSubscriber = () => {
+    setModalMessage('You have sucessfully subscribed to this services.')
+    setModalType('success')
+  }
+
+  const getTemplate = async () => {
+    try {
+      const response = await axios.get(`${baseUrl}/signature/get-templates/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          langCode: 'en',
+        },
       })
       console.log(response)
-
+      const { businessCard, statusCard } = response.data.response;
+      setSignatureTemplates(businessCard);
+      setStatusTemplates(statusCard);
+    } catch (e) {
+      console.log(e)
     }
+  }
 
-    const showSucessSubscriber = ()=>{
-      setModalMessage('You have sucessfully subscribed to this services.')
-      setShowModal(true)
-      setModalType('success')
+  const setCardMessage = (template: any) => {
+
+    if (activeTab.toLocaleLowerCase() === 'signature') {
+      dispatch(setSignatureMessage(template))
+    } else {
+      dispatch(setStatusMessage(template))
     }
+  }
 
-    const getTemplate = async () => {
-        try {
-            const response = await axios.get(`${baseUrl}/signature/get-templates/${userId}`, {
-                headers: {
-                    Authorization:  `Bearer ${token}`,
-                    langCode: 'en',
-                },
-            })
-            console.log(response)
-            const { businessCard, statusCard } = response.data.response;
-            setSignatureTemplates(businessCard);
-            setStatusTemplates(statusCard);
-        } catch (e) {
-            console.log(e)
-        }
-    }
+  const closeModal = () => {
+    setShowModal(false);
+    dispatch(setFirstTimeModal(false))
+  };
 
-    const setCardMessage=(template:any)=>{
-        setFlashMessage(template)
-    }
-
-    const closeModal = () => {
-        setShowModal(false);
-      };
-    
-    const template = activeTab.toLocaleLowerCase() === 'signature' ? signatureTemplates : statusTemplates
-    const flashMessageToShow = activeTab.toLocaleLowerCase() === 'signature' ? signatureMessage : statusMessage
-    return (
-        <Container>
-            <Modal show={showModal} onClose={closeModal} message={modalMessage}  type={modalType} subMessage={modalSubMessage}/>
-            <Header>
-                <HamburgerMenu onClick={toggleSidebar}>☰</HamburgerMenu>
-                <CallSignatureHeader>
-                    <Logo src={logo} alt="Call Signature" />
-                    <Title>Call Signature</Title>
-                </CallSignatureHeader>
-                <NotificationsIcon onClick={()=>setShowModal((p)=>!p)} />
-            </Header>
-            <Content>
-                <SignatrueTabs/>
-                <FlashMessageContainer>
-                    <FlashMessageTitle>Flash Message</FlashMessageTitle>
-                    <FlashMessageContent>
-                        {flashMessageToShow}
-                    </FlashMessageContent>
-                    <FlashMessageStatus>Active</FlashMessageStatus>
-                    <ButtonContainer>
-                        <Button onClick={()=>navigate('/preview')}>Preview</Button>
-                        <Button primary onClick={() => navigate('/edit-signature')}>Edit Signature</Button>
-                    </ButtonContainer>
-                </FlashMessageContainer>
-                <BusinessCardContainer>
-                    <BusinessCardTitle>Template Business Cards</BusinessCardTitle>
-                    {template.map((template, index) => (
-                        <BusinessCard onClick={()=>setCardMessage(template)}>
-                            <BusinessCardTitleText key={index}>{template}</BusinessCardTitleText>
-                        </BusinessCard>
-                    ))}
-                </BusinessCardContainer>
-            </Content>
-            <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-        </Container>
-    );
+  const template = activeTab.toLocaleLowerCase() === 'signature' ? signatureTemplates : statusTemplates
+  const flashMessageToShow = activeTab.toLocaleLowerCase() === 'signature' ? signatureMessage : statusMessage
+  const modalToShow = firstTimeModal || showModal
+  return (
+    <Container>
+      {loader && <Loader />}
+      <Modal show={modalToShow} onClose={closeModal} message={modalMessage} type={modalType} subMessage={modalSubMessage} />
+      <Header>
+        <HamburgerMenu onClick={toggleSidebar}>☰</HamburgerMenu>
+        <CallSignatureHeader>
+          <Logo src={logo} alt="Call Signature" />
+          <Title>Call Signature</Title>
+        </CallSignatureHeader>
+        <NotificationsIcon onClick={() => setShowModal((p) => !p)} />
+      </Header>
+      <Content>
+        <SignatrueTabs />
+        <FlashMessageContainer>
+          <FlashMessageTitle>Flash Message</FlashMessageTitle>
+          <FlashMessageContent>
+            {flashMessageToShow}
+          </FlashMessageContent>
+          <FlashMessageStatus>Active</FlashMessageStatus>
+          <ButtonContainer>
+            <Button onClick={() => navigate('/preview')}>Preview</Button>
+            <Button primary onClick={() => navigate('/edit-signature')}>Edit Signature</Button>
+          </ButtonContainer>
+        </FlashMessageContainer>
+        <BusinessCardContainer>
+          <BusinessCardTitle>Template Business Cards</BusinessCardTitle>
+          {template.map((template, index) => (
+            <BusinessCard onClick={() => setCardMessage(template)}>
+              <BusinessCardTitleText key={index}>{template}</BusinessCardTitleText>
+            </BusinessCard>
+          ))}
+        </BusinessCardContainer>
+      </Content>
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+    </Container>
+  );
 };
 
 export default Dashboard;

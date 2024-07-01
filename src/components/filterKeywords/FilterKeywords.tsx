@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { setKeywords } from '../../redux/slices/FilterSlice';
 import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
+import axios, { AxiosResponse } from 'axios';
+
+import Loader from '../loader/Loader';
 
 const Container = styled.div`
   display: flex;
@@ -103,59 +106,96 @@ const TitleHeader = styled.div`
 
 
 const FilterKeywords: React.FC = () => {
-   
-    const { keywords } = useSelector((state: RootState) => state.filter);
-    const [newKeyword, setNewKeyword] = useState<string>('');
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+  const { keywords } = useSelector((state: RootState) => state.filter);
+  const [newKeyword, setNewKeyword] = useState<string>('');
+  const { token, userId } = useSelector((state: RootState) => state.user);
+  const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
 
-    const addKeyword = () => {
-        if (newKeyword.trim() !== '' && !keywords.includes(newKeyword.trim())) {
-            dispatch(setKeywords([...keywords, newKeyword.trim()]));
-            setNewKeyword('');
-        }
-    };
+  const [loader, setLoader] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const getFilterWord = "/filter/get-filter-words";
+  const addFilterWord = "/filter/keywords/ADD";
+  const deleteFilterWord = "/filter/keywords/DELETE";
 
-    const removeKeyword = (keyword: string) => {
-        dispatch(setKeywords(keywords.filter(k => k !== keyword)));
-    };
+  useEffect(() => {
+      getfilterWords();
+  }, []);
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            addKeyword();
-        }
-    };
-    return (
-        <Container>
-            <Header> 
-                <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon/></BackButton>
-                <Title>Keywords</Title> 
-                
-            </Header>
-            <Subtitle>Customize your filters by easily adding or removing keywords.</Subtitle>
-            <KeywordsContainer>
-                {keywords.map((keyword, index) => (
-                    <KeywordChip key={index}>
-                        {keyword}
-                        <RemoveButton onClick={() => removeKeyword(keyword)}>×</RemoveButton>
-                    </KeywordChip>
-                ))}
-            </KeywordsContainer>
-            <Input
-                type="text"
-                value={newKeyword}
-                onChange={(e) => setNewKeyword(e.target.value)}
-                placeholder="Add new keyword"
-                onKeyDown={handleKeyDown}
-            />
-            <AddButton onClick={addKeyword}>Add Text</AddButton>
 
-        </Container>
-    );
+  const getfilterWords = async () => {
+    setLoader(true);
+    try {
+      // const response = await getData(API_END_POINT.getFilterWord, token);
+      const response: AxiosResponse<any> = await axios.get(baseUrl+getFilterWord,{
+        headers: {
+          Authorization:  `Bearer ${token}`,
+          
+          langCode: 'en',
+      },
+      })
+      console.log(response.data.response       ,'lil')
+      // dispatch(setKeywords(response.data.response));
+      setLoader(false);
+      
+    } catch (err: any) {
+      setLoader(false);
+      
+      
+    }
+  };
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const addKeyword = () => {
+    if (newKeyword.trim() !== '' && !keywords.includes(newKeyword.trim())) {
+      dispatch(setKeywords([...keywords, newKeyword.trim()]));
+      setNewKeyword('');
+    }
+  };
+
+  const removeKeyword = (keyword: string) => {
+    dispatch(setKeywords(keywords.filter(k => k !== keyword)));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      addKeyword();
+    }
+  };
+
+  console.log('keywords',keywords)
+  return (
+    <Container>
+      {loader && <Loader/>}
+      <Header>
+        <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
+        <Title>Keywords</Title>
+
+      </Header>
+      <Subtitle>Customize your filters by easily adding or removing keywords.</Subtitle>
+      <KeywordsContainer>
+        {keywords.map((keyword, index) => (
+          <KeywordChip key={index}>
+            {keyword}
+            <RemoveButton onClick={() => removeKeyword(keyword)}>×</RemoveButton>
+          </KeywordChip>
+        ))}
+      </KeywordsContainer>
+      <Input
+        type="text"
+        value={newKeyword}
+        onChange={(e) => setNewKeyword(e.target.value)}
+        placeholder="Add new keyword"
+        onKeyDown={handleKeyDown}
+      />
+      <AddButton onClick={addKeyword}>Add Text</AddButton>
+
+    </Container>
+  );
 };
 
 export default FilterKeywords;
