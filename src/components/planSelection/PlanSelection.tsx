@@ -56,7 +56,7 @@ const PhoneInputContainer = styled.div`
   display: flex;
   flex-direction:column;
   justify-content: center;
-  width:90%;
+  width:22rem;
 `;
 const CallSignatureHeader = styled.div`
   display: flex;
@@ -85,7 +85,7 @@ const PlanButton = styled.div<{ selected: boolean }>`
 `;
 
 const Input = styled.input`
-  width: 100%;
+ 
   padding: 10px;
   margin: 10px 0;
   border: 1px solid #e4ebf3;
