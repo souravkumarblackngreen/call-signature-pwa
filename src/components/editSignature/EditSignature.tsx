@@ -106,6 +106,7 @@ const ButtonContainer = styled.div`
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
+  width:auto;
 `;
 
 const Button = styled.button<{ primary?: boolean }>`
@@ -117,7 +118,7 @@ const Button = styled.button<{ primary?: boolean }>`
   cursor: pointer;
   flex: 1;
   margin: 0 5px;
-  width:16rem;
+  width:auto;
 `;
 
 const filteredWords = [ 'fraud', 'spam'];

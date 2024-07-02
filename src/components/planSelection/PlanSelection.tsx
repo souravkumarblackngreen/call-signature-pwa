@@ -134,9 +134,11 @@ const PlanSelection: React.FC = () => {
     const [selectedPlan, setSelectedPlan] = useState<string>('Monthly');
     const [phoneNumber, setPhoneNumber] = useState<string>('');
     const isLoading = useSelector((state: RootState) => state.loader.isLoading);
+    const {isHeaderEnrichment} = useSelector((state: RootState) => state.user);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    
     const handleSelectPlan = (plan: string) => {
         setSelectedPlan(plan);
     };
@@ -156,6 +158,9 @@ const PlanSelection: React.FC = () => {
         if (e.key === 'Enter') {
           handleSendOtp();
         }
+      };
+      const byPassSendOTP = () => {
+      navigate('/dashboard')
       };
 
     return (
@@ -193,21 +198,24 @@ const PlanSelection: React.FC = () => {
 
                 </PlanButton>
             </PlanContainer>
-            <PhoneInputContainer>
-                <PhoneTitle>Phone number</PhoneTitle>
-                <Input
-                    type="text"
-                    placeholder="Enter Phone number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                />
-            </PhoneInputContainer>
+            {
+              !isHeaderEnrichment && <PhoneInputContainer>
+              <PhoneTitle>Phone number</PhoneTitle>
+               <Input
+                  type="number"
+                  placeholder="Enter Phone number"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  onKeyDown={handleKeyDown}
+              />
+          </PhoneInputContainer>
+            }
+            
 
             <Disclaimer>
                 By registering yourself to this platform you have agreed to the terms and conditions of the platform
             </Disclaimer>
-            <SendOtpButton onClick={handleSendOtp}>Send OTP</SendOtpButton>
+            <SendOtpButton onClick={isHeaderEnrichment?byPassSendOTP:handleSendOtp}>{isHeaderEnrichment?"Subscribe":"Send OTP"}</SendOtpButton>
         </Container>
       </>
       

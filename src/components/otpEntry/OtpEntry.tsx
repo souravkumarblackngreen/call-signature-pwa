@@ -5,12 +5,11 @@ import logo from '../../assets/logo.png'; // Replace with your logo path
 import background from '../../assets/SplashScreenBg.png'
 import LanguageDropdown from '../languageDropdown/LanguageDropdown';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
-import { setToken,setRefreshToken,setUserId } from '../../redux/slices/UserTypeSlice';
+import { setToken, setRefreshToken, setUserId } from '../../redux/slices/UserTypeSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import Loader from '../loader/Loader';
 import axios from 'axios';
-
 
 const Container = styled.div<{ isLoading: boolean }>`
   display: flex;
@@ -33,8 +32,8 @@ const Container = styled.div<{ isLoading: boolean }>`
 `;
 
 const Logo = styled.img`
-width: 40px;
-height:38px;
+  width: 40px;
+  height: 38px;
 `;
 
 const Title = styled.h1`
@@ -63,20 +62,18 @@ const OtpInput = styled.input`
   text-align: center;
   border: 1px solid #e4ebf3;
   border-radius: 8px;
-  background:#262626;
-  color:#ffff;
+  background: #262626;
+  color: #ffff;
 
   &::placeholder {
     color: #FFFFFF; /* Change this to your desired color */
     opacity: 1; /* Adjust this if you need to change the opacity */
   }
-
 `;
 
 const Disclaimer = styled.p`
   font-size: 0.8rem;
   margin: 10px 0;
-  
 `;
 
 const ResendOtp = styled.a`
@@ -85,7 +82,7 @@ const ResendOtp = styled.a`
   text-decoration: none;
 `;
 
-const LoginButton = styled.button`
+const LoginButton = styled.button<{ disabled: boolean }>`
   padding: 10px 20px;
   font-size: 1rem;
   cursor: pointer;
@@ -95,15 +92,18 @@ const LoginButton = styled.button`
   color: white;
   margin-bottom: 20%;
   width: 20rem;
+  opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
+  pointer-events: ${({ disabled }) => (disabled ? 'none' : 'auto')};
 `;
 
 const CallSignatureHeader = styled.div`
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
-  align-items:center;
-  gap:5px;
+  align-items: center;
+  gap: 5px;
 `;
+
 const LoaderOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -124,8 +124,7 @@ const OtpEntry: React.FC = () => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
   const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
-  const loginUrl = "/api/login"
-
+  const loginUrl = "/api/login";
 
   const handleChange = (value: string, index: number) => {
     if (/^[0-9]$/.test(value)) {
@@ -145,7 +144,6 @@ const OtpEntry: React.FC = () => {
     }
   };
 
-  
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     if (e.key === 'Backspace' || e.key === 'Delete') {
       if (otp[index] === '') {
@@ -157,77 +155,74 @@ const OtpEntry: React.FC = () => {
         newOtp[index] = '';
         setOtp(newOtp);
       }
-    }else if (e.key === 'Enter') {
-        handleLogin();
-      }
+    } else if (e.key === 'Enter') {
+      handleLogin();
+    }
   };
 
-  const handleLogin = async() => {
+  const handleLogin = async () => {
     if (otp.join('').length === 4) {
       // Assuming you have a success page
-    dispatch(startLoading());
-    const response = await axios.post(baseUrl+loginUrl,{
-      'userName':'sourav.kumar@blackngreen.com',
-      'password':'Sourav@123'
-    })
-    
-    if(response.status == 200){
-      const {refreshToken,token,userId, userType} = response.data.response
-      console.log(token,'ss')
-      navigate('/dashboard');
-      dispatch(stopLoading());
-      dispatch(setToken(token))
-      dispatch(setRefreshToken(refreshToken))
-      dispatch(setUserId(userId))
-     
-    }
-    
+      dispatch(startLoading());
+      const response = await axios.post(baseUrl + loginUrl, {
+        'userName': 'sourav.kumar@blackngreen.com',
+        'password': 'Sourav@123'
+      });
+
+      if (response.status === 200) {
+        const { refreshToken, token, userId, userType } = response.data.response;
+        console.log(token, 'ss');
+        navigate('/dashboard');
+        dispatch(stopLoading());
+        dispatch(setToken(token));
+        dispatch(setRefreshToken(refreshToken));
+        dispatch(setUserId(userId));
+      }
     }
   };
-  const login = async ()=>{
-    const response = await axios.post(baseUrl+loginUrl,{
-      'userName':'sourav.kumar@blackngreen.com',
-      'password':'Sourav@123'
-    })
-    console.log(response)
 
-  }
+  const login = async () => {
+    const response = await axios.post(baseUrl + loginUrl, {
+      'userName': 'sourav.kumar@blackngreen.com',
+      'password': 'Sourav@123'
+    });
+    console.log(response);
+  };
+
+  const isOtpComplete = otp.every(value => value !== '');
 
   return (
     <>
-     {isLoading && (
-        <Loader/>
+      {isLoading && (
+        <Loader />
       )}
-    <Container isLoading={isLoading}>
-    
-      <LanguageDropdown/>
+      <Container isLoading={isLoading}>
+        <LanguageDropdown />
         <CallSignatureHeader>
-                <Logo src={logo} alt="Call Signature" />
-                <Title>Call Signature</Title>
-            </CallSignatureHeader>
-      
-      <Subtitle>Enter OTP</Subtitle>
-      <OtpContainer>
-        {otp.map((value, index) => (
-          <OtpInput
-            key={index}
-            type="text"
-            maxLength={1}
-            value={value}
-            ref={(el) => (inputRefs.current[index] = el)}
-            onChange={(e) => handleChange(e.target.value, index)}
-            onKeyDown={(e) => handleKeyDown(e, index)}
-          />
-        ))}
-      </OtpContainer>
-      <Disclaimer>OTP has been sent to your phone number +91 9876543210</Disclaimer>
-      <Disclaimer style={{"color":'grey'}}>
-        Didn't receive OTP? <ResendOtp>Resend OTP</ResendOtp>
-      </Disclaimer>
-      <LoginButton onClick={handleLogin}>Login</LoginButton>
-    </Container>
+          <Logo src={logo} alt="Call Signature" />
+          <Title>Call Signature</Title>
+        </CallSignatureHeader>
+        <Subtitle>Enter OTP</Subtitle>
+        <OtpContainer>
+          {otp.map((value, index) => (
+            <OtpInput
+              key={index}
+              type="text"
+              maxLength={1}
+              value={value}
+              ref={(el) => (inputRefs.current[index] = el)}
+              onChange={(e) => handleChange(e.target.value, index)}
+              onKeyDown={(e) => handleKeyDown(e, index)}
+            />
+          ))}
+        </OtpContainer>
+        <Disclaimer>OTP has been sent to your phone number +91 9876543210</Disclaimer>
+        <Disclaimer style={{ color: 'grey' }}>
+          Didn't receive OTP? <ResendOtp>Resend OTP</ResendOtp>
+        </Disclaimer>
+        <LoginButton onClick={handleLogin} disabled={!isOtpComplete}>Login</LoginButton>
+      </Container>
     </>
-   
   );
 };
 
