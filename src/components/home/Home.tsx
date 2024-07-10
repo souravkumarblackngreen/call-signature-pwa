@@ -11,6 +11,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios, { AxiosResponse } from 'axios';
 import { setUserType, setToken, setUserId,setRefreshToken, setMediaContent } from '../../redux/slices/UserTypeSlice'
 
+import {getData} from '../../services/Services'
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;

@@ -11,7 +11,7 @@ import { RootState } from '../../redux/store';
 import Loader from '../loader/Loader';
 import axios from 'axios';
 import { API_END_POINT } from '../../services/Constant';
-import { configDotenv } from 'dotenv';
+
 
 const Container = styled.div<{ isLoading: boolean }>`
   display: flex;

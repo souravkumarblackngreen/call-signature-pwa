@@ -51,7 +51,7 @@ const Content = styled.div`
   align-items: center;
 `;
 
-const MobileFrame = styled.div`
+const MobileFrame = styled.div<{mobileFrame:string}>`
   position: relative;
   width: 300px;
   height: 600px;
@@ -63,7 +63,7 @@ const MobileFrame = styled.div`
   align-items: center;
   margin-top: 20px;
 `;
-const MobileNotch = styled.div`
+const MobileNotch = styled.div<{notch:string}>`
   position: absolute;
   width: 50%;
   height: 5%;
@@ -116,7 +116,7 @@ const Preview: React.FC = () => {
   const navigate = useNavigate();
   const { statusMessage, signatureMessage , globalShowModal} = useSelector((state: RootState) => state.dashboard);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
-  const { userId} = useSelector((state: RootState) => state.user);
+  const { userId, mediaContent} = useSelector((state: RootState) => state.user);
   const configText = useSelector((state: RootState) => state.configText);
   
 
@@ -135,9 +135,9 @@ const Preview: React.FC = () => {
         <div style={{ width: '24px' }} /> {/* Placeholder to balance the header */}
       </Header>
       <Content>
-        <MobileFrame>
+        <MobileFrame mobileFrame={mediaContent.callScreen}>
           <PreviewContent>
-            <MobileNotch/>
+            <MobileNotch notch={mediaContent.notch}/>
             <PhoneNumber>+91-{userId}</PhoneNumber>
             <FlashMessageContainer>
               <FlashMessageTitle>{configText.config.flashMessage}</FlashMessageTitle>

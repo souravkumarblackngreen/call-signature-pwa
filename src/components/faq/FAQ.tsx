@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import MenuIcon from '@mui/icons-material/Menu';
-import logo from '../../assets/logo.png';
 import Sidebar from '../sidemenu/Sidebar';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
 import { useNavigate } from 'react-router-dom';
@@ -123,7 +120,7 @@ const FAQ: React.FC = () => {
   useEffect(()=>{
     getFAQ()
   },[])
-  
+
   const getFAQ = async()=>{
     try{
       const response = await axios.get(API_END_POINT.baseUrl+API_END_POINT.getFAQ,{

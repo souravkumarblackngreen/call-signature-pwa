@@ -8,7 +8,7 @@ import { setLanguage } from '../../redux/slices/LanguageSlice';
 import axios from 'axios';
 import { API_END_POINT } from '../../services/Constant';
 import { setConfigText } from '../../redux/slices/GloabalTextDataSlice';
-
+import {getData} from '../../services/Services'
 
 const DropdownContainer = styled.div`
   position: absolute;

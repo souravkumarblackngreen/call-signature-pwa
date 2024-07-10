@@ -35,5 +35,6 @@ export const API_END_POINT={
     getInfo:"/signature/get-info",
     unsubscribe:"/subscriber/remove",
     mediaContent:"http://172.16.11.222:5442/crbtSignature/v1/api/media-content?isIndividualSpecific=true",
+    updateSignature:"http://172.16.11.222:5442/crbtSignature/v1/signature/update"
 
 }

@@ -12,6 +12,10 @@ interface userType {
 }
 interface MediaContentObj {
   logo: string;
+  splashScreenBg:string;
+  callScreen:string;
+  notch:string;
+
 }
 
 const initialState: userType = {
@@ -23,7 +27,7 @@ const initialState: userType = {
   isHeaderEnrichment:false,
   phoneNumber:"",
   selectedPlan:"",
-  mediaContent:{logo:''}
+  mediaContent:{logo:'',splashScreenBg:'',callScreen:'',notch:''}
 };
 
 const userSlice = createSlice({

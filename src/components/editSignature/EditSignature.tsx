@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
-import MenuIcon from '@mui/icons-material/Menu';
+
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Sidebar from '../sidemenu/Sidebar';
 import Modal from '../modal/Modal';
@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setStatusMessage, setSignatureMessage } from '../../redux/slices/DashboardSlice';
 import axios from 'axios';
-import { resolve } from 'path';
+
 import Loader from '../loader/Loader';
 
 const Container = styled.div`
@@ -125,7 +125,7 @@ const filteredWords = [ 'fraud', 'spam'];
 
 const EditSignature: React.FC = () => {
   
-  const { statusMessage, signatureMessage , globalShowModal} = useSelector((state: RootState) => state.dashboard);
+  const { statusMessage, signatureMessage , globalShowModal, signatureId, statusId} = useSelector((state: RootState) => state.dashboard);
   const { lang,languages } = useSelector((state: RootState) => state.lang);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
   const { token,userId } = useSelector((state: RootState) => state.user);
@@ -138,7 +138,7 @@ const EditSignature: React.FC = () => {
   const [modalSubMessage, setModalSubMessage] = useState('')
   const configText = useSelector((state: RootState) => state.configText);
 
-  const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
+  const baseUrl = "http://172.16.11.222:5442/crbtSignature/v1";
   const updateSignature="/signature/update";
 
   const navigate = useNavigate();
@@ -154,11 +154,11 @@ const EditSignature: React.FC = () => {
     const response = await axios.post(
       baseUrl + "/signature/update",
       {
-       
+       signatureId:activeTab === configText.config.signature ? signatureId : statusId,
         signatureLangCode: lang,
-        text: activeTab === configText.config.configText ? signatureMessage : statusMessage,
-        signatureType: activeTab === configText.config.configText ? "BUSINESS_CARD" : "STATUS",
-        department: "HR",
+        text: activeTab === configText.config.signature ? signatureMessage : statusMessage,
+        signatureType: activeTab === configText.config.signature ? "BUSINESS_CARD" : "STATUS",
+        
       },
       {
         headers: {
@@ -167,6 +167,7 @@ const EditSignature: React.FC = () => {
         },
       }
     );
+   
     setLoader(false)
     setShowModal(true)
     setModalType('success')
@@ -175,6 +176,8 @@ const EditSignature: React.FC = () => {
     setModalSubMessage(' ')
     
   };
+
+  
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;

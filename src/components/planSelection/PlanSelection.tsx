@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
+
 import logo from '../../assets/logo.png'; // Replace with your logo path
 import background from '../../assets/SplashScreenBg.png'
 import LanguageDropdown from '../languageDropdown/LanguageDropdown';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 import { setPhoneNumber, setSelectedPlan } from '../../redux/slices/UserTypeSlice';
-import { setLanguage, setLanguages } from '../../redux/slices/LanguageSlice';
-import { setConfigText } from '../../redux/slices/GloabalTextDataSlice';
+import { setLanguages } from '../../redux/slices/LanguageSlice';
+
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../loader/Loader';
 import { RootState } from '../../redux/store';
 import axios from 'axios';
 import { API_END_POINT } from "../../services/Constant";
 
-const Container = styled.div`
+const Container = styled.div<{ background: string }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -139,7 +139,7 @@ const PlanSelection: React.FC = () => {
 
 
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
-  const { isHeaderEnrichment, token, phoneNumber, selectedPlan } = useSelector((state: RootState) => state.user);
+  const { isHeaderEnrichment, token, phoneNumber, selectedPlan ,mediaContent} = useSelector((state: RootState) => state.user);
   const { lang, languages } = useSelector((state: RootState) => state.lang);
   const configText = useSelector((state: RootState) => state.configText);
 
@@ -228,7 +228,7 @@ const PlanSelection: React.FC = () => {
     const value = e.target.value;
     // // const phoneNumberPattern = /^[0-9]{0,10}$/;
     // console.log(value.length == 10)
-    if(value.length == 10)
+    if(value.length == 11)
       return
     dispatch(setPhoneNumber(value));
     // if (phoneNumberPattern.test(value)) {
@@ -242,10 +242,10 @@ const PlanSelection: React.FC = () => {
   return (
     <>
       {isLoading && <Loader />}
-      <Container>
+      <Container background={mediaContent.splashScreenBg}>
         <LanguageDropdown />
         <CallSignatureHeader>
-          <Logo src={logo} alt="Call Signature" />
+          <Logo src={mediaContent.logo} alt="Call Signature" />
           <Title>{configText.config.callSignature}</Title>
         </CallSignatureHeader>
         <Subtitle>{configText.config.chooseTemplate}</Subtitle>

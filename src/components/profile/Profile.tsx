@@ -131,7 +131,7 @@ const Profile: React.FC = () => {
           amount
 
           } = response.data.response 
-        console.log(planStartDate        ,'profile');
+        
         dispatch(setPhoneNo(userId))
         dispatch(setSubscriptionDate(planStartDate))
         dispatch(setNextRenewal(planEndDate))
@@ -148,7 +148,7 @@ const Profile: React.FC = () => {
     }, []);
 
     
-    console.log(SubscriptionDate)
+   
     return (
         <Container>
           {loader && <Loader/>}

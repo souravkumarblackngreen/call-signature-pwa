@@ -9,13 +9,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from "axios";
 import Modal from '../modal/Modal';
 import SignatrueTabs from '../signatureTabs/SignatureTabs';
-import { setStatusMessage, setSignatureMessage } from '../../redux/slices/DashboardSlice';
+import { setStatusMessage, setSignatureMessage, setSignatureId,setStatusId } from '../../redux/slices/DashboardSlice';
 import { setFirstTimeModal, setMediaContent } from '../../redux/slices/UserTypeSlice';
 import { setPrivacy, setTerms } from '../../redux/slices/PrivacyPolicySlice';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Loader from '../loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
+import {getData} from '../../services/Services'
 
 const Container = styled.div`
   display: flex;
@@ -148,7 +149,7 @@ const ButtonContainer = styled.div`
 const Button = styled.button<{ primary?: boolean }>`
   background: ${(props) => (props.primary ? '#0032DF' : 'white')};
   color: ${(props) => (props.primary ? 'white' : '#0032DF')};
-  border: 1px solid ${(props) => (props.primary ? '#0032DF' : '#0032DF')};
+  border: 1px solid #0032DF;
   border-radius: 25px;
   padding: 10px 20px;
   cursor: pointer;
@@ -223,6 +224,9 @@ const Dashboard: React.FC = () => {
 
   const navigate = useNavigate()
 
+
+ 
+
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
   };
@@ -260,13 +264,14 @@ const Dashboard: React.FC = () => {
 
   const getTemplate = async () => {
     try {
-      const response = await axios.get(`${baseUrl}`+API_END_POINT.getTemplates+userId, {
+      const response = await getData(API_END_POINT.getTemplates+userId, {
         headers: {
           Authorization: `Bearer ${token}`,
           langCode: lang,
         },
       })
-      const { businessCard, statusCard } = response.data.response;
+      const { businessCard, statusCard } = response;
+      
       setSignatureTemplates(businessCard);
       setStatusTemplates(statusCard);
     } catch (e) {
@@ -308,14 +313,17 @@ const Dashboard: React.FC = () => {
       );
       // dispatch(setSignatureIDData(businessCard));
       // dispatch(setStatusIDData(statusCard));
+     
       if (businessCard) {
 
         // setMessageForPhone(businessCard.text)
         dispatch(setSignatureMessage(businessCard.text));
+        dispatch(setSignatureId(businessCard.signatureId))
       }
 
       if (statusCard) {
         dispatch(setStatusMessage(statusCard.text));
+        dispatch(setStatusId(businessCard.signatureId))
       }
     }
   };
@@ -345,11 +353,29 @@ const Dashboard: React.FC = () => {
     dispatch(setFirstTimeModal(false))
   };
 
-  const handleToggleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleToggleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setToggleChecked(event.target.checked);
-    // Handle the toggle change event
-    
+    setLoader(true);
+    const action = event.target.checked ? "PUBLISH" : "UNPUBLISH";
+    try {
+      await axios.post(`http://172.16.11.222:5442/crbtSignature/v1/dashboard/signature-action/${action}`, [], {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          langCode: lang,
+        },
+      });
+      setModalMessage(`Signature ${action.toLowerCase()}ed successfully.`);
+      setModalType('success');
+    } catch (err) {
+      setModalMessage(`Failed to ${action.toLowerCase()} signature.`);
+      setModalType('error');
+    }
+    setLoader(false);
+    setShowModal(true);
   };
+
+
+  console.log(signatureTemplates)
 
   const template = activeTab.toLocaleLowerCase() === 'signature' ? signatureTemplates : statusTemplates
   const flashMessageToShow = activeTab.toLocaleLowerCase() === 'signature' ? signatureMessage : statusMessage
