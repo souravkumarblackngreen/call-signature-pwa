@@ -110,14 +110,14 @@ const FilterKeywords: React.FC = () => {
   const { keywords } = useSelector((state: RootState) => state.filter);
   const [newKeyword, setNewKeyword] = useState<string>('');
   const { token, userId } = useSelector((state: RootState) => state.user);
+  const configText = useSelector((state: RootState) => state.configText);
   const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
 
   const [loader, setLoader] = useState<boolean>(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const getFilterWord = "/filter/get-filter-words";
-  const addFilterWord = "/filter/keywords/ADD";
-  const deleteFilterWord = "/filter/keywords/DELETE";
+  
 
   useEffect(() => {
       getfilterWords();
@@ -135,8 +135,8 @@ const FilterKeywords: React.FC = () => {
           langCode: 'en',
       },
       })
-      console.log(response.data.response       ,'lil')
-      // dispatch(setKeywords(response.data.response));
+      
+    
       setLoader(false);
       
     } catch (err: any) {
@@ -167,16 +167,16 @@ const FilterKeywords: React.FC = () => {
     }
   };
 
-  console.log('keywords',keywords)
+
   return (
     <Container>
       {loader && <Loader/>}
       <Header>
         <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
-        <Title>Keywords</Title>
+        <Title>{configText.config.filterKeywords}</Title>
 
       </Header>
-      <Subtitle>Customize your filters by easily adding or removing keywords.</Subtitle>
+      <Subtitle>{configText.config.customizeYourFilterInfo}</Subtitle>
       <KeywordsContainer>
         {keywords.map((keyword, index) => (
           <KeywordChip key={index}>
@@ -189,10 +189,10 @@ const FilterKeywords: React.FC = () => {
         type="text"
         value={newKeyword}
         onChange={(e) => setNewKeyword(e.target.value)}
-        placeholder="Add new keyword"
+        placeholder={configText.config.addNewKeywords}
         onKeyDown={handleKeyDown}
       />
-      <AddButton onClick={addKeyword}>Add Text</AddButton>
+      <AddButton onClick={addKeyword}>{configText.config.addText}</AddButton>
 
     </Container>
   );

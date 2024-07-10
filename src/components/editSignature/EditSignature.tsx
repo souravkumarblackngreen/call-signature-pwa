@@ -126,6 +126,7 @@ const filteredWords = [ 'fraud', 'spam'];
 const EditSignature: React.FC = () => {
   
   const { statusMessage, signatureMessage , globalShowModal} = useSelector((state: RootState) => state.dashboard);
+  const { lang,languages } = useSelector((state: RootState) => state.lang);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
   const { token,userId } = useSelector((state: RootState) => state.user);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -135,6 +136,8 @@ const EditSignature: React.FC = () => {
   const [modalMessage, setModalMessage] = useState('');
   const [modalTitle, setModalTitle] = useState('')
   const [modalSubMessage, setModalSubMessage] = useState('')
+  const configText = useSelector((state: RootState) => state.configText);
+
   const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
   const updateSignature="/signature/update";
 
@@ -152,9 +155,9 @@ const EditSignature: React.FC = () => {
       baseUrl + "/signature/update",
       {
        
-        signatureLangCode: 'en',
-        text: activeTab.toLocaleLowerCase() === "signature" ? signatureMessage : statusMessage,
-        signatureType: activeTab.toLocaleLowerCase() === "signature" ? "BUSINESS_CARD" : "STATUS",
+        signatureLangCode: lang,
+        text: activeTab === configText.config.configText ? signatureMessage : statusMessage,
+        signatureType: activeTab === configText.config.configText ? "BUSINESS_CARD" : "STATUS",
         department: "HR",
       },
       {
@@ -183,7 +186,7 @@ const EditSignature: React.FC = () => {
       setModalSubMessage('Your post contains content that voilates our guidelines.')
       setShowModal(true);
     } else {
-      if(activeTab.toLocaleLowerCase() === 'signature'){
+      if(activeTab === configText.config.signature){
         dispatch(setSignatureMessage(value))
       }else{
         dispatch(setStatusMessage(value))
@@ -202,7 +205,7 @@ const EditSignature: React.FC = () => {
 
 
 
-  const flashMessageToShow = activeTab.toLocaleLowerCase() === 'signature' ? signatureMessage : statusMessage
+  const flashMessageToShow = activeTab === configText.config.signature ? signatureMessage : statusMessage
   return (
     <Container>
       {loader && <Loader/>}
@@ -211,24 +214,24 @@ const EditSignature: React.FC = () => {
         <HamburgerMenu onClick={toggleSidebar}>☰</HamburgerMenu>
         <CallSignatureHeader>
           <Logo src={logo} alt="Call Signature" />
-          <Title>Call Signature</Title>
+          <Title>{configText.config.callSignature}</Title>
         </CallSignatureHeader>
         <NotificationsIcon />
       </Header>
       <Content>
       <SignatrueTabs/>
         <FlashMessageContainer>
-          <FlashMessageTitle>Flash Message</FlashMessageTitle>
+          <FlashMessageTitle>{configText.config.flashMessage}</FlashMessageTitle>
           <FlashMessageInput
             value={flashMessageToShow}
             onChange={handleInputChange}
             maxLength={100}
           />
-          <p>{flashMessageToShow.length}/100 characters</p>
+          <p>{flashMessageToShow.length}/100 {configText.config.characters}</p>
         </FlashMessageContainer>
         <ButtonContainer>
-          <Button onClick={handleSaveToTemplates}>Save To Templates</Button>
-          <Button primary onClick={handleDone}>Done</Button>
+          <Button onClick={handleSaveToTemplates}>{configText.config.saveToTemplates}</Button>
+          <Button primary onClick={handleDone}>{configText.config.done}</Button>
         </ButtonContainer>
       </Content>
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />

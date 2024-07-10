@@ -10,9 +10,12 @@ import axios from "axios";
 import Modal from '../modal/Modal';
 import SignatrueTabs from '../signatureTabs/SignatureTabs';
 import { setStatusMessage, setSignatureMessage } from '../../redux/slices/DashboardSlice';
-import { setFirstTimeModal } from '../../redux/slices/UserTypeSlice';
+import { setFirstTimeModal, setMediaContent } from '../../redux/slices/UserTypeSlice';
 import { setPrivacy, setTerms } from '../../redux/slices/PrivacyPolicySlice';
+import Switch from '@mui/material/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Loader from '../loader/Loader';
+import { API_END_POINT } from '../../services/Constant';
 
 const Container = styled.div`
   display: flex;
@@ -40,6 +43,55 @@ const Title = styled.h1`
 const HamburgerMenu = styled.div`
   font-size: 24px;
   cursor: pointer;
+`;
+
+const ToggleContainer = styled.div`
+  display: flex;
+  align-items: center;
+
+  margin-bottom: 10px;
+`;
+
+const ToggleLabel = styled.label`
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+`;
+
+const ToggleInput = styled.input`
+  opacity: 0;
+  width: 0;
+  height: 0;
+  &:checked + span {
+    background-color: green;
+  }
+  &:checked + span:before {
+    transform: translateX(26px);
+  }
+`;
+
+const ToggleSlider = styled.span`
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+  &:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
 `;
 
 const Content = styled.div`
@@ -139,6 +191,11 @@ const BusinessCardTitleText = styled.p`
   color: #555;
 `;
 
+const ToggleButton = styled.div`
+display:flex;
+
+`
+
 const Dashboard: React.FC = () => {
 
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -150,18 +207,19 @@ const Dashboard: React.FC = () => {
   const [loader, setLoader] = useState<boolean>(false);
   const [signatureTemplates, setSignatureTemplates] = useState<string[]>([]);
   const [statusTemplates, setStatusTemplates] = useState<string[]>([]);
-  const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
-  const loginUrl = "/api/login"
+  const [toggleChecked, setToggleChecked] = useState(false);
+  const baseUrl = "http://172.16.11.222:8092/crbtSignature/v1";
   const privacyContent = "/api/privacy-content";
 
   const { statusMessage, signatureMessage, globalShowModal, } = useSelector((state: RootState) => state.dashboard);
+  const { lang,languages } = useSelector((state: RootState) => state.lang);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
   const { token, userId, firstTimeModal } = useSelector((state: RootState) => state.user);
+  const configText = useSelector((state: RootState) => state.configText);
 
   const dispatch = useDispatch();
 
 
-  console.log(token, 'token')
 
   const navigate = useNavigate()
 
@@ -172,8 +230,10 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
 
     getTemplate()
-    getTermsNcondition()
-    showSucessSubscriber()
+    getInfo()
+    getMediaContent()
+    // getTermsNcondition()
+    // showSucessSubscriber()
   }, [])
 
   const getTermsNcondition = async () => {
@@ -181,7 +241,7 @@ const Dashboard: React.FC = () => {
     const response = await axios.get(baseUrl + privacyContent, {
       headers: {
         Authorization: `Bearer ${token}`,
-        langCode: 'en',
+        langCode: lang,
       },
 
     })
@@ -200,13 +260,12 @@ const Dashboard: React.FC = () => {
 
   const getTemplate = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/signature/get-templates/${userId}`, {
+      const response = await axios.get(`${baseUrl}`+API_END_POINT.getTemplates+userId, {
         headers: {
           Authorization: `Bearer ${token}`,
-          langCode: 'en',
+          langCode: lang,
         },
       })
-      console.log(response)
       const { businessCard, statusCard } = response.data.response;
       setSignatureTemplates(businessCard);
       setStatusTemplates(statusCard);
@@ -215,6 +274,52 @@ const Dashboard: React.FC = () => {
     }
   }
 
+  const getInfo = async () => {
+    try {
+      const response = await axios.get(`${baseUrl}`+API_END_POINT.getInfo, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          langCode: lang,
+        },
+      })
+    
+      // const {signatureData} = response.data.response;
+      preprocessData(response.data.response)
+      
+
+      // const { businessCard, statusCard } = response.data.response;
+      
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+
+  // preprocessing and setting the status / signature which already set
+  const preprocessData = (data: any) => {
+    if (data) {
+      const { signatureData } = data;
+     
+      const businessCard = signatureData.find(
+        (sig:any) => sig.signatureType === "BUSINESS_CARD"
+      );
+      const statusCard = signatureData.find(
+        (sig:any) => sig.signatureType === "STATUS"
+      );
+      // dispatch(setSignatureIDData(businessCard));
+      // dispatch(setStatusIDData(statusCard));
+      if (businessCard) {
+
+        // setMessageForPhone(businessCard.text)
+        dispatch(setSignatureMessage(businessCard.text));
+      }
+
+      if (statusCard) {
+        dispatch(setStatusMessage(statusCard.text));
+      }
+    }
+  };
+  
   const setCardMessage = (template: any) => {
 
     if (activeTab.toLocaleLowerCase() === 'signature') {
@@ -224,9 +329,26 @@ const Dashboard: React.FC = () => {
     }
   }
 
+  const getMediaContent = async()=>{
+    try{
+      const response = await axios.get(API_END_POINT.mediaContent)
+    
+    dispatch(setMediaContent(response.data.response))
+    }catch(err){
+      
+    }
+    
+  }
+
   const closeModal = () => {
     setShowModal(false);
     dispatch(setFirstTimeModal(false))
+  };
+
+  const handleToggleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setToggleChecked(event.target.checked);
+    // Handle the toggle change event
+    
   };
 
   const template = activeTab.toLocaleLowerCase() === 'signature' ? signatureTemplates : statusTemplates
@@ -240,26 +362,42 @@ const Dashboard: React.FC = () => {
         <HamburgerMenu onClick={toggleSidebar}>☰</HamburgerMenu>
         <CallSignatureHeader>
           <Logo src={logo} alt="Call Signature" />
-          <Title>Call Signature</Title>
+          <Title>{configText.config.callSignature}</Title>
         </CallSignatureHeader>
         <NotificationsIcon onClick={() => setShowModal((p) => !p)} />
       </Header>
       <Content>
         <SignatrueTabs />
         <FlashMessageContainer>
-          <FlashMessageTitle>Flash Message</FlashMessageTitle>
+          <FlashMessageTitle>{configText.config.flashMessage}</FlashMessageTitle>
           <FlashMessageContent>
             {flashMessageToShow}
           </FlashMessageContent>
+          
           <FlashMessageStatus>Active</FlashMessageStatus>
           <ButtonContainer>
-            <Button onClick={() => navigate('/preview')}>Preview</Button>
-            <Button primary onClick={() => navigate('/edit-signature')}>Edit Signature</Button>
+            <Button onClick={() => navigate('/preview')}>{configText.config.preview}</Button>
+            <Button primary onClick={() => navigate('/edit-signature')}>{configText.config.editSignature}</Button>
           </ButtonContainer>
+          <ToggleButton>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={toggleChecked}
+                onChange={handleToggleChange}
+                name="toggleSwitch"
+                color="success"
+                inputProps={{ 'aria-label': 'primary checkbox' }}
+              />
+            }
+            label={toggleChecked?configText.config.signature:configText.config.subscribeActive}
+          />
+          </ToggleButton>
+          
         </FlashMessageContainer>
         <BusinessCardContainer>
-          <BusinessCardTitle>Template Business Cards</BusinessCardTitle>
-          {template.map((template, index) => (
+          <BusinessCardTitle>{configText.config.templateBusinessCard}</BusinessCardTitle>
+          {template?.map((template, index) => (
             <BusinessCard onClick={() => setCardMessage(template)}>
               <BusinessCardTitleText key={index}>{template}</BusinessCardTitleText>
             </BusinessCard>
@@ -272,3 +410,6 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
+
+
+

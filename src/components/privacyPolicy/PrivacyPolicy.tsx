@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import profilePic from '../../assets/profilePic.jpg'; // Replace with your profile picture path
-import AccountBoxSharpIcon from '@mui/icons-material/AccountBoxSharp';
+
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
 import { RootState } from '../../redux/store';
 import { useSelector } from 'react-redux';
@@ -99,6 +98,7 @@ width: 100%;
 const PrivacyPolicy: React.FC = () => {
     const navigate = useNavigate();
     const { privacyPolicy} = useSelector((state: RootState) => state.terms);
+    const configText = useSelector((state: RootState) => state.configText);
 
     const handleBack = () => {
         navigate(-1);
@@ -110,7 +110,7 @@ const PrivacyPolicy: React.FC = () => {
             <HeaderContainer>
                 <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
                 <Header>
-                    <Title>Privacy Policy</Title>
+                    <Title>{configText.config.privacyPolicy}</Title>
                 </Header>
             </HeaderContainer>
 

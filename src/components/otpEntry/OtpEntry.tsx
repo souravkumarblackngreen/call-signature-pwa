@@ -10,6 +10,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import Loader from '../loader/Loader';
 import axios from 'axios';
+import { API_END_POINT } from '../../services/Constant';
+import { configDotenv } from 'dotenv';
 
 const Container = styled.div<{ isLoading: boolean }>`
   display: flex;
@@ -123,9 +125,9 @@ const OtpEntry: React.FC = () => {
   const dispatch = useDispatch();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
-  const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
-  const loginUrl = "/api/login";
-
+  const { phoneNumber,selectedPlan } = useSelector((state: RootState) => state.user);
+  const configText = useSelector((state: RootState) => state.configText);
+  
   const handleChange = (value: string, index: number) => {
     if (/^[0-9]$/.test(value)) {
       const newOtp = [...otp];
@@ -164,14 +166,11 @@ const OtpEntry: React.FC = () => {
     if (otp.join('').length === 4) {
       // Assuming you have a success page
       dispatch(startLoading());
-      const response = await axios.post(baseUrl + loginUrl, {
-        'userName': 'sourav.kumar@blackngreen.com',
-        'password': 'Sourav@123'
-      });
+      const response = await axios.get(`${API_END_POINT.baseUrl + API_END_POINT.validateOTP}?msisdn=${phoneNumber}&message=${otp.join('')}`);
 
       if (response.status === 200) {
         const { refreshToken, token, userId, userType } = response.data.response;
-        console.log(token, 'ss');
+       
         navigate('/dashboard');
         dispatch(stopLoading());
         dispatch(setToken(token));
@@ -181,15 +180,26 @@ const OtpEntry: React.FC = () => {
     }
   };
 
-  const login = async () => {
-    const response = await axios.post(baseUrl + loginUrl, {
-      'userName': 'sourav.kumar@blackngreen.com',
-      'password': 'Sourav@123'
-    });
-    console.log(response);
-  };
+ 
 
+  const handleResendOTP= async()=>{
+    dispatch(startLoading());
+    try{
+      
+        const response = await axios.get(API_END_POINT.baseUrl+API_END_POINT.resendOTP+`?msisdn=${phoneNumber}&message=${selectedPlan}`)
+      
+        if(response.status == 200){
+       
+          dispatch(stopLoading())
+        }
+      
+    }
+    catch{
+
+    }
+  }
   const isOtpComplete = otp.every(value => value !== '');
+
 
   return (
     <>
@@ -200,9 +210,9 @@ const OtpEntry: React.FC = () => {
         <LanguageDropdown />
         <CallSignatureHeader>
           <Logo src={logo} alt="Call Signature" />
-          <Title>Call Signature</Title>
+          <Title>{configText.config.callSignature}</Title>
         </CallSignatureHeader>
-        <Subtitle>Enter OTP</Subtitle>
+        <Subtitle>{configText.config.enterOTP}</Subtitle>
         <OtpContainer>
           {otp.map((value, index) => (
             <OtpInput
@@ -216,11 +226,11 @@ const OtpEntry: React.FC = () => {
             />
           ))}
         </OtpContainer>
-        <Disclaimer>OTP has been sent to your phone number +91 9876543210</Disclaimer>
+        <Disclaimer>{configText.config.otpSent+ phoneNumber}</Disclaimer>
         <Disclaimer style={{ color: 'grey' }}>
-          Didn't receive OTP? <ResendOtp>Resend OTP</ResendOtp>
+          {configText.config.resendOtpText}<ResendOtp onClick={handleResendOTP}>{configText.config.resendOtp}</ResendOtp>
         </Disclaimer>
-        <LoginButton onClick={handleLogin} disabled={!isOtpComplete}>Login</LoginButton>
+        <LoginButton onClick={handleLogin} disabled={!isOtpComplete}>{configText.config.login}</LoginButton>
       </Container>
     </>
   );

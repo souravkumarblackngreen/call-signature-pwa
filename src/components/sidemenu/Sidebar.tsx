@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import logo from '../../assets/logo.png';
-import { Navigate, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { RootState } from '../../redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import { API_END_POINT } from '../../services/Constant';
+import { setConfigText } from '../../redux/slices/GloabalTextDataSlice';
+import { setLanguage } from '../../redux/slices/LanguageSlice';
+
 
 const SidebarContainer = styled.div<{ isOpen: boolean }>`
   position: fixed;
@@ -77,14 +84,59 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const [isLanguageOpen, setLanguageOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('English');
+  const { lang,languages } = useSelector((state: RootState) => state.lang);
+  const dispatch = useDispatch();
+  const { token, userId } = useSelector((state: RootState) => state.user);
+  // const { getData,handleLanguageChangeData, showModalApi, isLoading, retryApiCall,error  } = useCommonServices();
 
   const toggleLanguageMenu = () => {
     setLanguageOpen(!isLanguageOpen);
   };
 
+
+
   const handleLanguageSelect = (language: string) => {
-    setSelectedLanguage(language);
+    dispatch(setLanguage(language));
+  };
+
+  useEffect(() => {
+    handleLanguageChangeData();
+  }, [lang]);
+
+  const handleLanguageChangeData = async () => {
+    try {
+      const response = await axios.get(
+        `${API_END_POINT.baseUrl+API_END_POINT.getAllData}/${lang}`
+      );
+      
+      if (response.data.statuscode == 200) {
+        dispatch(setConfigText(response.data.response));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+const Unsubscribe = async () => {
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'langCode':'en'
+      },
+      data: [
+        0
+      ]
+    };
+    try {
+      const response = await axios.delete(`${API_END_POINT.baseUrl+API_END_POINT.unsubscribe}`,config);
+      
+      if (response.data.statuscode == 200) {
+        dispatch(setConfigText(response.data.response));
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -102,19 +154,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       </MenuItem>
       {isLanguageOpen && (
         <SubMenuContainer>
-          <SubMenuItem onClick={() => handleLanguageSelect('English')}>
-            {selectedLanguage === 'English' && <CheckCircleOutlineIcon style={{ marginRight: '5px' }} />}
-            English
-          </SubMenuItem>
-          <SubMenuItem onClick={() => handleLanguageSelect('French')}>
-            {selectedLanguage === 'French' && <CheckCircleOutlineIcon style={{ marginRight: '5px' }} />}
-            French
-          </SubMenuItem>
+          {languages.map((language:any) => (
+            <SubMenuItem key={language.languageCode} onClick={() => handleLanguageSelect(language.languageCode)}>
+              {lang === language.languageCode && <CheckCircleOutlineIcon style={{ marginRight: '5px' }} />}
+              {language.languageName}
+            </SubMenuItem>
+          ))}
         </SubMenuContainer>
       )}
       <MenuItem onClick={() => navigate('/termsNconditions')}>Terms & Conditions</MenuItem>
       <MenuItem onClick={() => navigate('/privacy-policy')}>Privacy Policy</MenuItem>
-      <MenuItem>Unsubscribe</MenuItem>
+      <MenuItem onClick={()=> Unsubscribe()}>Unsubscribe</MenuItem>
     </SidebarContainer>
   );
 };

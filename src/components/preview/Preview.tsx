@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import mobileFrame from '../../assets/callScreen.png';
 import notch from '../../assets/notch.png';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
-import Loader from '../loader/Loader';
+
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 
@@ -116,6 +116,8 @@ const Preview: React.FC = () => {
   const navigate = useNavigate();
   const { statusMessage, signatureMessage , globalShowModal} = useSelector((state: RootState) => state.dashboard);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
+  const { userId} = useSelector((state: RootState) => state.user);
+  const configText = useSelector((state: RootState) => state.configText);
   
 
   const handleBack = () => {
@@ -129,16 +131,16 @@ const Preview: React.FC = () => {
       {/* {Loader && <Loader/>} */}
       <Header>
         <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
-        <Title>Preview</Title>
+        <Title>{configText.config.preview}</Title>
         <div style={{ width: '24px' }} /> {/* Placeholder to balance the header */}
       </Header>
       <Content>
         <MobileFrame>
           <PreviewContent>
             <MobileNotch/>
-            <PhoneNumber>+251 923244566</PhoneNumber>
+            <PhoneNumber>+91-{userId}</PhoneNumber>
             <FlashMessageContainer>
-              <FlashMessageTitle>Flash Message</FlashMessageTitle>
+              <FlashMessageTitle>{configText.config.flashMessage}</FlashMessageTitle>
               <FlashMessageContent>
                 {flashMessageToShow}
               </FlashMessageContent>

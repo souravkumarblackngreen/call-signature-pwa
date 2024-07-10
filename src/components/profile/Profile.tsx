@@ -108,6 +108,7 @@ const Profile: React.FC = () => {
     const profileUrl = "/user/profile"
     const dispatch = useDispatch();
     const [loader, setLoader] = useState<boolean>(false);
+    const configText = useSelector((state: RootState) => state.configText);
 
     const handleBack = () => {
         navigate(-1);
@@ -154,7 +155,7 @@ const Profile: React.FC = () => {
             <HeaderContainer>
                 <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
                 <Header>
-                    <Title>Profile</Title>
+                    <Title>{configText.config.profile}</Title>
                 </Header>
             </HeaderContainer>
 

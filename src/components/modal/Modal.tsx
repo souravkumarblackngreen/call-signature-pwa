@@ -2,7 +2,7 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { PiSmileySad } from "react-icons/pi";
 import { FaCheck } from "react-icons/fa";
-// import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
 
 const fadeIn = keyframes`
   from {

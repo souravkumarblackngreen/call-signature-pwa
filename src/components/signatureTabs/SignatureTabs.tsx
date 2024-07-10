@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useDispatch, useSelector } from 'react-redux';
@@ -36,20 +36,25 @@ const SignatrueTabs: React.FC = () => {
     // const [activeTab, setActiveTab] = useState('Signature');
     const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
     const dispatch = useDispatch();
+    const configText = useSelector((state: RootState) => state.configText);
+
+    useEffect(()=>{
+        dispatch(setActiveTab(configText.config.signature))
+    },[])
     return (
         <div className='hello'>
                     <TabsContainer>
-                        <Tab active={activeTab === 'Signature'} onClick={() => dispatch(setActiveTab('Signature'))}>
-                            Signature
+                        <Tab active={activeTab === configText.config.signature} onClick={() => dispatch(setActiveTab(configText.config.signature))}>
+                            {configText.config.signature}
                         </Tab>
-                        <Tab active={activeTab === 'Status'} onClick={() => dispatch(setActiveTab('Status'))}>
-                            Status
+                        <Tab active={activeTab === configText.config.status} onClick={() => dispatch(setActiveTab(configText.config.status))}>
+                        {configText.config.status}
                         </Tab>
 
                     </TabsContainer>
                     <InfoContainer>
                         <InfoOutlinedIcon sx={{ 'fontSize': '1rem' }} />
-                        <span>The Requested verification is in process.</span>
+                        <span>{configText.config.verificationInProcess}</span>
                     </InfoContainer>
 
                 </div>
