@@ -10,6 +10,7 @@ import SignatrueTabs from '../signatureTabs/SignatureTabs';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setStatusMessage, setSignatureMessage } from '../../redux/slices/DashboardSlice';
+import { API_END_POINT } from '../../services/Constant';
 import axios from 'axios';
 import { resolve } from 'path';
 import Loader from '../loader/Loader';
@@ -112,7 +113,7 @@ const ButtonContainer = styled.div`
 const Button = styled.button<{ primary?: boolean }>`
   background: ${(props) => (props.primary ? '#0032DF' : 'white')};
   color: ${(props) => (props.primary ? 'white' : '#0032DF')};
-  border: 1px solid ${(props) => (props.primary ? '#0032DF' : '#0032DF')};
+  border: 1px solid #0032DF;
   border-radius: 25px;
   padding: 10px 20px;
   cursor: pointer;
@@ -138,8 +139,7 @@ const EditSignature: React.FC = () => {
   const [modalSubMessage, setModalSubMessage] = useState('')
   const configText = useSelector((state: RootState) => state.configText);
 
-  const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
-  const updateSignature="/signature/update";
+
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -152,7 +152,7 @@ const EditSignature: React.FC = () => {
     // Implement save to templates logic
     setLoader(true)
     const response = await axios.post(
-      baseUrl + "/signature/update",
+      API_END_POINT.baseUrl + "/signature/update",
       {
        
         signatureLangCode: lang,

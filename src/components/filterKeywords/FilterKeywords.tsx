@@ -111,7 +111,7 @@ const FilterKeywords: React.FC = () => {
   const [newKeyword, setNewKeyword] = useState<string>('');
   const { token, userId } = useSelector((state: RootState) => state.user);
   const configText = useSelector((state: RootState) => state.configText);
-  const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
+  const baseUrl = "http://172.16.11.222:5442/crbtSignature/v1";
 
   const [loader, setLoader] = useState<boolean>(false);
   const navigate = useNavigate();

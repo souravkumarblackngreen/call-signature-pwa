@@ -11,6 +11,15 @@ import axios from 'axios';
 import { API_END_POINT } from '../../services/Constant';
 import { setConfigText } from '../../redux/slices/GloabalTextDataSlice';
 import { setLanguage } from '../../redux/slices/LanguageSlice';
+import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
+import { resetConfigState } from '../../redux/slices/GloabalTextDataSlice';
+import { resetDashboardState } from '../../redux/slices/DashboardSlice';
+import { resetFilterState } from '../../redux/slices/FilterSlice';
+import { resetLanguageState } from '../../redux/slices/LanguageSlice';
+import { resetLoadingState } from '../../redux/slices/LoaderSlice';
+import { resetPrivacyPolicyState } from '../../redux/slices/PrivacyPolicySlice';
+import { resetProfileState } from '../../redux/slices/ProfileSlice';
+import { resetSignatureTabsState } from '../../redux/slices/SignatureTabsSlice';
 
 
 const SidebarContainer = styled.div<{ isOpen: boolean }>`
@@ -50,7 +59,7 @@ const MenuItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
+  flex-direction:column;
   &:hover {
     text-decoration: underline;
   }
@@ -76,6 +85,12 @@ const SubMenuContainer = styled.div`
   margin-left: 20px;
 `;
 
+const UnsubscribeButton = styled(MenuItem)`
+  margin-top: auto; /* Added this line to push it to the bottom */
+  margin-bottom:25%;
+`;
+
+
 interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
@@ -85,9 +100,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const [isLanguageOpen, setLanguageOpen] = useState(false);
   const { lang,languages } = useSelector((state: RootState) => state.lang);
+  const [menuData, setMenuData] = useState<[]>([]);
   const dispatch = useDispatch();
   const { token, userId } = useSelector((state: RootState) => state.user);
-  // const { getData,handleLanguageChangeData, showModalApi, isLoading, retryApiCall,error  } = useCommonServices();
+  const configText = useSelector((state: RootState) => state.configText);
+  
 
   const toggleLanguageMenu = () => {
     setLanguageOpen(!isLanguageOpen);
@@ -101,7 +118,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
   useEffect(() => {
     handleLanguageChangeData();
+    
   }, [lang]);
+
+  useEffect(()=>{
+    getMenu()
+  },[])
 
   const handleLanguageChangeData = async () => {
     try {
@@ -118,53 +140,93 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   };
 
 const Unsubscribe = async () => {
-    const config = {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'langCode':'en'
-      },
-      data: [
-        0
-      ]
-    };
+    
     try {
-      const response = await axios.delete(`${API_END_POINT.baseUrl+API_END_POINT.unsubscribe}`,config);
+      const response = await axios.delete(`${API_END_POINT.baseUrl+API_END_POINT.unsubscribe}`,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+          langCode: lang,
+        },
+      });
       
       if (response.data.statuscode == 200) {
-        dispatch(setConfigText(response.data.response));
+        dispatch(resetConfigState())
+        dispatch(resetDashboardState())
+        dispatch(resetFilterState())
+        dispatch(resetLanguageState())
+        dispatch(resetLoadingState())
+        dispatch(resetPrivacyPolicyState())
+        dispatch(resetProfileState())
+        dispatch(resetSignatureTabsState())
+        navigate('/')
       }
     } catch (error) {
       console.log(error);
     }
   };
 
+
+  const getMenu = async () => {
+    dispatch(startLoading())
+    try {
+      const response = await axios.get(API_END_POINT.baseUrl+API_END_POINT.sideMenu,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+          langCode: lang,
+        },
+      });
+      if (response.data.statuscode === 200) {
+        setMenuData(response.data.response);
+      }
+      dispatch(stopLoading())
+    } catch (error: any) {
+      dispatch(stopLoading())
+    
+    }
+  };
+
+
+  const renderMenuItem = (item: any) => {
+    switch (item.name) {
+      case 'languageIndi':
+        return (
+          <MenuItem key={item.name}>
+            <div onClick={toggleLanguageMenu} style={{ display: 'flex', alignItems: 'center' }}>
+            {configText.config[item.name]}
+              {isLanguageOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </div>
+            {isLanguageOpen && (
+              <SubMenuContainer>
+                {languages.map((language: any) => (
+                  <SubMenuItem key={language.languageCode} onClick={() => handleLanguageSelect(language.languageCode)}>
+                    {lang === language.languageCode && <CheckCircleOutlineIcon style={{ marginRight: '5px' }} />}
+                    {language.languageName}
+                  </SubMenuItem>
+                ))}
+              </SubMenuContainer>
+            )}
+          </MenuItem>
+        );
+      case 'unsubscribe':
+        return (
+          <MenuItem key={item.name} onClick={Unsubscribe}>
+            {configText.config[item.name]}
+          </MenuItem>
+        );
+      default:
+        return (
+          <MenuItem key={item.name} onClick={() => navigate(item.routePath)}>
+             {configText.config[item.name]}
+          </MenuItem>
+        );
+    }
+  };
   return (
     <SidebarContainer isOpen={isOpen}>
       <CloseButton onClick={toggleSidebar}>×</CloseButton>
       <Logo src={logo} alt="Call Signature" />
-      <MenuItem onClick={() => navigate('/profile')}>Profile</MenuItem>
-      <MenuItem onClick={() => navigate('/filter-keywords')}>Keywords</MenuItem>
-      <MenuItem onClick={() => navigate('/faq')}>FAQs</MenuItem>
-      <MenuItem>
-        <div onClick={toggleLanguageMenu} style={{ display: 'flex', alignItems: 'center' }}>
-          Language
-          {isLanguageOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        </div>
-      </MenuItem>
-      {isLanguageOpen && (
-        <SubMenuContainer>
-          {languages.map((language:any) => (
-            <SubMenuItem key={language.languageCode} onClick={() => handleLanguageSelect(language.languageCode)}>
-              {lang === language.languageCode && <CheckCircleOutlineIcon style={{ marginRight: '5px' }} />}
-              {language.languageName}
-            </SubMenuItem>
-          ))}
-        </SubMenuContainer>
-      )}
-      <MenuItem onClick={() => navigate('/termsNconditions')}>Terms & Conditions</MenuItem>
-      <MenuItem onClick={() => navigate('/privacy-policy')}>Privacy Policy</MenuItem>
-      <MenuItem onClick={()=> Unsubscribe()}>Unsubscribe</MenuItem>
+      {menuData.map((item: any) => renderMenuItem(item))}
+      <UnsubscribeButton onClick={Unsubscribe}>{'Unsubscribe'}</UnsubscribeButton>
     </SidebarContainer>
   );
 };

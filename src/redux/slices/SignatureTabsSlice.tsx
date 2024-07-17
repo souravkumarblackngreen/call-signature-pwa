@@ -17,12 +17,12 @@ const SignatureTabsSlice = createSlice({
           state.activeTab = action.payload;
         },
    
-    resetState: () => initialState,
+    resetSignatureTabsState: () => initialState,
   },
 });
 
 export const {
-    setActiveTab,
+    setActiveTab,resetSignatureTabsState
 } = SignatureTabsSlice.actions;
 
 export default SignatureTabsSlice.reducer;

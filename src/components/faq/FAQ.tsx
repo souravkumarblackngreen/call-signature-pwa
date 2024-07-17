@@ -12,6 +12,7 @@ import axios from 'axios';
 import { API_END_POINT } from '../../services/Constant';
 import { RootState } from '../../redux/store';
 import { useSelector } from 'react-redux';
+import { getData } from '../../services/Services';
 
 const Container = styled.div`
   display: flex;
@@ -46,16 +47,6 @@ margin-left: 20px;
 background:white;
 `;
 
-const LogoContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
-
-const Logo = styled.img`
-  width: 32px;
-  height: 32px;
-`;
 
 const Title = styled.div`
   font-size: 1.3rem;
@@ -126,13 +117,13 @@ const FAQ: React.FC = () => {
   
   const getFAQ = async()=>{
     try{
-      const response = await axios.get(API_END_POINT.baseUrl+API_END_POINT.getFAQ,{
+      const response = await getData(API_END_POINT.getFAQ,{
         headers: {
           Authorization: `Bearer ${token}`,
           langCode: lang,
         },
       })
-      setFaqs(response.data.response.faqs)
+      setFaqs(response.faqs)
     
     }
     catch{

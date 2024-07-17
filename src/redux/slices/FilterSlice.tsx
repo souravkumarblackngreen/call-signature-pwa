@@ -17,12 +17,12 @@ const FilterKeyWordsSlice = createSlice({
           state.keywords = action.payload;
         },
    
-    resetState: () => initialState,
+    resetFilterState: () => initialState,
   },
 });
 
 export const {
-    setKeywords,
+    setKeywords,resetFilterState
 } = FilterKeyWordsSlice.actions;
 
 export default FilterKeyWordsSlice.reducer;

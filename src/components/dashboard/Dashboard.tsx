@@ -10,12 +10,14 @@ import axios from "axios";
 import Modal from '../modal/Modal';
 import SignatrueTabs from '../signatureTabs/SignatureTabs';
 import { setStatusMessage, setSignatureMessage } from '../../redux/slices/DashboardSlice';
-import { setFirstTimeModal, setMediaContent } from '../../redux/slices/UserTypeSlice';
+import { setFirstTimeModal } from '../../redux/slices/UserTypeSlice';
 import { setPrivacy, setTerms } from '../../redux/slices/PrivacyPolicySlice';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Loader from '../loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
+import {getData} from '../../services/Services'
+import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 
 const Container = styled.div`
   display: flex;
@@ -45,55 +47,6 @@ const HamburgerMenu = styled.div`
   cursor: pointer;
 `;
 
-const ToggleContainer = styled.div`
-  display: flex;
-  align-items: center;
-
-  margin-bottom: 10px;
-`;
-
-const ToggleLabel = styled.label`
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-`;
-
-const ToggleInput = styled.input`
-  opacity: 0;
-  width: 0;
-  height: 0;
-  &:checked + span {
-    background-color: green;
-  }
-  &:checked + span:before {
-    transform: translateX(26px);
-  }
-`;
-
-const ToggleSlider = styled.span`
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: .4s;
-  border-radius: 34px;
-  &:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-  }
-`;
-
 const Content = styled.div`
   flex: 1;
   width: 100%;
@@ -110,10 +63,6 @@ const Logo = styled.img`
   width: 32px;
   height: 32px;
 `;
-
-
-
-
 
 const FlashMessageContainer = styled.div`
   background: #fff;
@@ -181,10 +130,7 @@ const BusinessCard = styled.div`
   }
 `;
 
-const BusinessCardName = styled.p`
-  font-size: 1rem;
-  font-weight: bold;
-`;
+
 
 const BusinessCardTitleText = styled.p`
   font-size: 0.9rem;
@@ -203,64 +149,43 @@ const Dashboard: React.FC = () => {
   const [modalMessage, setModalMessage] = useState('');
   const [modalSubMessage, setModalSubMessage] = useState('');
   const [modalType, setModalType] = useState('');
-  const [flashMessage, setFlashMessage] = useState('Henry, Sales Manager, I am here to scam you')
-  const [loader, setLoader] = useState<boolean>(false);
+  const [modalButtonLabel,setModalButtonLabel] = useState('')
+ 
+  // const [loader, setLoader] = useState<boolean>(false);
   const [signatureTemplates, setSignatureTemplates] = useState<string[]>([]);
   const [statusTemplates, setStatusTemplates] = useState<string[]>([]);
   const [toggleChecked, setToggleChecked] = useState(false);
-  const baseUrl = "http://172.16.11.222:8092/crbtSignature/v1";
-  const privacyContent = "/api/privacy-content";
-
-  const { statusMessage, signatureMessage, globalShowModal, } = useSelector((state: RootState) => state.dashboard);
-  const { lang,languages } = useSelector((state: RootState) => state.lang);
+ 
+  const { statusMessage, signatureMessage, } = useSelector((state: RootState) => state.dashboard);
+  const { lang  } = useSelector((state: RootState) => state.lang);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
   const { token, userId, firstTimeModal } = useSelector((state: RootState) => state.user);
+  const { isLoading } = useSelector((state: RootState) => state.loader);
   const configText = useSelector((state: RootState) => state.configText);
 
   const dispatch = useDispatch();
-
-
-
   const navigate = useNavigate()
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!isSidebarOpen);
-  };
-
   useEffect(() => {
-
     getTemplate()
     getInfo()
-    getMediaContent()
-    // getTermsNcondition()
-    // showSucessSubscriber()
+    getTermsNcondition()
   }, [])
 
-  const getTermsNcondition = async () => {
-    setLoader(true)
-    const response = await axios.get(baseUrl + privacyContent, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        langCode: lang,
-      },
-
-    })
-    const { privacyPolicy, tearmsAndCondition } = response.data.response
-    setLoader(false)
-    dispatch(setPrivacy(privacyPolicy))
-    dispatch(setTerms(tearmsAndCondition))
-
-  }
+ 
 
 
   const showSucessSubscriber = () => {
     setModalMessage('You have sucessfully subscribed to this services.')
     setModalType('success')
+    setModalButtonLabel('Explore')
+    setModalSubMessage(' ')
   }
 
   const getTemplate = async () => {
+    dispatch(startLoading())
     try {
-      const response = await axios.get(`${baseUrl}`+API_END_POINT.getTemplates+userId, {
+      const response = await axios.get(`${API_END_POINT.baseUrl}`+API_END_POINT.getTemplates+userId, {
         headers: {
           Authorization: `Bearer ${token}`,
           langCode: lang,
@@ -269,28 +194,46 @@ const Dashboard: React.FC = () => {
       const { businessCard, statusCard } = response.data.response;
       setSignatureTemplates(businessCard);
       setStatusTemplates(statusCard);
+      dispatch(stopLoading())
     } catch (e) {
       console.log(e)
+      dispatch(stopLoading())
+      setErrorModalMessage()
     }
+  }
+  const getTermsNcondition = async () => {
+    dispatch(startLoading())
+    const response = await getData(API_END_POINT.privacyContent, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        langCode: lang,
+      },
+
+    })
+    const { privacyPolicy, tearmsAndCondition } = response
+    dispatch(stopLoading())
+    dispatch(setPrivacy(privacyPolicy))
+    dispatch(setTerms(tearmsAndCondition))
+
   }
 
   const getInfo = async () => {
+    dispatch(startLoading())
     try {
-      const response = await axios.get(`${baseUrl}`+API_END_POINT.getInfo, {
+      const response = await getData(API_END_POINT.getInfo, {
         headers: {
           Authorization: `Bearer ${token}`,
           langCode: lang,
         },
       })
     
-      // const {signatureData} = response.data.response;
-      preprocessData(response.data.response)
-      
-
-      // const { businessCard, statusCard } = response.data.response;
-      
+      preprocessData(response)
+      showSucessSubscriber()
+      dispatch(stopLoading())
     } catch (e) {
       console.log(e)
+      dispatch(stopLoading())
+      setErrorModalMessage()
     }
   }
 
@@ -306,11 +249,9 @@ const Dashboard: React.FC = () => {
       const statusCard = signatureData.find(
         (sig:any) => sig.signatureType === "STATUS"
       );
-      // dispatch(setSignatureIDData(businessCard));
-      // dispatch(setStatusIDData(statusCard));
+    
+     
       if (businessCard) {
-
-        // setMessageForPhone(businessCard.text)
         dispatch(setSignatureMessage(businessCard.text));
       }
 
@@ -329,35 +270,57 @@ const Dashboard: React.FC = () => {
     }
   }
 
-  const getMediaContent = async()=>{
-    try{
-      const response = await axios.get(API_END_POINT.mediaContent)
-    
-    dispatch(setMediaContent(response.data.response))
-    }catch(err){
-      
+
+  const handleToggleChange = async(event: React.ChangeEvent<HTMLInputElement>) => {
+    setToggleChecked(event.target.checked);
+    const action = event.target.checked ? "PUBLISH" : "UNPUBLISH";
+    dispatch(startLoading())
+    try {
+      const response= await axios.post(`http://172.16.11.222:5442/crbtSignature/v1/dashboard/signature-action/${action}`, [], {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          langCode: lang,
+        },
+      });
+      setModalMessage(`Signature ${action.toLowerCase()}ed successfully.`);
+      setModalType('success');
+      dispatch(stopLoading())
+    } catch (err) {
+      setErrorModalMessage()
+      dispatch(stopLoading())
     }
-    
-  }
+    setShowModal(true);
+  };
 
   const closeModal = () => {
     setShowModal(false);
     dispatch(setFirstTimeModal(false))
   };
 
-  const handleToggleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setToggleChecked(event.target.checked);
-    // Handle the toggle change event
+  const setErrorModalMessage = () =>{
+    setModalMessage('Seems like there was a problem with your request.')
+    setModalSubMessage('Please try again later.')
+    setModalType('error')
+    setModalButtonLabel('Close')
     
+  }
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen);
   };
+
+  
+
+
+  
 
   const template = activeTab.toLocaleLowerCase() === 'signature' ? signatureTemplates : statusTemplates
   const flashMessageToShow = activeTab.toLocaleLowerCase() === 'signature' ? signatureMessage : statusMessage
   const modalToShow = firstTimeModal || showModal
   return (
     <Container>
-      {loader && <Loader />}
-      <Modal show={modalToShow} onClose={closeModal} message={modalMessage} type={modalType} subMessage={modalSubMessage} />
+      {isLoading && <Loader />}
+      <Modal show={modalToShow} onClose={closeModal} message={modalMessage} type={modalType} subMessage={modalSubMessage} buttonLabel={modalButtonLabel} />
       <Header>
         <HamburgerMenu onClick={toggleSidebar}>☰</HamburgerMenu>
         <CallSignatureHeader>

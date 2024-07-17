@@ -16,8 +16,9 @@ const globalTextDataSlice = createSlice({
     setConfigText: (state, action: PayloadAction<Config["config"]>) => {
       state.config = action.payload;
     },
+    resetConfigState: () => initialState,
   },
 });
 
-export const { setConfigText } = globalTextDataSlice.actions;
+export const { setConfigText, resetConfigState } = globalTextDataSlice.actions;
 export default globalTextDataSlice.reducer;

@@ -8,7 +8,8 @@ import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../loader/Loader';
 import axios from 'axios';
-import { setSubscriptionDate,setNextRenewal,setSubscriptionPlan,setPhoneNo} from '../../redux/slices/ProfileSlice';
+import { setSubscriptionDate, setNextRenewal, setSubscriptionPlan, setPhoneNo } from '../../redux/slices/ProfileSlice';
+import { formatDate } from '../../services/Services';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -99,84 +100,100 @@ width: 100%;
 
 
 const Profile: React.FC = () => {
-    
 
-    const navigate = useNavigate();
-    const { SubscriptionPlan, SubscriptionDate ,NextRenewal ,PhoneNo} = useSelector((state: RootState) => state.profile);
-    const { token,userId } = useSelector((state: RootState) => state.user);
-    const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
-    const profileUrl = "/user/profile"
-    const dispatch = useDispatch();
-    const [loader, setLoader] = useState<boolean>(false);
-    const configText = useSelector((state: RootState) => state.configText);
 
-    const handleBack = () => {
-        navigate(-1);
-    };
+  const navigate = useNavigate();
+  const { SubscriptionPlan, SubscriptionDate, NextRenewal, PhoneNo } = useSelector((state: RootState) => state.profile);
+  const { token, userId } = useSelector((state: RootState) => state.user);
+  const baseUrl = "http://172.16.11.222:5442/crbtSignature/v1";
+  const profileUrl = "/user/profile"
+  const dispatch = useDispatch();
+  const [loader, setLoader] = useState<boolean>(false);
+  const configText = useSelector((state: RootState) => state.configText);
 
-    const getUserProfile = async () => {
-      setLoader(true);
-      try {
-        const response = await axios.get(baseUrl+profileUrl,{
-          headers: {
-            Authorization:  `Bearer ${token}`,
-            langCode: 'en',
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const getUserProfile = async () => {
+    setLoader(true);
+    try {
+      const response = await axios.get(baseUrl + profileUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          langCode: 'en',
         },
-        });
-        setLoader(false);
-        const{
-          planStartDate,
-          planEndDate,
-          userId,
-          amount
+      });
+      setLoader(false);
+      const {
+        planStartDate,
+        planEndDate,
+        userId,
+        amount,
+        duration
+      } = response.data.response
 
-          } = response.data.response 
-        console.log(planStartDate        ,'profile');
-        dispatch(setPhoneNo(userId))
-        dispatch(setSubscriptionDate(planStartDate))
-        dispatch(setNextRenewal(planEndDate))
-        dispatch(setSubscriptionPlan(amount))
+      dispatch(setPhoneNo(userId))
+      dispatch(setSubscriptionDate(planStartDate))
+      dispatch(setNextRenewal(planEndDate))
+      dispatch(setSubscriptionPlan(duration))
 
-      } catch (error: any) {
-        setLoader(false);
-       
-      }
-    };
-    useEffect(() => {
 
-      getUserProfile();
-    }, []);
+    } catch (error: any) {
+      setLoader(false);
 
-    
-    console.log(SubscriptionDate)
-    return (
-        <Container>
-          {loader && <Loader/>}
-            <HeaderContainer>
-                <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
-                <Header>
-                    <Title>{configText.config.profile}</Title>
-                </Header>
-            </HeaderContainer>
+    }
+  };
+  useEffect(() => {
 
-            <ProfileCard>
-                <AccountBoxSharpIcon fontSize='large'/>
-                <PhoneNumber>{PhoneNo}</PhoneNumber>
-                <InfoContainer>
-                    <InfoLabel>Subscription Plan:</InfoLabel>
-                    <InfoValue>{SubscriptionPlan}</InfoValue>
-                </InfoContainer>
-                <InfoContainer>
-                    <InfoLabel>Subscription Date:</InfoLabel>
-                    <InfoValue>{SubscriptionDate}</InfoValue>
-                </InfoContainer>
-                <InfoContainer>
-                    <InfoLabel>Next Renewal:</InfoLabel>
-                    <InfoValue>{NextRenewal}</InfoValue>
-                </InfoContainer>
-            </ProfileCard>
-        </Container>
-    );
+    getUserProfile();
+  }, []);
+
+  // const formatDate = (dateString:string) => {
+  //   const date = new Date(dateString);
+
+  //   // Extract day, month, and year
+  //   const day = date.getUTCDate();
+  //   const month = date.getUTCMonth() + 1; // getUTCMonth() is zero-based
+  //   const year = date.getUTCFullYear();
+
+  //   // Format day and month to have leading zeros if needed
+  //   const formattedDay = day < 10 ? '0' + day : day;
+  //   const formattedMonth = month < 10 ? '0' + month : month;
+
+  //   // Concatenate the components in the desired format
+  //   const formattedDate = formattedDay + '/' + formattedMonth + '/' + year;
+  // }
+
+  console.log(SubscriptionDate)
+  return (
+    <Container>
+      {loader && <Loader />}
+      <HeaderContainer>
+        <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
+        <Header>
+          <Title>{configText.config.profile}</Title>
+        </Header>
+      </HeaderContainer>
+
+      <ProfileCard>
+        <AccountBoxSharpIcon fontSize='large' />
+        <PhoneNumber>{PhoneNo}</PhoneNumber>
+        <InfoContainer>
+          <InfoLabel>Subscription Plan:</InfoLabel>
+          <InfoValue>{SubscriptionPlan}</InfoValue>
+        </InfoContainer>
+        <InfoContainer>
+          <InfoLabel>Subscription Date:</InfoLabel>
+          <InfoValue>{formatDate(SubscriptionDate)}</InfoValue>
+        </InfoContainer>
+        <InfoContainer>
+          <InfoLabel>Next Renewal:</InfoLabel>
+          <InfoValue>{formatDate(NextRenewal)}</InfoValue>
+        </InfoContainer>
+      </ProfileCard>
+    </Container>
+  );
 };
 
 export default Profile;

@@ -33,7 +33,7 @@ color:grey;
 
 
 const SignatrueTabs: React.FC = () => {
-    // const [activeTab, setActiveTab] = useState('Signature');
+  
     const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
     const dispatch = useDispatch();
     const configText = useSelector((state: RootState) => state.configText);

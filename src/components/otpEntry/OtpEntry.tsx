@@ -2,16 +2,13 @@ import React, { useState, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png'; // Replace with your logo path
-import background from '../../assets/SplashScreenBg.png'
-import LanguageDropdown from '../languageDropdown/LanguageDropdown';
-import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
-import { setToken, setRefreshToken, setUserId } from '../../redux/slices/UserTypeSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
+import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
+import { setToken, setRefreshToken, setUserId } from '../../redux/slices/UserTypeSlice';
 import Loader from '../loader/Loader';
-import axios from 'axios';
 import { API_END_POINT } from '../../services/Constant';
-import { configDotenv } from 'dotenv';
+import { getData } from '../../services/Services';
 
 const Container = styled.div<{ isLoading: boolean }>`
   display: flex;
@@ -19,13 +16,9 @@ const Container = styled.div<{ isLoading: boolean }>`
   align-items: center;
   text-align: center;
   height: 100vh;
-  background: #451322;
-  justify-content: flex-end;
-  color: white;
+  background: white;
+  justify-content: flex-start;
   padding: 20px;
-  background-image: url(${background});
-  background-size: cover;
-  background-position: center;
   ${({ isLoading }) =>
     isLoading &&
     css`
@@ -34,18 +27,21 @@ const Container = styled.div<{ isLoading: boolean }>`
 `;
 
 const Logo = styled.img`
-  width: 40px;
-  height: 38px;
+  width: 80px;
+  height: 80px;
+  margin-top: 20px;
 `;
 
 const Title = styled.h1`
   font-size: 1.5rem;
   margin: 10px 0;
+  color: black;
 `;
 
 const Subtitle = styled.h2`
-  font-size: 1.2rem;
+  font-size: 1rem;
   margin-bottom: 20px;
+  color: grey;
 `;
 
 const OtpContainer = styled.div`
@@ -53,8 +49,7 @@ const OtpContainer = styled.div`
   justify-content: center;
   margin-bottom: 20px;
   gap: 2%;
-  flex-wrap: wrap;
-  width: 100vw;
+  width: 100%;
 `;
 
 const OtpInput = styled.input`
@@ -64,22 +59,23 @@ const OtpInput = styled.input`
   text-align: center;
   border: 1px solid #e4ebf3;
   border-radius: 8px;
-  background: #262626;
-  color: #ffff;
+  background: white;
+  color: black;
 
   &::placeholder {
-    color: #FFFFFF; /* Change this to your desired color */
-    opacity: 1; /* Adjust this if you need to change the opacity */
+    color: grey;
+    opacity: 1;
   }
 `;
 
 const Disclaimer = styled.p`
   font-size: 0.8rem;
   margin: 10px 0;
+  color: grey;
 `;
 
 const ResendOtp = styled.a`
-  color: #1E90FF;
+  color: #1e90ff;
   cursor: pointer;
   text-decoration: none;
 `;
@@ -90,20 +86,12 @@ const LoginButton = styled.button<{ disabled: boolean }>`
   cursor: pointer;
   border: none;
   border-radius: 25px;
-  background-color: #0032E3;
+  background-color: #0032e3;
   color: white;
-  margin-bottom: 20%;
-  width: 20rem;
+  margin-top: 20px;
+  width: 100%;
   opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
   pointer-events: ${({ disabled }) => (disabled ? 'none' : 'auto')};
-`;
-
-const CallSignatureHeader = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-  align-items: center;
-  gap: 5px;
 `;
 
 const LoaderOverlay = styled.div`
@@ -125,21 +113,19 @@ const OtpEntry: React.FC = () => {
   const dispatch = useDispatch();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
-  const { phoneNumber,selectedPlan } = useSelector((state: RootState) => state.user);
+  const { phoneNumber, selectedPlan } = useSelector((state: RootState) => state.user);
   const configText = useSelector((state: RootState) => state.configText);
-  
+
   const handleChange = (value: string, index: number) => {
     if (/^[0-9]$/.test(value)) {
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
 
-      // Move to the next input field
       if (index < inputRefs.current.length - 1) {
         inputRefs.current[index + 1]?.focus();
       }
     } else if (value === '') {
-      // Clear the current input
       const newOtp = [...otp];
       newOtp[index] = '';
       setOtp(newOtp);
@@ -164,55 +150,43 @@ const OtpEntry: React.FC = () => {
 
   const handleLogin = async () => {
     if (otp.join('').length === 4) {
-      // Assuming you have a success page
       dispatch(startLoading());
-      const response = await axios.get(`${API_END_POINT.baseUrl + API_END_POINT.validateOTP}?msisdn=${phoneNumber}&message=${otp.join('')}`);
-
-      if (response.status === 200) {
-        const { refreshToken, token, userId, userType } = response.data.response;
-       
+      const response = await getData(`${API_END_POINT.validateOTP}?msisdn=${phoneNumber}&otp=${otp.join('')}`);
+      if (response.currentStatus === 'active') {
+        const { refreshToken, token, userId } = response;
         navigate('/dashboard');
         dispatch(stopLoading());
         dispatch(setToken(token));
         dispatch(setRefreshToken(refreshToken));
         dispatch(setUserId(userId));
+      } else if (response.data.response.currentStatus === 'new') {
+        const res = await getData(API_END_POINT.subscribe + `?msisdn=${phoneNumber}&planId=${selectedPlan}`);
+        if (res.data.response.currentStatus === 'new') {
+          navigate('/dashboard');
+        }
       }
     }
   };
 
- 
-
-  const handleResendOTP= async()=>{
+  const handleResendOTP = async () => {
     dispatch(startLoading());
-    try{
-      
-        const response = await axios.get(API_END_POINT.baseUrl+API_END_POINT.resendOTP+`?msisdn=${phoneNumber}&message=${selectedPlan}`)
-      
-        if(response.status == 200){
-       
-          dispatch(stopLoading())
-        }
-      
-    }
-    catch{
+    await getData(API_END_POINT.resendOTP + `?msisdn=${phoneNumber}&otp=${selectedPlan}`);
+    dispatch(stopLoading());
+  };
 
-    }
-  }
   const isOtpComplete = otp.every(value => value !== '');
-
 
   return (
     <>
       {isLoading && (
-        <Loader />
+        <LoaderOverlay>
+          <Loader />
+        </LoaderOverlay>
       )}
       <Container isLoading={isLoading}>
-        <LanguageDropdown />
-        <CallSignatureHeader>
-          <Logo src={logo} alt="Call Signature" />
-          <Title>{configText.config.callSignature}</Title>
-        </CallSignatureHeader>
-        <Subtitle>{configText.config.enterOTP}</Subtitle>
+        <Logo src={logo} alt="Call Signature" />
+        <Title>Call Signature</Title>
+        <Subtitle>OTP Verification</Subtitle>
         <OtpContainer>
           {otp.map((value, index) => (
             <OtpInput
@@ -226,11 +200,11 @@ const OtpEntry: React.FC = () => {
             />
           ))}
         </OtpContainer>
-        <Disclaimer>{configText.config.otpSent+ phoneNumber}</Disclaimer>
-        <Disclaimer style={{ color: 'grey' }}>
-          {configText.config.resendOtpText}<ResendOtp onClick={handleResendOTP}>{configText.config.resendOtp}</ResendOtp>
+        <Disclaimer>We have sent a code to {phoneNumber} to verify your registration.</Disclaimer>
+        <Disclaimer>
+          Haven't got the code yet? <ResendOtp onClick={handleResendOTP}>Resend Code</ResendOtp>
         </Disclaimer>
-        <LoginButton onClick={handleLogin} disabled={!isOtpComplete}>{configText.config.login}</LoginButton>
+        <LoginButton onClick={handleLogin} disabled={!isOtpComplete}>Submit</LoginButton>
       </Container>
     </>
   );

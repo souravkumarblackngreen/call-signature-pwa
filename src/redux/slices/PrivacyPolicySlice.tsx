@@ -22,12 +22,12 @@ const PrivacyPolicySlice = createSlice({
             state.termsncondition = action.payload;
           },
    
-    resetState: () => initialState,
+    resetPrivacyPolicyState: () => initialState,
   },
 });
 
 export const {
-    setPrivacy,setTerms
+    setPrivacy,setTerms,resetPrivacyPolicyState
 } = PrivacyPolicySlice.actions;
 
 export default PrivacyPolicySlice.reducer;

@@ -3,7 +3,9 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 interface DashboardState {
   statusMessage:string;
   signatureMessage:string;
-  globalShowModal:boolean
+  globalShowModal:boolean;
+  signatureId:number | null;
+  statusId:number | null;
 
 }
 
@@ -11,6 +13,8 @@ const initialState: DashboardState = {
   statusMessage:"hey, i m status",
   signatureMessage:"hey, i m signature",
   globalShowModal:false,
+  signatureId:0,
+  statusId:0
 
 
 };
@@ -29,10 +33,16 @@ const dashboareSlice = createSlice({
       setGlobalShowModal:(state, action: PayloadAction<boolean>) => {
         state.globalShowModal = action.payload;
       },
-   
+      setSignatureId:(state, action: PayloadAction<number>) => {
+        state.signatureId = action.payload;
+      },
+      setStatusId:(state, action: PayloadAction<number>) => {
+        state.statusId = action.payload;
+      },
+      resetDashboardState: () => initialState,
   },
 });
 
-export const { setStatusMessage, setSignatureMessage , setGlobalShowModal} = dashboareSlice.actions;
+export const { setStatusMessage, setSignatureId,setStatusId,setSignatureMessage , setGlobalShowModal, resetDashboardState} = dashboareSlice.actions;
 
 export default dashboareSlice.reducer;

@@ -11,6 +11,7 @@ import PrivacyPolicy from './components/privacyPolicy/PrivacyPolicy'
 import TermsNconditions from './components/termsNconditions/TermsNconditions';
 import Preview from './components/preview/Preview';
 import FAQ from './components/faq/FAQ';
+import PhoneNumberEntry from './components/phoneNumberPage/PhoneNumberPage';
 
 const App: React.FC = () => {
   return (
@@ -25,6 +26,7 @@ const App: React.FC = () => {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/termsNconditions" element={<TermsNconditions />} />
         <Route path="/edit-signature" element={<EditSignature />} />
+        <Route path="/enter-phoneno" element={<PhoneNumberEntry />} />
         <Route path="/preview" element={<Preview />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="*" element={<Navigate to="/" />} />

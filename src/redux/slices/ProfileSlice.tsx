@@ -29,10 +29,11 @@ const profileSlice = createSlice({
         },
         setPhoneNo: (state, action: PayloadAction<string>) => {
             state.PhoneNo = action.payload;
-        }
+        },
+        resetProfileState: () => initialState,
     },
 });
 
-export const { setSubscriptionPlan, setNextRenewal, setSubscriptionDate, setPhoneNo } = profileSlice.actions;
+export const { setSubscriptionPlan, setNextRenewal, setSubscriptionDate, setPhoneNo, resetProfileState } = profileSlice.actions;
 
 export default profileSlice.reducer;

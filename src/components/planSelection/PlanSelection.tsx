@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
-import logo from '../../assets/logo.png'; // Replace with your logo path
-import background from '../../assets/SplashScreenBg.png'
+import logo from '../../assets/logo.png'
+import background from '../../assets/SplashScreenBg.png';
 import LanguageDropdown from '../languageDropdown/LanguageDropdown';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
-import { setPhoneNumber, setSelectedPlan } from '../../redux/slices/UserTypeSlice';
-import { setLanguage, setLanguages } from '../../redux/slices/LanguageSlice';
-import { setConfigText } from '../../redux/slices/GloabalTextDataSlice';
+import { setPhoneNumber, setSelectedPlan, setToken } from '../../redux/slices/UserTypeSlice';
+import { setLanguages } from '../../redux/slices/LanguageSlice';
+
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../loader/Loader';
 import { RootState } from '../../redux/store';
-import axios from 'axios';
-import { API_END_POINT } from "../../services/Constant";
+
+import { API_END_POINT } from '../../services/Constant';
+import { getData } from '../../services/Services';
 
 const Container = styled.div`
   display: flex;
@@ -54,7 +54,7 @@ const PlanContainer = styled.div`
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
-  width:100%;
+  width: 100%;
 `;
 
 const PhoneInputContainer = styled.div`
@@ -73,8 +73,8 @@ const CallSignatureHeader = styled.div`
 `;
 
 const PlanButton = styled.div<{ selected: boolean }>`
-  background: ${(props) => (props.selected ? '#0032DF;' : 'white')};
-  color: ${(props) => (props.selected ? 'white' : '#0032DF;')};
+  background: ${(props) => (props.selected ? '#0032DF' : 'white')};
+  color: ${(props) => (props.selected ? 'white' : '#0032DF')};
   border: 1px solid ${(props) => (props.selected ? '#1E90FF' : '#ccc')};
   border-radius: 8px;
   padding: 10px 20px;
@@ -82,11 +82,12 @@ const PlanButton = styled.div<{ selected: boolean }>`
   cursor: pointer;
   font-size: 1rem;
   min-height: 150px;
-  width:25%;
+  width: 25%;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 `;
 
 const Input = styled.input`
@@ -99,8 +100,8 @@ const Input = styled.input`
   color: #e4ebf3;
 
   &::placeholder {
-    color: #FFFFFF; /* Change this to your desired color */
-    opacity: 1; /* Adjust this if you need to change the opacity */
+    color: #FFFFFF;
+    opacity: 1;
   }
 `;
 
@@ -111,6 +112,9 @@ const Disclaimer = styled.p`
 
 const PlanDuration = styled.div`
   font-size: 0.8rem;
+`;
+const PlanDisplayName = styled.div`
+  font-size: 1.2rem;
 `;
 
 const PlanRate = styled.div`
@@ -136,82 +140,71 @@ const SendOtpButton = styled.button<{ disabled: boolean }>`
 `;
 
 const PlanSelection: React.FC = () => {
-
-
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
-  const { isHeaderEnrichment, token, phoneNumber, selectedPlan } = useSelector((state: RootState) => state.user);
+  const { isHeaderEnrichment, phoneNumber, selectedPlan, mediaContent } = useSelector((state: RootState) => state.user);
   const { lang, languages } = useSelector((state: RootState) => state.lang);
   const configText = useSelector((state: RootState) => state.configText);
+  const msisdnNo = '1234567899';
 
   const [plans, setPlans] = useState<any[]>([]);
-
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-
   useEffect(() => {
-    getSubscription()
-    getLanguageData()
-  }, [])
+    if (isHeaderEnrichment) {
+      checkSub();
+    }
+    getSubscription();
+    getLanguageData();
+  }, []);
 
-
-
-
-
-  const getLanguageData = async () => {
-    try {
-      const response = await axios.get(API_END_POINT.baseUrl + API_END_POINT.allLanguage);
-
-      if (response.data.statuscode == 200) {
-        dispatch(setLanguages(response.data.response));
-
-      }
-    } catch (error: any) {
-
+  const checkSub = async () => {
+    const response = await getData(API_END_POINT.checkSubApi + msisdnNo);
+    dispatch(startLoading());
+    if (response.currentStatus === 'active') {
+      dispatch(setToken(response.token));
+      navigate('/dashboard');
     }
   };
 
+  const getLanguageData = async () => {
+    dispatch(startLoading());
+    const response = await getData(API_END_POINT.allLanguage);
+    dispatch(setLanguages(response));
+    dispatch(stopLoading());
+  };
 
   const getSubscription = async () => {
-    dispatch(startLoading())
-    try {
-      const response = await axios.get(API_END_POINT.baseUrl + API_END_POINT.subscriptionPlans, {
-        // headers: {
-        //   "langCode": 'en',
-        //   "Authorization":`Bearer ${token}`
-
-        // }
-      })
-      setPlans(response.data.response);
-      dispatch(stopLoading())
-
-    } catch {
-      dispatch(stopLoading())
-    }
-
-  }
-
+    dispatch(startLoading());
+    const response = await getData(API_END_POINT.subscriptionPlans);
+    setPlans(response);
+    dispatch(stopLoading());
+  };
 
   const handleSelectPlan = (plan: string) => {
     dispatch(setSelectedPlan(plan));
   };
 
-  const handleSendOtp = async () => {
+  const handleLogin = () => {
+    isHeaderEnrichment ? subscribers() : handleSendOtp();
+  };
+
+  const subscribers = async () => {
     dispatch(startLoading());
-    try {
-      if (selectedPlan && phoneNumber) {
-        const response = await axios.get(API_END_POINT.baseUrl + API_END_POINT.sendOTP + `?msisdn=${phoneNumber}&message=${selectedPlan}`)
-        if (response.status == 200) {
-          navigate('/enter-otp')
-          dispatch(stopLoading())
-        }
-      }
-    }
-    catch {
+    const response = await getData(API_END_POINT.subscribe + `?msisdn=${msisdnNo}&planId=${selectedPlan}`);
+    dispatch(stopLoading());
+  };
 
-    }
-
+  const handleSendOtp = async () => {
+    navigate('/enter-phoneno');
+    // dispatch(startLoading());
+    // const response = await getData(API_END_POINT.sendOTP + `?msisdn=${phoneNumber}&message=${selectedPlan}`);
+    // console.log(response, 'hello brother');
+    // if (response.statuscode === 200) {
+      
+    //   dispatch(stopLoading());
+    // }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -220,25 +213,15 @@ const PlanSelection: React.FC = () => {
     }
   };
 
-  const byPassSendOTP = () => {
-    navigate('/dashboard');
-  };
-
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // // const phoneNumberPattern = /^[0-9]{0,10}$/;
-    // console.log(value.length == 10)
-    if(value.length == 10)
-      return
+    if (value.length === 11) return;
     dispatch(setPhoneNumber(value));
-    // if (phoneNumberPattern.test(value)) {
-      
-    // }
   };
 
-  const isFormComplete = selectedPlan && (isHeaderEnrichment || phoneNumber);
+  // const isFormComplete = selectedPlan && (isHeaderEnrichment || phoneNumber);
 
-
+  const isFormComplete = selectedPlan
   return (
     <>
       {isLoading && <Loader />}
@@ -252,14 +235,13 @@ const PlanSelection: React.FC = () => {
         <PlanContainer>
           {plans.map((plan) => (
             <PlanButton key={plan.planId} selected={selectedPlan === plan.planId} onClick={() => handleSelectPlan(plan.planId)}>
-              <PlanRate>
-                {plan.displayName}
-              </PlanRate>
-              <PlanDuration>{plan.planId}</PlanDuration>
+              <PlanDisplayName>{plan.displayName}</PlanDisplayName>
+              <PlanRate>{`${plan.currency} ${plan.price}`} </PlanRate>
+              <PlanDuration>{plan.duration}</PlanDuration>
             </PlanButton>
           ))}
         </PlanContainer>
-        {!isHeaderEnrichment && (
+        {/* {!isHeaderEnrichment && (
           <PhoneInputContainer>
             <PhoneTitle>{configText.config.phoneNo}</PhoneTitle>
             <Input
@@ -270,12 +252,10 @@ const PlanSelection: React.FC = () => {
               onKeyDown={handleKeyDown}
             />
           </PhoneInputContainer>
-        )}
-        <Disclaimer>
-          {configText.config.disclaimer}
-        </Disclaimer>
-        <SendOtpButton onClick={isHeaderEnrichment ? byPassSendOTP : handleSendOtp} disabled={!isFormComplete}>
-          {isHeaderEnrichment ? configText.config.subscribe : configText.config.sendOtp}
+        )} */}
+        <Disclaimer>{configText.config.disclaimer}</Disclaimer>
+        <SendOtpButton onClick={handleLogin} disabled={!isFormComplete}>
+          {configText.config.subscribe}
         </SendOtpButton>
       </Container>
     </>
