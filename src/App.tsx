@@ -11,6 +11,7 @@ import PrivacyPolicy from './components/privacyPolicy/PrivacyPolicy'
 import TermsNconditions from './components/termsNconditions/TermsNconditions';
 import Preview from './components/preview/Preview';
 import FAQ from './components/faq/FAQ';
+import PhoneNumberEntry from './components/phoneEntry/PhoneEntry';
 
 const App: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/plan-selection" element={<PlanSelection />} />
+        <Route path="/enter-phoneno" element={<PhoneNumberEntry/>} />
         <Route path="/enter-otp" element={<OtpEntry />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />

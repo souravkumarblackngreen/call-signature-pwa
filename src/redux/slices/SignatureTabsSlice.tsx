@@ -1,14 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
 interface SignatureTabs {
     activeTab: string;
 }
-
 const initialState: SignatureTabs = {
     activeTab:'Signature'
-
 };
-
 const SignatureTabsSlice = createSlice({
   name: "signaturetabs",
   initialState,
@@ -17,12 +13,10 @@ const SignatureTabsSlice = createSlice({
           state.activeTab = action.payload;
         },
    
-    resetState: () => initialState,
+    resetSignatureTabsState: () => initialState,
   },
 });
-
 export const {
-    setActiveTab,
+    setActiveTab,resetSignatureTabsState
 } = SignatureTabsSlice.actions;
-
 export default SignatureTabsSlice.reducer;

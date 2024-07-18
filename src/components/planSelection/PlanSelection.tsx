@@ -14,6 +14,7 @@ import Loader from '../loader/Loader';
 import { RootState } from '../../redux/store';
 import axios from 'axios';
 import { API_END_POINT } from "../../services/Constant";
+import { getData } from '../../services/Services';
 
 const Container = styled.div<{ background: string }>`
   display: flex;
@@ -137,9 +138,8 @@ const SendOtpButton = styled.button<{ disabled: boolean }>`
 
 const PlanSelection: React.FC = () => {
 
-
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
-  const { isHeaderEnrichment, token, phoneNumber, selectedPlan ,mediaContent} = useSelector((state: RootState) => state.user);
+  const { isHeaderEnrichment, phoneNumber, selectedPlan ,mediaContent} = useSelector((state: RootState) => state.user);
   const { lang, languages } = useSelector((state: RootState) => state.lang);
   const configText = useSelector((state: RootState) => state.configText);
 
@@ -160,36 +160,17 @@ const PlanSelection: React.FC = () => {
 
 
   const getLanguageData = async () => {
-    try {
-      const response = await axios.get(API_END_POINT.baseUrl + API_END_POINT.allLanguage);
-
-      if (response.data.statuscode == 200) {
-        dispatch(setLanguages(response.data.response));
-
-      }
-    } catch (error: any) {
-
-    }
+    const response = await getData(API_END_POINT.allLanguage);
+      dispatch(setLanguages(response));
+   
   };
 
 
   const getSubscription = async () => {
     dispatch(startLoading())
-    try {
-      const response = await axios.get(API_END_POINT.baseUrl + API_END_POINT.subscriptionPlans, {
-        // headers: {
-        //   "langCode": 'en',
-        //   "Authorization":`Bearer ${token}`
-
-        // }
-      })
-      setPlans(response.data.response);
-      dispatch(stopLoading())
-
-    } catch {
-      dispatch(stopLoading())
-    }
-
+    const response = await getData(API_END_POINT.subscriptionPlans)
+    setPlans(response);
+    dispatch(stopLoading())
   }
 
 
@@ -197,46 +178,35 @@ const PlanSelection: React.FC = () => {
     dispatch(setSelectedPlan(plan));
   };
 
-  const handleSendOtp = async () => {
-    dispatch(startLoading());
-    try {
-      if (selectedPlan && phoneNumber) {
-        const response = await axios.get(API_END_POINT.baseUrl + API_END_POINT.sendOTP + `?msisdn=${phoneNumber}&message=${selectedPlan}`)
-        if (response.status == 200) {
-          navigate('/enter-otp')
-          dispatch(stopLoading())
-        }
-      }
-    }
-    catch {
+ 
 
-    }
+  const moveToEnterPhonenoRoute = ()=>{
+    navigate('/enter-phoneno')
+  }
 
-  };
+  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e.key === 'Enter') {
+  //     handleSendOtp();
+  //   }
+  // };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSendOtp();
-    }
-  };
+  // const byPassSendOTP = () => {
+  //   navigate('/dashboard');
+  // };
 
-  const byPassSendOTP = () => {
-    navigate('/dashboard');
-  };
-
-  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // // const phoneNumberPattern = /^[0-9]{0,10}$/;
-    // console.log(value.length == 10)
-    if(value.length == 11)
-      return
-    dispatch(setPhoneNumber(value));
-    // if (phoneNumberPattern.test(value)) {
+  // const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const value = e.target.value;
+  //   // // const phoneNumberPattern = /^[0-9]{0,10}$/;
+  //   // console.log(value.length == 10)
+  //   if(value.length == 11)
+  //     return
+  //   dispatch(setPhoneNumber(value));
+  //   // if (phoneNumberPattern.test(value)) {
       
-    // }
-  };
+  //   // }
+  // };
 
-  const isFormComplete = selectedPlan && (isHeaderEnrichment || phoneNumber);
+  const isFormComplete = selectedPlan 
 
 
   return (
@@ -259,23 +229,11 @@ const PlanSelection: React.FC = () => {
             </PlanButton>
           ))}
         </PlanContainer>
-        {!isHeaderEnrichment && (
-          <PhoneInputContainer>
-            <PhoneTitle>{configText.config.phoneNo}</PhoneTitle>
-            <Input
-              type="number"
-              placeholder={configText.config.phoneTitle}
-              value={phoneNumber}
-              onChange={handlePhoneNumberChange}
-              onKeyDown={handleKeyDown}
-            />
-          </PhoneInputContainer>
-        )}
         <Disclaimer>
           {configText.config.disclaimer}
         </Disclaimer>
-        <SendOtpButton onClick={isHeaderEnrichment ? byPassSendOTP : handleSendOtp} disabled={!isFormComplete}>
-          {isHeaderEnrichment ? configText.config.subscribe : configText.config.sendOtp}
+        <SendOtpButton onClick={moveToEnterPhonenoRoute} disabled={!isFormComplete}>
+          {configText.config.subscribe}
         </SendOtpButton>
       </Container>
     </>

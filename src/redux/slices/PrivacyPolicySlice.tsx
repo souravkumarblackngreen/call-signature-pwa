@@ -1,16 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
 interface PrivacyPolicy {
     privacyPolicy: string;
     termsncondition:string;
 }
-
 const initialState: PrivacyPolicy = {
     privacyPolicy:'',
     termsncondition:''
-
 };
-
 const PrivacyPolicySlice = createSlice({
   name: "filter",
   initialState,
@@ -22,12 +18,10 @@ const PrivacyPolicySlice = createSlice({
             state.termsncondition = action.payload;
           },
    
-    resetState: () => initialState,
+    resetPrivacyPolicyState: () => initialState,
   },
 });
-
 export const {
-    setPrivacy,setTerms
+    setPrivacy,setTerms,resetPrivacyPolicyState
 } = PrivacyPolicySlice.actions;
-
 export default PrivacyPolicySlice.reducer;

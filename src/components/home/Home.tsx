@@ -66,68 +66,66 @@ const Home: React.FC = () => {
   
 
   useEffect(() => {  
-    fetchData()  
-    heLogin()
+    // fetchData()  
     getMediaContent()
   }, []);
 
-  const fetchData = async () => {
-    try {
-      const response = await fetch('http://localhost:8095/');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+  // const fetchData = async () => {
+  //   try {
+  //     const response = await fetch('http://localhost:8095/');
+  //     if (!response.ok) {
+  //       throw new Error('Network response was not ok');
+  //     }
 
-      // Inspect request headers
-      console.log('Request Headers:', {
-        'Request URL': response.url,
-        'Request Method': 'GET', // assuming GET request as per your example
+  //     // Inspect request headers
+  //     console.log('Request Headers:', {
+  //       'Request URL': response.url,
+  //       'Request Method': 'GET', // assuming GET request as per your example
         
-      });
+  //     });
 
-      // Inspect response headers
+  //     // Inspect response headers
      
-      response.headers.forEach((value, key) => {
-        console.log(`${key}: ${value}`);
-      });
+  //     response.headers.forEach((value, key) => {
+  //       console.log(`${key}: ${value}`);
+  //     });
 
-    } catch (error) {
-      console.error('Fetch error:', error);
-    }
-  };
+  //   } catch (error) {
+  //     console.error('Fetch error:', error);
+  //   }
+  // };
 
 
   const getMediaContent = async()=>{
     try{
-      const response = await axios.get(API_END_POINT.mediaContent)
-    
-    dispatch(setMediaContent(response.data.response))
+      const response = await getData(API_END_POINT.mediaContent)
+      dispatch(setMediaContent(response))
     }catch(err){
       
     }
     
   }
-  const heLogin = async () => {
-    try {
-      const response: AxiosResponse<any> = await axios.get(API_END_POINT.baseUrl+API_END_POINT.heLoginApi,{
-        headers: {
-          'http-x-msisdn': hemsisdn,
-          'langCode': 'en'
+  // const heLogin = async () => {
+  //   try {
+  //     const response: AxiosResponse<any> = await axios.get(API_END_POINT.baseUrl+API_END_POINT.heLoginApi,{
+  //       headers: {
+  //         'http-x-msisdn': hemsisdn,
+  //         'langCode': 'en'
           
-          // Assuming the content type is JSON
-        },
-      })
+  //         // Assuming the content type is JSON
+  //       },
+  //     })
 
-      const {userType,token,userId,refreshToken} = response.data.response
-      dispatch(setToken(token))
-      dispatch(setUserId(userId))
-      dispatch(setRefreshToken(refreshToken))
-      dispatch(setUserType(userType))
+  //     const {userType,token,userId,refreshToken} = response.data.response
+  //     dispatch(setToken(token))
+  //     dispatch(setUserId(userId))
+  //     dispatch(setRefreshToken(refreshToken))
+  //     dispatch(setUserType(userType))
 
-    } catch (error) {
-      console.error('Fetch error:', error);
-    }
-  };
+  //   } catch (error) {
+  //     console.error('Fetch error:', error);
+  //   }
+  // };
   const handleNext = () => {
     navigate('/plan-selection');
   };

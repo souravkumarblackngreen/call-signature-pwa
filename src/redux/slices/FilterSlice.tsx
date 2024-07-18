@@ -1,14 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
 interface FilterKeyWords {
     keywords: string[];
 }
-
 const initialState: FilterKeyWords = {
     keywords:['MTN', 'Earn', 'Win free']
-
 };
-
 const FilterKeyWordsSlice = createSlice({
   name: "filter",
   initialState,
@@ -17,12 +13,10 @@ const FilterKeyWordsSlice = createSlice({
           state.keywords = action.payload;
         },
    
-    resetState: () => initialState,
+    resetFilterState: () => initialState,
   },
 });
-
 export const {
-    setKeywords,
+    setKeywords,resetFilterState
 } = FilterKeyWordsSlice.actions;
-
 export default FilterKeyWordsSlice.reducer;

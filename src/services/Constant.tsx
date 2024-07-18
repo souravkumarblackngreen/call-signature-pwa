@@ -1,5 +1,5 @@
 export const API_END_POINT={
-    baseUrl:"http://172.16.11.222:8092/crbtSignature/v1",
+    baseUrl:"http://172.16.11.222:5442/crbtSignature/v1",
     dashboard:"/dashboard/get",
     login:"/api/login",
     allLanguage:"/api/language/all",
@@ -33,8 +33,10 @@ export const API_END_POINT={
     resendOTP:"/otp/manage-Otp/RESEND_OTP",
     validateOTP:"/otp/validate-Otp",
     getInfo:"/signature/get-info",
-    unsubscribe:"/subscriber/remove",
-    mediaContent:"http://172.16.11.222:5442/crbtSignature/v1/api/media-content?isIndividualSpecific=true",
-    updateSignature:"http://172.16.11.222:5442/crbtSignature/v1/signature/update"
+    unsubscribe:"/billing/unsubscription",
+    subscribe:"/billing/subscription",
+    mediaContent:"/api/media-content?isIndividualSpecific=true",
+    updateSignature:"http://172.16.11.222:5442/crbtSignature/v1/signature/update",
+    checkSubApi:"/billing/checkSub?msisdn="
 
 }
