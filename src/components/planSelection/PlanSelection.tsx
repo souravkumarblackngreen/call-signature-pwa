@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import logo from '../../assets/logo.png'; // Replace with your logo path
 import background from '../../assets/SplashScreenBg.png'
@@ -46,23 +46,11 @@ const Subtitle = styled.h2`
   margin-bottom: 30px;
 `;
 
-const PhoneTitle = styled.span`
-  font-size: 1.2rem;
-  align-self: flex-start;
-`;
-
 const PlanContainer = styled.div`
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
-  width:100%;
-`;
-
-const PhoneInputContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 22rem;
+  width: 100%;
 `;
 
 const CallSignatureHeader = styled.div`
@@ -74,35 +62,21 @@ const CallSignatureHeader = styled.div`
 `;
 
 const PlanButton = styled.div<{ selected: boolean }>`
-  background: ${(props) => (props.selected ? '#0032DF;' : 'white')};
-  color: ${(props) => (props.selected ? 'white' : '#0032DF;')};
+  background: ${(props) => (props.selected ? '#0032DF' : 'white')};
+  color: ${(props) => (props.selected ? 'white' : '#0032DF')};
   border: 1px solid ${(props) => (props.selected ? '#1E90FF' : '#ccc')};
   border-radius: 8px;
-  padding: 10px 20px;
+  padding: 20px;
   margin: 0 10px;
   cursor: pointer;
   font-size: 1rem;
   min-height: 150px;
-  width:25%;
+  width: 25%;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #e4ebf3;
-  border-radius: 8px;
-  font-size: 1rem;
-  background: #262626;
-  color: #e4ebf3;
-
-  &::placeholder {
-    color: #FFFFFF; /* Change this to your desired color */
-    opacity: 1; /* Adjust this if you need to change the opacity */
-  }
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const Disclaimer = styled.p`
@@ -114,12 +88,24 @@ const PlanDuration = styled.div`
   font-size: 0.8rem;
 `;
 
+const PlanDisplayName = styled.div`
+  font-size: 0.8rem;
+`;
+
 const PlanRate = styled.div`
-  font-size: 1rem;
+  font-size: 1.5rem;
   display: flex;
   font-weight: 900;
   justify-content: center;
   align-items: center;
+`;
+
+const PlanCurrency = styled.span`
+  margin-right: 5px;
+`;
+
+const PlanPrice = styled.span`
+  font-size: 2rem;
 `;
 
 const SendOtpButton = styled.button<{ disabled: boolean }>`
@@ -130,84 +116,60 @@ const SendOtpButton = styled.button<{ disabled: boolean }>`
   border-radius: 25px;
   background-color: #0032DF;
   color: white;
-  margin-bottom: 20%;
+  margin-bottom: 10px;
   width: 20rem;
   opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
   pointer-events: ${({ disabled }) => (disabled ? 'none' : 'auto')};
 `;
 
-const PlanSelection: React.FC = () => {
+const LoginLink = styled(Link)`
+  color: white;
+  font-size: 0.8rem;
+  text-decoration: none;
+  margin-top: 10px;
 
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const PlanSelection: React.FC = () => {
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
-  const { isHeaderEnrichment, phoneNumber, selectedPlan ,mediaContent} = useSelector((state: RootState) => state.user);
+  const { isHeaderEnrichment, phoneNumber, selectedPlan, mediaContent } = useSelector((state: RootState) => state.user);
   const { lang, languages } = useSelector((state: RootState) => state.lang);
   const configText = useSelector((state: RootState) => state.configText);
 
   const [plans, setPlans] = useState<any[]>([]);
 
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-
   useEffect(() => {
-    getSubscription()
-    getLanguageData()
-  }, [])
-
-
-
-
+    getSubscription();
+    getLanguageData();
+  }, []);
 
   const getLanguageData = async () => {
     const response = await getData(API_END_POINT.allLanguage);
-      dispatch(setLanguages(response));
-   
+    dispatch(setLanguages(response));
   };
 
-
   const getSubscription = async () => {
-    dispatch(startLoading())
-    const response = await getData(API_END_POINT.subscriptionPlans)
+    dispatch(startLoading());
+    const response = await getData(API_END_POINT.subscriptionPlans);
     setPlans(response);
-    dispatch(stopLoading())
-  }
-
+    dispatch(stopLoading());
+  };
 
   const handleSelectPlan = (plan: string) => {
     dispatch(setSelectedPlan(plan));
   };
 
- 
+  const moveToEnterPhonenoRoute = () => {
+    navigate('/enter-phoneno');
+  };
 
-  const moveToEnterPhonenoRoute = ()=>{
-    navigate('/enter-phoneno')
-  }
-
-  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-  //   if (e.key === 'Enter') {
-  //     handleSendOtp();
-  //   }
-  // };
-
-  // const byPassSendOTP = () => {
-  //   navigate('/dashboard');
-  // };
-
-  // const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const value = e.target.value;
-  //   // // const phoneNumberPattern = /^[0-9]{0,10}$/;
-  //   // console.log(value.length == 10)
-  //   if(value.length == 11)
-  //     return
-  //   dispatch(setPhoneNumber(value));
-  //   // if (phoneNumberPattern.test(value)) {
-      
-  //   // }
-  // };
-
-  const isFormComplete = selectedPlan 
-
+  const isFormComplete = selectedPlan;
 
   return (
     <>
@@ -222,10 +184,12 @@ const PlanSelection: React.FC = () => {
         <PlanContainer>
           {plans.map((plan) => (
             <PlanButton key={plan.planId} selected={selectedPlan === plan.planId} onClick={() => handleSelectPlan(plan.planId)}>
+              <PlanDisplayName>{plan.displayName}</PlanDisplayName>
               <PlanRate>
-                {plan.displayName}
+                <PlanCurrency>{plan.currency}</PlanCurrency>
+                <PlanPrice>{plan.price}</PlanPrice>
               </PlanRate>
-              <PlanDuration>{plan.planId}</PlanDuration>
+              <PlanDuration>{plan.duration}</PlanDuration>
             </PlanButton>
           ))}
         </PlanContainer>
@@ -235,6 +199,7 @@ const PlanSelection: React.FC = () => {
         <SendOtpButton onClick={moveToEnterPhonenoRoute} disabled={!isFormComplete}>
           {configText.config.subscribe}
         </SendOtpButton>
+        <LoginLink to="/login">Already existing user? Click here to login</LoginLink>
       </Container>
     </>
   );

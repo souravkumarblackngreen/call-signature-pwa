@@ -109,11 +109,11 @@ const LoaderOverlay = styled.div`
 `;
 
 const PhoneNumberEntry: React.FC = () => {
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
+//   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
-  const { selectedPlan } = useSelector((state: RootState) => state.user);
+  const { selectedPlan, phoneNumber } = useSelector((state: RootState) => state.user);
 
  
   const handleSendOtp = async () => {
@@ -150,7 +150,7 @@ const PhoneNumberEntry: React.FC = () => {
             type="text"
             placeholder="Enter phone number"
             value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            onChange={(e) => dispatch(setPhoneNumber(e.target.value))}
           />
         </InputContainer>
         <SendOtpButton onClick={handleSendOtp} disabled={phoneNumber.length === 0}>
