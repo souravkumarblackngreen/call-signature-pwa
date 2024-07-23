@@ -6,7 +6,7 @@ import AccountBoxSharpIcon from '@mui/icons-material/AccountBoxSharp';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
 import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
-import Loader from '../loader/Loader';
+import Loader from '../../components/loader/Loader';
 
 import { setSubscriptionDate,setNextRenewal,setSubscriptionPlan,setPhoneNo} from '../../redux/slices/ProfileSlice';
 import { formatDate, getData } from '../../services/Services';
@@ -158,15 +158,15 @@ const Profile: React.FC = () => {
                 <AccountBoxSharpIcon fontSize='large'/>
                 <PhoneNumber>{PhoneNo}</PhoneNumber>
                 <InfoContainer>
-                    <InfoLabel>Subscription Plan:</InfoLabel>
+                    <InfoLabel>{configText.config.subscriptionPlan}:</InfoLabel>
                     <InfoValue>{SubscriptionPlan}</InfoValue>
                 </InfoContainer>
                 <InfoContainer>
-                    <InfoLabel>Subscription Date:</InfoLabel>
+                    <InfoLabel>{configText.config.subscription_date}:</InfoLabel>
                     <InfoValue>{formatDate(SubscriptionDate)}</InfoValue>
                 </InfoContainer>
                 <InfoContainer>
-                    <InfoLabel>Next Renewal:</InfoLabel>
+                    <InfoLabel>{configText.config.next_renewal}:</InfoLabel>
                     <InfoValue>{formatDate(NextRenewal)}</InfoValue>
                 </InfoContainer>
             </ProfileCard>

@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 import { setPhoneNumber } from '../../redux/slices/UserTypeSlice';
-import Loader from '../loader/Loader';
+import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
 import { getData } from '../../services/Services';
 
@@ -118,8 +118,13 @@ const PhoneNumberEntry: React.FC = () => {
   const dispatch = useDispatch();
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
   const { selectedPlan, phoneNumber } = useSelector((state: RootState) => state.user);
+  const configText = useSelector((state: RootState) => state.configText);
+
   const [errorMessage, setErrorMessage] = useState('');
 
+
+
+ 
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     if (/^\d{0,10}$/.test(value)) {
@@ -159,21 +164,21 @@ const PhoneNumberEntry: React.FC = () => {
       )}
       <Container isLoading={isLoading}>
         <Logo src={logo} alt="Call Signature" />
-        <Title>Call Signature</Title>
-        <Subtitle>Your Voice, Your Mark: Personalized Calling with Call Signature</Subtitle>
-        <WelComeTitle>Welcome</WelComeTitle>
+        <Title>{configText.config.callSignature}</Title>
+        <Subtitle>{configText.config.your_voice_your_mark}</Subtitle>
+        <WelComeTitle>{configText.config.welcome}</WelComeTitle>
         <InputContainer>
-          <InputLabel>Phone Number</InputLabel>
+          <InputLabel>{configText.config.phoneTitle}</InputLabel>
           <InputField
             type="text"
-            placeholder="Enter phone number"
+            placeholder={configText.config.phoneNo}
             value={phoneNumber}
             onChange={handlePhoneNumberChange}
           />
           {errorMessage && <ErrorContainer >{errorMessage}</ErrorContainer>}
         </InputContainer>
         <SendOtpButton onClick={handleSendOtp} disabled={phoneNumber.length !== 10}>
-          Send OTP
+          {configText.config.sendOtp}
         </SendOtpButton>
       </Container>
     </>

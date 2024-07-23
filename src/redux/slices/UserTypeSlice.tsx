@@ -9,6 +9,7 @@ interface UserType {
   phoneNumber:string;
   selectedPlan:string;
   mediaContent:MediaContentObj;
+  regax:object;
 }
 interface MediaContentObj {
   logo: string;
@@ -27,7 +28,10 @@ const initialState: UserType = {
   isHeaderEnrichment:false,
   phoneNumber:"",
   selectedPlan:"",
-  mediaContent:{logo:'',splashScreenBg:'',callScreen:'',notch:''}
+  mediaContent:{logo:'',splashScreenBg:'',callScreen:'',notch:''},
+  regax:{
+  }
+
 };
 
 const userSlice = createSlice({
@@ -62,10 +66,13 @@ const userSlice = createSlice({
       setMediaContent:(state, action: PayloadAction<MediaContentObj>) => {
         state.mediaContent = action.payload;
       },
+      setRegax:(state,action:PayloadAction<object>)=>{
+        state.regax=action.payload
+      },
     resetUserState: () => initialState,
   },
 });
 
-export const { setUserType, setMediaContent,setPhoneNumber,setSelectedPlan,setToken, setUserId, resetUserState,setRefreshToken, setFirstTimeModal, setIsHeaderEnrichment } =
+export const { setUserType, setMediaContent,setPhoneNumber,setSelectedPlan,setToken, setUserId, setRegax,resetUserState,setRefreshToken, setFirstTimeModal, setIsHeaderEnrichment } =
   userSlice.actions;
 export default userSlice.reducer;

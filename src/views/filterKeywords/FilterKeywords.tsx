@@ -6,8 +6,9 @@ import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
 import axios, { AxiosResponse } from 'axios';
+import Loader from '../../components/loader/Loader';
 
-import Loader from '../loader/Loader';
+
 
 const Container = styled.div`
   display: flex;

@@ -37,6 +37,7 @@ export const API_END_POINT={
     mediaContent:"/api/media-content?isIndividualSpecific=true",
     updateSignature:"http://172.16.11.222:5442/crbtSignature/v1/signature/update",
     checkSubApi:"/billing/checkSub?msisdn=",
-    profileUrl:"/user/profile"
+    profileUrl:"/user/profile",
+    regexUrl:"/api/regex"
 
 }

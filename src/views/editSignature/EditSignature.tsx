@@ -4,15 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import Sidebar from '../sidemenu/Sidebar';
-import Modal from '../modal/Modal';
-import SignatrueTabs from '../signatureTabs/SignatureTabs';
+import Sidebar from '../../components/sidemenu/Sidebar';
+import Modal from '../../components/modal/Modal';
+import SignatrueTabs from '../../components/signatureTabs/SignatureTabs';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setStatusMessage, setSignatureMessage } from '../../redux/slices/DashboardSlice';
 import axios from 'axios';
 
-import Loader from '../loader/Loader';
+import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
 
 const Container = styled.div`

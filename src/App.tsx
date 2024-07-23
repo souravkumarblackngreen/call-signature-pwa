@@ -1,17 +1,18 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Home from './components/home/Home';
-import PlanSelection from './components/planSelection/PlanSelection';
-import OtpEntry from './components/otpEntry/OtpEntry';
-import Dashboard from './components/dashboard/Dashboard';
-import Profile from './components/profile/Profile';
-import FilterKeywords from './components/filterKeywords/FilterKeywords';
-import EditSignature from './components/editSignature/EditSignature';
-import PrivacyPolicy from './components/privacyPolicy/PrivacyPolicy'
-import TermsNconditions from './components/termsNconditions/TermsNconditions';
-import Preview from './components/preview/Preview';
-import FAQ from './components/faq/FAQ';
-import PhoneNumberEntry from './components/phoneNumberEntry/PhoneNumberEntry';
+import Home from './views/home/Home';
+import PlanSelection from './views/planSelection/PlanSelection';
+import OtpEntry from './views/otpEntry/OtpEntry';
+import Dashboard from './views/dashboard/Dashboard';
+import Profile from './views/profile/Profile';
+
+import EditSignature from './views/editSignature/EditSignature';
+import PrivacyPolicy from './views/privacyPolicy/PrivacyPolicy'
+import TermsNconditions from './views/termsNconditions/TermsNconditions';
+import Preview from './views/preview/Preview';
+import FAQ from './views/faq/FAQ';
+import PhoneNumberEntry from './views/phoneNumberEntry/PhoneNumberEntry';
+import FilterKeywords from './views/filterKeywords/FilterKeywords';
 
 const App: React.FC = () => {
   return (

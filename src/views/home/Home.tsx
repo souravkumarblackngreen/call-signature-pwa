@@ -9,11 +9,11 @@ import background from '../../assets/SplashScreenBg.png' // Replace with your ba
 import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 
-import {  setIsHeaderEnrichment, setMediaContent, setPhoneNumber } from '../../redux/slices/UserTypeSlice'
+import {  setIsHeaderEnrichment, setMediaContent, setPhoneNumber, setRegax } from '../../redux/slices/UserTypeSlice'
 
 import {getData} from '../../services/Services'
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
-import Loader from '../loader/Loader';
+import Loader from '../../components/loader/Loader';
 import axios from 'axios';
 
 const Container = styled.div`
@@ -72,6 +72,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {  
     getMediaContent()
+    getRegex()
     helogin()
   }, []);
 
@@ -83,6 +84,13 @@ const Home: React.FC = () => {
       dispatch(stopLoading())
     
     
+  }
+
+  const getRegex = async()=>{
+    dispatch(startLoading())
+    const response = await getData(API_END_POINT.regexUrl)
+    dispatch(setRegax(response))
+   
   }
 
   const decryptParam = (encryptedParam: string) => {

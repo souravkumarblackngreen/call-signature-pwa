@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import Sidebar from '../sidemenu/Sidebar';
+import Sidebar from '../../components/sidemenu/Sidebar';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import logo from '../../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from "axios";
-import Modal from '../modal/Modal';
-import SignatrueTabs from '../signatureTabs/SignatureTabs';
+import Modal from '../../components/modal/Modal';
+import SignatrueTabs from '../../components/signatureTabs/SignatureTabs';
 import { setStatusMessage, setSignatureMessage, setSignatureId,setStatusId } from '../../redux/slices/DashboardSlice';
 import { setFirstTimeModal } from '../../redux/slices/UserTypeSlice';
 import { setPrivacy, setTerms } from '../../redux/slices/PrivacyPolicySlice';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Loader from '../loader/Loader';
+import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
 import {getData} from '../../services/Services'
 

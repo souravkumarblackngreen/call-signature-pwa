@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 import { setToken, setRefreshToken, setUserId } from '../../redux/slices/UserTypeSlice';
-import Loader from '../loader/Loader';
+import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
 import { getData } from '../../services/Services';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
@@ -126,6 +126,8 @@ justify-content: center;
 align-items: center;
 margin-left: 20px;
 background:white;
+align-self:flex-start;
+
 `;
 
 const OtpEntry: React.FC = () => {
@@ -212,9 +214,9 @@ const OtpEntry: React.FC = () => {
       <Container isLoading={isLoading}>
       <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
         <Logo src={logo} alt="Call Signature" />
-        <Title>Call Signature</Title>
-        <Subtitle>Your Voice, Your Mark: Personalized Calling with Call Signature</Subtitle>
-        <VerificationLabel>OTP Verification</VerificationLabel>
+        <Title>{configText.config.callSignature}</Title>
+        <Subtitle>{configText.config.your_voice_your_mark}</Subtitle>
+        <VerificationLabel>{configText.config.otp_verification}</VerificationLabel>
         <OtpContainer>
           {otp.map((value, index) => (
             <OtpInput
@@ -228,11 +230,11 @@ const OtpEntry: React.FC = () => {
             />
           ))}
         </OtpContainer>
-        <Disclaimer>We have sent a code to {phoneNumber} to verify your registration.</Disclaimer>
+        <Disclaimer>{configText.config.sent_code + phoneNumber + configText.config.verify_registration}</Disclaimer>
         <Disclaimer>
-          Haven't got the code yet? <ResendOtp onClick={handleResendOTP}>Resend Code</ResendOtp>
+          {configText.config.not_got_code} <ResendOtp onClick={handleResendOTP}>{configText.config.resend_code}</ResendOtp>
         </Disclaimer>
-        <LoginButton onClick={handleLogin} disabled={!isOtpComplete}>Submit</LoginButton>
+        <LoginButton onClick={handleLogin} disabled={!isOtpComplete}>{configText.config.submit}</LoginButton>
       </Container>
     </>
   );

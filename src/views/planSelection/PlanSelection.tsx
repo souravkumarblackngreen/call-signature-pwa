@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 
 
 import background from '../../assets/SplashScreenBg.png'
-import LanguageDropdown from '../languageDropdown/LanguageDropdown';
+import LanguageDropdown from '../../components/languageDropdown/LanguageDropdown';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 import { setPhoneNumber, setRefreshToken, setSelectedPlan, setToken, setUserId } from '../../redux/slices/UserTypeSlice';
 import { setLanguages } from '../../redux/slices/LanguageSlice';
 
 import { useDispatch, useSelector } from 'react-redux';
-import Loader from '../loader/Loader';
+import Loader from '../../components/loader/Loader';
 import { RootState } from '../../redux/store';
 
 import { API_END_POINT } from "../../services/Constant";
@@ -233,7 +233,7 @@ const PlanSelection: React.FC = () => {
         <SendOtpButton onClick={moveToEnterPhonenoRoute} disabled={!isFormComplete}>
           {configText.config.subscribe}
         </SendOtpButton>
-        <LoginLink>Already existing user? <LoginLinkButton onClick={resetPlanBeforeMove}>Click here to login</LoginLinkButton></LoginLink>
+        <LoginLink>{configText.config.already_existing_user} <LoginLinkButton onClick={resetPlanBeforeMove}>{configText.config.click_here_to_login}</LoginLinkButton></LoginLink>
       </Container>
     </>
   );
