@@ -1,5 +1,4 @@
 import axios from "axios";
-import { API_END_POINT } from './Constant';
 
 export const getData = async (endpoint: string, headers: any = {}) => {
     try {
