@@ -32,8 +32,8 @@ color:grey;
 `;
 
 
-const SignatrueTabs: React.FC = () => {
-    // const [activeTab, setActiveTab] = useState('Signature');
+const SignatureTabs: React.FC = () => {
+   
     const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
     const dispatch = useDispatch();
     const configText = useSelector((state: RootState) => state.configText);
@@ -42,7 +42,7 @@ const SignatrueTabs: React.FC = () => {
         dispatch(setActiveTab(configText.config.signature))
     },[])
     return (
-        <div className='hello'>
+        <div>
                     <TabsContainer>
                         <Tab active={activeTab === configText.config.signature} onClick={() => dispatch(setActiveTab(configText.config.signature))}>
                             {configText.config.signature}
@@ -61,4 +61,4 @@ const SignatrueTabs: React.FC = () => {
     );
 };
 
-export default SignatrueTabs;
+export default SignatureTabs;

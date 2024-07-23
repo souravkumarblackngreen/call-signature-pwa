@@ -5,7 +5,6 @@ import TranslateIcon from '@mui/icons-material/Translate';
 import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLanguage } from '../../redux/slices/LanguageSlice';
-import axios from 'axios';
 import { API_END_POINT } from '../../services/Constant';
 import { setConfigText } from '../../redux/slices/GloabalTextDataSlice';
 import {getData} from '../../services/Services'
@@ -39,13 +38,11 @@ const LanguageDropdown: React.FC = () => {
 
   const handleLanguageChangeData = async () => {
     try {
-      const response = await axios.get(
-        `${API_END_POINT.baseUrl+API_END_POINT.getAllData}/${lang}`
+      const response = await getData(
+        `${API_END_POINT.getAllData}/${lang}`
       );
+      dispatch(setConfigText(response));
       
-      if (response.data.statuscode == 200) {
-        dispatch(setConfigText(response.data.response));
-      }
     } catch (error) {
       console.log(error);
     }
@@ -73,9 +70,9 @@ const LanguageDropdown: React.FC = () => {
             },
           }}
         >
-          {languages.map((lang) => (
-            <MenuItem key={lang.languageCode} value={lang.languageCode}>
-              {lang.languageName}
+          {languages.map((language) => (
+            <MenuItem key={language.languageCode} value={language.languageCode}>
+              {language.languageName}
             </MenuItem>
           ))}
         </Select>

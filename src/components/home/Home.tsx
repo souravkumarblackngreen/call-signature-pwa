@@ -1,17 +1,20 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-// import logo from '../../assets/logo.png'
+import CryptoJS from 'crypto-js';
+
 import ArrowForwardSharpIcon from '@mui/icons-material/ArrowForwardSharp';
 import { API_END_POINT } from "../../services/Constant";
 import background from '../../assets/SplashScreenBg.png' // Replace with your background image path
 import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 
-import axios, { AxiosResponse } from 'axios';
-import { setUserType, setToken, setUserId,setRefreshToken, setMediaContent } from '../../redux/slices/UserTypeSlice'
+import {  setIsHeaderEnrichment, setMediaContent, setPhoneNumber } from '../../redux/slices/UserTypeSlice'
 
 import {getData} from '../../services/Services'
+import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
+import Loader from '../loader/Loader';
+import axios from 'axios';
 
 const Container = styled.div`
   display: flex;
@@ -61,78 +64,85 @@ const NextButton = styled.button`
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isHeaderEnrichment, mediaContent } = useSelector((state: RootState) => state.user);
-  const hemsisdn = 1234567899;
+  const [redirectData,setRedirectData] = useState()
+  const { mediaContent, isHeaderEnrichment, phoneNumber } = useSelector((state: RootState) => state.user);
+  const isLoading = useSelector((state: RootState) => state.loader.isLoading);
+ 
   
 
   useEffect(() => {  
-    // fetchData()  
     getMediaContent()
+    helogin()
   }, []);
 
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await fetch('http://localhost:8095/');
-  //     if (!response.ok) {
-  //       throw new Error('Network response was not ok');
-  //     }
-
-  //     // Inspect request headers
-  //     console.log('Request Headers:', {
-  //       'Request URL': response.url,
-  //       'Request Method': 'GET', // assuming GET request as per your example
-        
-  //     });
-
-  //     // Inspect response headers
-     
-  //     response.headers.forEach((value, key) => {
-  //       console.log(`${key}: ${value}`);
-  //     });
-
-  //   } catch (error) {
-  //     console.error('Fetch error:', error);
-  //   }
-  // };
-
-
+  
   const getMediaContent = async()=>{
-    try{
+      dispatch(startLoading())
       const response = await getData(API_END_POINT.mediaContent)
       dispatch(setMediaContent(response))
-    }catch(err){
-      
-    }
+      dispatch(stopLoading())
+    
     
   }
-  // const heLogin = async () => {
-  //   try {
-  //     const response: AxiosResponse<any> = await axios.get(API_END_POINT.baseUrl+API_END_POINT.heLoginApi,{
-  //       headers: {
-  //         'http-x-msisdn': hemsisdn,
-  //         'langCode': 'en'
+
+  const decryptParam = (encryptedParam: string) => {
+  const key = CryptoJS.enc.Utf8.parse('p@4DnhsE1jF-t(GN06k}eL9B7Z8h&Ay*');
+  const decrypted = CryptoJS.AES.decrypt(encryptedParam, key, {
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7
+  });
+  return decrypted.toString(CryptoJS.enc.Utf8);
+  };
+ 
+  const helogin = async() =>
+    {
+      dispatch(startLoading());
+      try {
+        const response = await axios.get("http://172.16.11.222:8099/header-augment-0.0.1-SNAPSHOT/v1/mobile/get-he-number",{
+          headers:{
+            'Service-Name':'callSignatureMobileView'
+          }
+        });
+        const urlParams = new URLSearchParams(response.request.responseURL.split('?')[1]);
+        const encryptedParam = urlParams.get('param');
+        if (encryptedParam) {
+          const decryptedParam = decryptParam(encryptedParam);
+          console.log('Decrypted Parameter:', decryptedParam);
+          dispatch(setIsHeaderEnrichment(true))
+          dispatch(setPhoneNumber(decryptedParam))
+        }else{
+          dispatch(setIsHeaderEnrichment(false))
+        }
+        
+      
+  
+        if (response.status === 302) {
+          const redirectUrl = response.headers.location;
+          if (redirectUrl) {
+            const redirectedResponse = await axios.get(redirectUrl);
+            setRedirectData(redirectedResponse.data)
+            
+          }
+        } else {
+          console.log(response.headers.location,'dsfsdf')
           
-  //         // Assuming the content type is JSON
-  //       },
-  //     })
-
-  //     const {userType,token,userId,refreshToken} = response.data.response
-  //     dispatch(setToken(token))
-  //     dispatch(setUserId(userId))
-  //     dispatch(setRefreshToken(refreshToken))
-  //     dispatch(setUserType(userType))
-
-  //   } catch (error) {
-  //     console.error('Fetch error:', error);
-  //   }
-  // };
+        }
+      } catch (error) {
+        dispatch(setIsHeaderEnrichment(false))
+        console.log('Error fetching media content:', error);
+      }
+      dispatch(stopLoading());
+    };
+  
   const handleNext = () => {
     navigate('/plan-selection');
   };
 
-  console.log(mediaContent)
+
+  
   return (
     <Container>
+      {isLoading && <Loader/>}
       {<Logo src={mediaContent.logo} alt="Call Signature" />}
       <Title>Call Signature</Title>
       <NextButton onClick={handleNext}>

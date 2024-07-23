@@ -9,6 +9,7 @@ import { setToken, setRefreshToken, setUserId } from '../../redux/slices/UserTyp
 import Loader from '../loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
 import { getData } from '../../services/Services';
+import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
 
 const Container = styled.div<{ isLoading: boolean }>`
   display: flex;
@@ -114,6 +115,19 @@ padding-bottom: 25px;
 color: black;
 `;
 
+const BackButton = styled.button`
+font-size: 24px;
+cursor: pointer;
+border: 1px solid grey;
+border-radius: 50%;
+padding: 5px;
+display: flex;
+justify-content: center;
+align-items: center;
+margin-left: 20px;
+background:white;
+`;
+
 const OtpEntry: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(new Array(4).fill(''));
   const navigate = useNavigate();
@@ -181,6 +195,11 @@ const OtpEntry: React.FC = () => {
     dispatch(stopLoading());
   };
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+
   const isOtpComplete = otp.every(value => value !== '');
 
   return (
@@ -191,6 +210,7 @@ const OtpEntry: React.FC = () => {
         </LoaderOverlay>
       )}
       <Container isLoading={isLoading}>
+      <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
         <Logo src={logo} alt="Call Signature" />
         <Title>Call Signature</Title>
         <Subtitle>Your Voice, Your Mark: Personalized Calling with Call Signature</Subtitle>

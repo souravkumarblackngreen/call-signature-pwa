@@ -13,6 +13,7 @@ import { setStatusMessage, setSignatureMessage } from '../../redux/slices/Dashbo
 import axios from 'axios';
 
 import Loader from '../loader/Loader';
+import { API_END_POINT } from '../../services/Constant';
 
 const Container = styled.div`
   display: flex;
@@ -62,22 +63,6 @@ const Logo = styled.img`
   height: 32px;
 `;
 
-const TabsContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-`;
-
-const Tab = styled.div<{ active: boolean }>`
-  background: ${(props) => (props.active ? '#0032DF' : 'white')};
-  color: ${(props) => (props.active ? 'white' : '#0032DF')};
-  border: 1px solid ${(props) => (props.active ? '#1E90FF' : '#ccc')};
-  border-radius: 8px;
-  padding: 10px 20px;
-  margin: 0 5px;
-  cursor: pointer;
-`;
-
 const FlashMessageContainer = styled.div`
   background: #fff;
   border-radius: 8px;
@@ -112,7 +97,7 @@ const ButtonContainer = styled.div`
 const Button = styled.button<{ primary?: boolean }>`
   background: ${(props) => (props.primary ? '#0032DF' : 'white')};
   color: ${(props) => (props.primary ? 'white' : '#0032DF')};
-  border: 1px solid ${(props) => (props.primary ? '#0032DF' : '#0032DF')};
+  border: 1px solid #0032DF;
   border-radius: 25px;
   padding: 10px 20px;
   cursor: pointer;
@@ -125,10 +110,10 @@ const filteredWords = [ 'fraud', 'spam'];
 
 const EditSignature: React.FC = () => {
   
-  const { statusMessage, signatureMessage , globalShowModal, signatureId, statusId} = useSelector((state: RootState) => state.dashboard);
-  const { lang,languages } = useSelector((state: RootState) => state.lang);
+  const { statusMessage, signatureMessage , signatureId, statusId} = useSelector((state: RootState) => state.dashboard);
+  const { lang } = useSelector((state: RootState) => state.lang);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
-  const { token,userId } = useSelector((state: RootState) => state.user);
+  const { token } = useSelector((state: RootState) => state.user);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [loader, setLoader] = useState<boolean>(false);
   const [showModal,setShowModal] = useState(false);
@@ -137,9 +122,6 @@ const EditSignature: React.FC = () => {
   const [modalTitle, setModalTitle] = useState('')
   const [modalSubMessage, setModalSubMessage] = useState('')
   const configText = useSelector((state: RootState) => state.configText);
-
-  const baseUrl = "http://172.16.11.222:5442/crbtSignature/v1";
-  const updateSignature="/signature/update";
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -152,7 +134,7 @@ const EditSignature: React.FC = () => {
     // Implement save to templates logic
     setLoader(true)
     const response = await axios.post(
-      baseUrl + "/signature/update",
+      API_END_POINT.updateSignature,
       {
        signatureId:activeTab === configText.config.signature ? signatureId : statusId,
         signatureLangCode: lang,

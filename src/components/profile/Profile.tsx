@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import profilePic from '../../assets/profilePic.jpg'; // Replace with your profile picture path
+
 import AccountBoxSharpIcon from '@mui/icons-material/AccountBoxSharp';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
 import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../loader/Loader';
-import axios from 'axios';
+
 import { setSubscriptionDate,setNextRenewal,setSubscriptionPlan,setPhoneNo} from '../../redux/slices/ProfileSlice';
+import { formatDate, getData } from '../../services/Services';
+import { API_END_POINT } from '../../services/Constant';
+import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -17,8 +21,6 @@ const Container = styled.div`
   height: 100vh;
   color: #000;
   gap:100px;
-
-  
 `;
 
 const Header = styled.div`
@@ -43,8 +45,6 @@ const BackButton = styled.div`
 
 const Title = styled.h1`
   font-size: 1.5rem;
-  
-
 `;
 
 const ProfileCard = styled.div`
@@ -59,13 +59,6 @@ const ProfileCard = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-`;
-
-const ProfileImage = styled.img`
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  margin-bottom: 20px;
 `;
 
 const PhoneNumber = styled.p`
@@ -102,56 +95,58 @@ const Profile: React.FC = () => {
     
 
     const navigate = useNavigate();
-    const { SubscriptionPlan, SubscriptionDate ,NextRenewal ,PhoneNo} = useSelector((state: RootState) => state.profile);
-    const { token,userId } = useSelector((state: RootState) => state.user);
-    const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
-    const profileUrl = "/user/profile"
     const dispatch = useDispatch();
-    const [loader, setLoader] = useState<boolean>(false);
+
+    const { SubscriptionPlan, SubscriptionDate ,NextRenewal ,PhoneNo} = useSelector((state: RootState) => state.profile);
+    const { token } = useSelector((state: RootState) => state.user);
+    const { lang } = useSelector((state: RootState) => state.lang);
+    
+    const isLoading = useSelector((state: RootState) => state.loader.isLoading);
     const configText = useSelector((state: RootState) => state.configText);
 
     const handleBack = () => {
         navigate(-1);
     };
 
+    
+    useEffect(() => {
+      getUserProfile();
+    }, []);
+
     const getUserProfile = async () => {
-      setLoader(true);
+      dispatch(startLoading())
       try {
-        const response = await axios.get(baseUrl+profileUrl,{
+        const response = await getData(API_END_POINT.profileUrl,{
           headers: {
             Authorization:  `Bearer ${token}`,
-            langCode: 'en',
+            langCode: lang,
         },
         });
-        setLoader(false);
+        
         const{
           planStartDate,
           planEndDate,
           userId,
-          amount
+          duration
 
-          } = response.data.response 
-        
+          } = response
+       
         dispatch(setPhoneNo(userId))
         dispatch(setSubscriptionDate(planStartDate))
         dispatch(setNextRenewal(planEndDate))
-        dispatch(setSubscriptionPlan(amount))
+        dispatch(setSubscriptionPlan(duration))
+        dispatch(stopLoading())
 
       } catch (error: any) {
-        setLoader(false);
-       
+        dispatch(stopLoading())
       }
     };
-    useEffect(() => {
-
-      getUserProfile();
-    }, []);
 
     
    
     return (
         <Container>
-          {loader && <Loader/>}
+          {isLoading && <Loader/>}
             <HeaderContainer>
                 <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
                 <Header>
@@ -168,11 +163,11 @@ const Profile: React.FC = () => {
                 </InfoContainer>
                 <InfoContainer>
                     <InfoLabel>Subscription Date:</InfoLabel>
-                    <InfoValue>{SubscriptionDate}</InfoValue>
+                    <InfoValue>{formatDate(SubscriptionDate)}</InfoValue>
                 </InfoContainer>
                 <InfoContainer>
                     <InfoLabel>Next Renewal:</InfoLabel>
-                    <InfoValue>{NextRenewal}</InfoValue>
+                    <InfoValue>{formatDate(NextRenewal)}</InfoValue>
                 </InfoContainer>
             </ProfileCard>
         </Container>

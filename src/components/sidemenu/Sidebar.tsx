@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import logo from '../../assets/logo.png';
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -9,17 +9,19 @@ import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { API_END_POINT } from '../../services/Constant';
-import { setConfigText } from '../../redux/slices/GloabalTextDataSlice';
-import { setLanguage } from '../../redux/slices/LanguageSlice';
-import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
-import { resetConfigState } from '../../redux/slices/GloabalTextDataSlice';
+import { setConfigText, resetConfigState } from '../../redux/slices/GloabalTextDataSlice';
+import { setLanguage,resetLanguageState } from '../../redux/slices/LanguageSlice';
+import { startLoading, stopLoading, resetLoadingState } from '../../redux/slices/LoaderSlice';
 import { resetFilterState } from '../../redux/slices/FilterSlice';
-import { resetLanguageState } from '../../redux/slices/LanguageSlice';
-import { resetLoadingState } from '../../redux/slices/LoaderSlice';
+
 import { resetPrivacyPolicyState } from '../../redux/slices/PrivacyPolicySlice';
 import { resetProfileState } from '../../redux/slices/ProfileSlice';
 import { resetSignatureTabsState } from '../../redux/slices/SignatureTabsSlice';
 import { resetDashboardState } from '../../redux/slices/DashboardSlice';
+import { resetUserState } from "../../redux/slices/UserTypeSlice"
+import { getData } from '../../services/Services';
+
+
 const SidebarContainer = styled.div<{ isOpen: boolean }>`
   position: fixed;
   top: 0;
@@ -87,12 +89,12 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const [isLanguageOpen, setLanguageOpen] = useState(false);
-  const { lang,languages } = useSelector((state: RootState) => state.lang);
+  const { lang, languages } = useSelector((state: RootState) => state.lang);
   const [menuData, setMenuData] = useState<[]>([]);
   const dispatch = useDispatch();
-  const { token, userId } = useSelector((state: RootState) => state.user);
+  const { token } = useSelector((state: RootState) => state.user);
   const configText = useSelector((state: RootState) => state.configText);
-  
+
   const toggleLanguageMenu = () => {
     setLanguageOpen(!isLanguageOpen);
   };
@@ -101,34 +103,31 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   };
   useEffect(() => {
     handleLanguageChangeData();
-    
   }, [lang]);
-  useEffect(()=>{
+  useEffect(() => {
     getMenu()
-  },[])
+  }, [])
   const handleLanguageChangeData = async () => {
     try {
-      const response = await axios.get(
-        `${API_END_POINT.baseUrl+API_END_POINT.getAllData}/${lang}`
+      const response = await getData(
+        `${API_END_POINT.getAllData}/${lang}`
       );
-      
-      if (response.data.statuscode == 200) {
-        dispatch(setConfigText(response.data.response));
-      }
+      dispatch(setConfigText(response));
+     
     } catch (error) {
       console.log(error);
     }
   };
-const Unsubscribe = async () => {
-    
+  const Unsubscribe = async () => {
+
     try {
-      const response = await axios.delete(`${API_END_POINT.baseUrl+API_END_POINT.unsubscribe}`,{
+      const response = await axios.delete(`${process.env.REACT_APP_ + API_END_POINT.unsubscribe}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           langCode: lang,
         },
       });
-      
+
       if (response.data.statuscode == 200) {
         dispatch(resetConfigState())
         dispatch(resetDashboardState())
@@ -138,6 +137,7 @@ const Unsubscribe = async () => {
         dispatch(resetPrivacyPolicyState())
         dispatch(resetProfileState())
         dispatch(resetSignatureTabsState())
+        dispatch(resetUserState())
         navigate('/')
       }
     } catch (error) {
@@ -147,19 +147,18 @@ const Unsubscribe = async () => {
   const getMenu = async () => {
     dispatch(startLoading())
     try {
-      const response = await axios.get(API_END_POINT.baseUrl+API_END_POINT.sideMenu,{
+      const response = await getData(API_END_POINT.sideMenu, {
         headers: {
           Authorization: `Bearer ${token}`,
           langCode: lang,
         },
       });
-      if (response.data.statuscode === 200) {
-        setMenuData(response.data.response);
-      }
+      setMenuData(response);
+      
       dispatch(stopLoading())
     } catch (error: any) {
       dispatch(stopLoading())
-    
+
     }
   };
   const renderMenuItem = (item: any) => {
@@ -168,7 +167,7 @@ const Unsubscribe = async () => {
         return (
           <MenuItem key={item.name}>
             <div onClick={toggleLanguageMenu} style={{ display: 'flex', alignItems: 'center' }}>
-            {configText.config[item.name]}
+              {configText.config[item.name]}
               {isLanguageOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </div>
             {isLanguageOpen && (
@@ -192,7 +191,7 @@ const Unsubscribe = async () => {
       default:
         return (
           <MenuItem key={item.name} onClick={() => navigate(item.routePath)}>
-             {configText.config[item.name]}
+            {configText.config[item.name]}
           </MenuItem>
         );
     }

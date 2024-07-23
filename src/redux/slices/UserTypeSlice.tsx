@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-interface userType {
+interface UserType {
   user: string;
   token: string;
   refreshToken: string;
@@ -18,7 +18,7 @@ interface MediaContentObj {
 
 }
 
-const initialState: userType = {
+const initialState: UserType = {
   user: "",
   token: "",
   userId: "",

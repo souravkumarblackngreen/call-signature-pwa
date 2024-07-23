@@ -59,33 +59,6 @@ const ContentCard = styled.div`
   justify-content: flex-start; /* Align items at the top */
 `;
 
-const ProfileImage = styled.img`
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  margin-bottom: 20px;
-`;
-
-const PhoneNumber = styled.p`
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-`;
-
-const InfoContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-  width:100%;
-`;
-
-const InfoLabel = styled.span`
-  color: #888;
-`;
-
-const InfoValue = styled.span`
-  color: #1E90FF;
-  cursor: pointer;
-`;
 const HeaderContainer = styled.div`
 display: flex;
 align-items: center;

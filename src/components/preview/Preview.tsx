@@ -41,6 +41,7 @@ justify-content: center;
 align-items: center;
 margin-left: 20px;
 background:white;
+align-self:flex-start;
 `;
 
 const Content = styled.div`
@@ -114,7 +115,7 @@ const FlashMessageContent = styled.p`
 
 const Preview: React.FC = () => {
   const navigate = useNavigate();
-  const { statusMessage, signatureMessage , globalShowModal} = useSelector((state: RootState) => state.dashboard);
+  const { statusMessage, signatureMessage } = useSelector((state: RootState) => state.dashboard);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
   const { userId, mediaContent} = useSelector((state: RootState) => state.user);
   const configText = useSelector((state: RootState) => state.configText);
@@ -128,11 +129,10 @@ const Preview: React.FC = () => {
   const flashMessageToShow = activeTab.toLocaleLowerCase() === 'signature' ? signatureMessage : statusMessage
   return (
     <Container>
-      {/* {Loader && <Loader/>} */}
       <Header>
         <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
         <Title>{configText.config.preview}</Title>
-        <div style={{ width: '24px' }} /> {/* Placeholder to balance the header */}
+        <div  style={{ width: '24px' }} /> 
       </Header>
       <Content>
         <MobileFrame mobileFrame={mediaContent.callScreen}>

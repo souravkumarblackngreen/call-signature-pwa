@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import logo from '../../assets/logo.png'; // Replace with your logo path
+
 import background from '../../assets/SplashScreenBg.png'
 import LanguageDropdown from '../languageDropdown/LanguageDropdown';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
-import { setPhoneNumber, setSelectedPlan } from '../../redux/slices/UserTypeSlice';
+import { setPhoneNumber, setRefreshToken, setSelectedPlan, setToken, setUserId } from '../../redux/slices/UserTypeSlice';
 import { setLanguages } from '../../redux/slices/LanguageSlice';
 
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../loader/Loader';
 import { RootState } from '../../redux/store';
-import axios from 'axios';
+
 import { API_END_POINT } from "../../services/Constant";
 import { getData } from '../../services/Services';
 
@@ -122,21 +122,30 @@ const SendOtpButton = styled.button<{ disabled: boolean }>`
   pointer-events: ${({ disabled }) => (disabled ? 'none' : 'auto')};
 `;
 
-const LoginLink = styled(Link)`
+const LoginLink = styled.div`
   color: white;
   font-size: 0.8rem;
   text-decoration: none;
-  margin-top: 10px;
+  margin-bottom: 10%;
+  display:flex;
+  gap:4px;
+`;
 
-  &:hover {
-    text-decoration: underline;
-  }
+const LoginLinkButton = styled.div`
+color: white;
+font-size: 0.8rem;
+text-decoration: none;
+font-weight:800;
+cursor:pointer;
+&:hover {
+  text-decoration: underline;
+}
 `;
 
 const PlanSelection: React.FC = () => {
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
-  const { isHeaderEnrichment, phoneNumber, selectedPlan, mediaContent } = useSelector((state: RootState) => state.user);
-  const { lang, languages } = useSelector((state: RootState) => state.lang);
+  const { selectedPlan, mediaContent, phoneNumber,isHeaderEnrichment} = useSelector((state: RootState) => state.user);
+  
   const configText = useSelector((state: RootState) => state.configText);
 
   const [plans, setPlans] = useState<any[]>([]);
@@ -147,8 +156,27 @@ const PlanSelection: React.FC = () => {
   useEffect(() => {
     getSubscription();
     getLanguageData();
+    if(isHeaderEnrichment){
+      checkSum()
+    }
   }, []);
 
+  const checkSum = async () => {
+    const response = await getData(API_END_POINT.checkSubApi+phoneNumber)
+    if (response.currentStatus === 'active') {
+      const { refreshToken, token, userId } = response;
+      navigate('/dashboard');
+      dispatch(stopLoading());
+      dispatch(setToken(token));
+      dispatch(setRefreshToken(refreshToken));
+      dispatch(setUserId(userId));
+    } else if (response.data.response.currentStatus === 'new') {
+      const res = await getData(API_END_POINT.subscribe + `?msisdn=${phoneNumber}&planId=${selectedPlan}`);
+      if (res.data.response.currentStatus === 'new') {
+        navigate('/dashboard');
+      }
+    }
+  }
   const getLanguageData = async () => {
     const response = await getData(API_END_POINT.allLanguage);
     dispatch(setLanguages(response));
@@ -168,6 +196,12 @@ const PlanSelection: React.FC = () => {
   const moveToEnterPhonenoRoute = () => {
     navigate('/enter-phoneno');
   };
+
+  const resetPlanBeforeMove = () =>{
+    dispatch(setSelectedPlan(''))
+    dispatch(setPhoneNumber(""))
+    navigate('/enter-phoneno');
+  }
 
   const isFormComplete = selectedPlan;
 
@@ -199,7 +233,7 @@ const PlanSelection: React.FC = () => {
         <SendOtpButton onClick={moveToEnterPhonenoRoute} disabled={!isFormComplete}>
           {configText.config.subscribe}
         </SendOtpButton>
-        <LoginLink to="/login">Already existing user? Click here to login</LoginLink>
+        <LoginLink>Already existing user? <LoginLinkButton onClick={resetPlanBeforeMove}>Click here to login</LoginLinkButton></LoginLink>
       </Container>
     </>
   );

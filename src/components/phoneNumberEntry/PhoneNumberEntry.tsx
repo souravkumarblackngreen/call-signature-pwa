@@ -10,7 +10,6 @@ import Loader from '../loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
 import { getData } from '../../services/Services';
 
-
 const Container = styled.div<{ isLoading: boolean }>`
   display: flex;
   flex-direction: column;
@@ -39,10 +38,10 @@ const Title = styled.h1`
   color: black;
 `;
 const WelComeTitle = styled.h1`
-font-size: 1.5rem;
-margin: 10px 0;
-padding-bottom: 25px;
-color: black;
+  font-size: 1.5rem;
+  margin: 10px 0;
+  padding-bottom: 25px;
+  color: black;
 `;
 
 const Subtitle = styled.h2`
@@ -63,7 +62,7 @@ const InputLabel = styled.div`
   font-size: 1rem;
   color: black;
   margin-bottom: 5px;
-  width:fit-content;
+  width: fit-content;
 `;
 
 const InputField = styled.input`
@@ -107,29 +106,48 @@ const LoaderOverlay = styled.div`
   align-items: center;
   z-index: 1000;
 `;
+const ErrorContainer = styled.div`
+  display:flex;
+  color:red;
+  font-size:0.8rem;
+  padding:4px;
+`;
 
 const PhoneNumberEntry: React.FC = () => {
-//   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
   const { selectedPlan, phoneNumber } = useSelector((state: RootState) => state.user);
+  const [errorMessage, setErrorMessage] = useState('');
 
- 
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (/^\d{0,10}$/.test(value)) {
+      dispatch(setPhoneNumber(value));
+      setErrorMessage('');
+    } else {
+      setErrorMessage('Please enter a valid 10-digit phone number');
+    }
+  };
+
   const handleSendOtp = async () => {
+    if (phoneNumber.length !== 10) {
+      setErrorMessage('Please enter a valid 10-digit phone number');
+      return;
+    }
     dispatch(startLoading());
     try {
       if (phoneNumber) {
-        const response = await getData(API_END_POINT.sendOTP + `?msisdn=${phoneNumber}&message=${selectedPlan}`)
-        navigate('/enter-otp')
-        dispatch(stopLoading())
+        const response = await getData(API_END_POINT.sendOTP + `?msisdn=${phoneNumber}&message=${selectedPlan}`); 
+        if(response.statuscode == 200){
+            navigate('/enter-otp');
+            dispatch(stopLoading());
+        }
         
       }
+    } catch {
+      // Handle error
     }
-    catch {
-
-    }
-
   };
 
   return (
@@ -150,10 +168,11 @@ const PhoneNumberEntry: React.FC = () => {
             type="text"
             placeholder="Enter phone number"
             value={phoneNumber}
-            onChange={(e) => dispatch(setPhoneNumber(e.target.value))}
+            onChange={handlePhoneNumberChange}
           />
+          {errorMessage && <ErrorContainer >{errorMessage}</ErrorContainer>}
         </InputContainer>
-        <SendOtpButton onClick={handleSendOtp} disabled={phoneNumber.length === 0}>
+        <SendOtpButton onClick={handleSendOtp} disabled={phoneNumber.length !== 10}>
           Send OTP
         </SendOtpButton>
       </Container>

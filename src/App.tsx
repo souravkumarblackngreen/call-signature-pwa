@@ -11,7 +11,7 @@ import PrivacyPolicy from './components/privacyPolicy/PrivacyPolicy'
 import TermsNconditions from './components/termsNconditions/TermsNconditions';
 import Preview from './components/preview/Preview';
 import FAQ from './components/faq/FAQ';
-import PhoneNumberEntry from './components/phoneEntry/PhoneEntry';
+import PhoneNumberEntry from './components/phoneNumberEntry/PhoneNumberEntry';
 
 const App: React.FC = () => {
   return (

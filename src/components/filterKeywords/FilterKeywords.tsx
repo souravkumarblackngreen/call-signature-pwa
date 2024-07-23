@@ -96,20 +96,13 @@ const Input = styled.input`
   max-width: 300px;
 `;
 
-const TitleHeader = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background:#ffff;
-`;
 
 
 const FilterKeywords: React.FC = () => {
 
   const { keywords } = useSelector((state: RootState) => state.filter);
   const [newKeyword, setNewKeyword] = useState<string>('');
-  const { token, userId } = useSelector((state: RootState) => state.user);
+  const { token } = useSelector((state: RootState) => state.user);
   const configText = useSelector((state: RootState) => state.configText);
   const baseUrl = "http://172.16.11.222:5441/crbtSignature/v1";
 
