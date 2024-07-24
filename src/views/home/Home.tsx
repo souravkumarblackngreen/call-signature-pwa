@@ -124,19 +124,6 @@ const Home: React.FC = () => {
           dispatch(setIsHeaderEnrichment(false))
         }
         
-      
-  
-        if (response.status === 302) {
-          const redirectUrl = response.headers.location;
-          if (redirectUrl) {
-            const redirectedResponse = await axios.get(redirectUrl);
-            setRedirectData(redirectedResponse.data)
-            
-          }
-        } else {
-          dispatch(setIsHeaderEnrichment(false))
-          
-        }
       } catch (error) {
         dispatch(setIsHeaderEnrichment(false))
         console.log('Error fetching media content:', error);
