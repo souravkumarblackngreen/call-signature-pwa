@@ -1,6 +1,0 @@
-projectKey=callSignature-EndUser
-serverUrl=http://172.16.11.222:9000/sonar
-serverVersion=8.9.10.61524
-dashboardUrl=http://172.16.11.222:9000/sonar/dashboard?id=callSignature-EndUser
-ceTaskId=AZDZJBNMGjiD2YgwXVYs
-ceTaskUrl=http://172.16.11.222:9000/sonar/api/ce/task?id=AZDZJBNMGjiD2YgwXVYs
