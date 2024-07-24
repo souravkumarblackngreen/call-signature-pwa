@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
 import { RootState } from '../../redux/store';
 import { useSelector } from 'react-redux';
+import '../../assets/css/variables.css';
 
 
 const Container = styled.div`
@@ -13,7 +14,7 @@ const Container = styled.div`
   align-items: center;
   text-align: center;
   height: 100vh;
-  color: #000;
+  color: var(--text-color);
   gap:50px;
 `;
 
@@ -22,7 +23,7 @@ const Header = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background:#ffff;
+  background:var(--header-background-color);
 `;
 
 const BackButton = styled.div`

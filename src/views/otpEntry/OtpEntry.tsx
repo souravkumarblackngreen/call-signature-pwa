@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/logo.png'; // Replace with your logo path
+import logo from '../../assets/images/logo.png'; // Replace with your logo path
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
@@ -10,6 +10,7 @@ import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
 import { getData } from '../../services/Services';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
+import '../../assets/css/variables.css';
 
 const Container = styled.div<{ isLoading: boolean }>`
   display: flex;
@@ -17,7 +18,7 @@ const Container = styled.div<{ isLoading: boolean }>`
   align-items: center;
   text-align: center;
   height: 100vh;
-  background: white;
+  background: var(--whiteColor);
   justify-content: flex-start;
   padding: 20px;
   ${({ isLoading }) =>
@@ -58,7 +59,7 @@ const OtpInput = styled.input`
   height: 50px;
   font-size: 24px;
   text-align: center;
-  border: 1px solid #e4ebf3;
+  border: 1px solid var(--otpInputBorderColor);
   border-radius: 8px;
   background: white;
   color: black;
@@ -76,7 +77,7 @@ const Disclaimer = styled.p`
 `;
 
 const ResendOtp = styled.a`
-  color: #1e90ff;
+  color: var(--planButtonBorderColorSecondary);
   cursor: pointer;
   text-decoration: none;
 `;
@@ -87,8 +88,9 @@ const LoginButton = styled.button<{ disabled: boolean }>`
   cursor: pointer;
   border: none;
   border-radius: 25px;
-  background-color: #0032e3;
+  background-color: var(--otpLoginButtonColor);
   color: white;
+  max-width:400px;
   margin-top: 20px;
   width: 100%;
   opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};

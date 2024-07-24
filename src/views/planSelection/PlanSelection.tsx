@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
 
-import background from '../../assets/SplashScreenBg.png'
+import background from '../../assets/images/SplashScreenBg.png';
 import LanguageDropdown from '../../components/languageDropdown/LanguageDropdown';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 import { setPhoneNumber, setRefreshToken, setSelectedPlan, setToken, setUserId } from '../../redux/slices/UserTypeSlice';
@@ -15,6 +15,7 @@ import { RootState } from '../../redux/store';
 
 import { API_END_POINT } from "../../services/Constant";
 import { getData } from '../../services/Services';
+import '../../assets/css/variables.css';
 
 const Container = styled.div<{ background: string }>`
   display: flex;
@@ -23,7 +24,7 @@ const Container = styled.div<{ background: string }>`
   justify-content: flex-end;
   text-align: center;
   height: 100vh;
-  background: #451322;
+  background: var(--homeBackgroundColor);
   color: white;
   padding: 20px;
   background-image: url(${background});
@@ -62,9 +63,9 @@ const CallSignatureHeader = styled.div`
 `;
 
 const PlanButton = styled.div<{ selected: boolean }>`
-  background: ${(props) => (props.selected ? '#0032DF' : 'white')};
-  color: ${(props) => (props.selected ? 'white' : '#0032DF')};
-  border: 1px solid ${(props) => (props.selected ? '#1E90FF' : '#ccc')};
+  background: ${(props) => (props.selected ? 'var(--button-background-color-primary)' : 'white')};
+  color: ${(props) => (props.selected ? 'white' : 'var(--button-background-color-primary)')};
+  border: 1px solid ${(props) => (props.selected ? 'var(--planButtonBorderColorSecondary)' : 'var(--planButtonBorderColorPrimary)')};
   border-radius: 8px;
   padding: 20px;
   margin: 0 10px;
@@ -114,7 +115,7 @@ const SendOtpButton = styled.button<{ disabled: boolean }>`
   cursor: pointer;
   border: none;
   border-radius: 25px;
-  background-color: #0032DF;
+  background-color: var(--button-background-color-primary);
   color: white;
   margin-bottom: 10px;
   width: 20rem;
@@ -147,6 +148,7 @@ const PlanSelection: React.FC = () => {
   const { selectedPlan, mediaContent, phoneNumber,isHeaderEnrichment} = useSelector((state: RootState) => state.user);
   
   const configText = useSelector((state: RootState) => state.configText);
+  const { lang } = useSelector((state: RootState) => state.lang);
 
   const [plans, setPlans] = useState<any[]>([]);
 
@@ -159,7 +161,7 @@ const PlanSelection: React.FC = () => {
     if(isHeaderEnrichment){
       checkSum()
     }
-  }, []);
+  }, [lang]);
 
   const checkSum = async () => {
     const response = await getData(API_END_POINT.checkSubApi+phoneNumber)
@@ -184,7 +186,9 @@ const PlanSelection: React.FC = () => {
 
   const getSubscription = async () => {
     dispatch(startLoading());
-    const response = await getData(API_END_POINT.subscriptionPlans);
+    const response = await getData(API_END_POINT.subscriptionPlans,{headers: {
+      langCode: lang,
+    }});
     setPlans(response);
     dispatch(stopLoading());
   };

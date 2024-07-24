@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/images/logo.png';
 import { useNavigate } from 'react-router-dom';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
+
 import { API_END_POINT } from '../../services/Constant';
 import { setConfigText, resetConfigState } from '../../redux/slices/GloabalTextDataSlice';
 import { setLanguage,resetLanguageState } from '../../redux/slices/LanguageSlice';
@@ -19,7 +19,7 @@ import { resetProfileState } from '../../redux/slices/ProfileSlice';
 import { resetSignatureTabsState } from '../../redux/slices/SignatureTabsSlice';
 import { resetDashboardState } from '../../redux/slices/DashboardSlice';
 import { resetUserState } from "../../redux/slices/UserTypeSlice"
-import { getData } from '../../services/Services';
+import { deleteData, getData } from '../../services/Services';
 
 
 const SidebarContainer = styled.div<{ isOpen: boolean }>`
@@ -121,14 +121,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const Unsubscribe = async () => {
 
     try {
-      const response = await axios.delete(`${process.env.REACT_APP_ + API_END_POINT.unsubscribe}`, {
+      const response = await deleteData(`${API_END_POINT.unsubscribe}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           langCode: lang,
         },
       });
 
-      if (response.data.statuscode == 200) {
+      
+      if (response.statuscode == 200) {
         dispatch(resetConfigState())
         dispatch(resetDashboardState())
         dispatch(resetFilterState())
@@ -201,7 +202,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       <CloseButton onClick={toggleSidebar}>×</CloseButton>
       <Logo src={logo} alt="Call Signature" />
       {menuData.map((item: any) => renderMenuItem(item))}
-      <UnsubscribeButton onClick={Unsubscribe}>{'Unsubscribe'}</UnsubscribeButton>
+      <UnsubscribeButton onClick={Unsubscribe}>{configText.config.unsubscribe}</UnsubscribeButton>
     </SidebarContainer>
   );
 };

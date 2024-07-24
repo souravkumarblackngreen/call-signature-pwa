@@ -12,6 +12,7 @@ import { setSubscriptionDate,setNextRenewal,setSubscriptionPlan,setPhoneNo} from
 import { formatDate, getData } from '../../services/Services';
 import { API_END_POINT } from '../../services/Constant';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
+import '../../assets/css/variables.css';
 
 const Container = styled.div`
   display: flex;
@@ -19,7 +20,7 @@ const Container = styled.div`
   align-items: center;
   text-align: center;
   height: 100vh;
-  color: #000;
+  color: var(--text-color);
   gap:100px;
 `;
 
@@ -28,7 +29,7 @@ const Header = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background:#ffff;
+  background:var(--header-background-color);
 `;
 
 const BackButton = styled.div`
@@ -48,7 +49,7 @@ const Title = styled.h1`
 `;
 
 const ProfileCard = styled.div`
-  background: #fff;
+  background: var(--header-background-color);
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -78,7 +79,7 @@ const InfoLabel = styled.span`
 `;
 
 const InfoValue = styled.span`
-  color: #1E90FF;
+  color: var(--planButtonBorderColorSecondary);
   cursor: pointer;
 `;
 const HeaderContainer = styled.div`

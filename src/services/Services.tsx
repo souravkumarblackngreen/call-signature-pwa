@@ -10,6 +10,25 @@ export const getData = async (endpoint: string, headers: any = {}) => {
     }
   };
 
+  export const postData = async (endpoint: string, data: any, headers: any = {}) => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_}${endpoint}`, data, headers);
+      return response.data.response || response.data;
+    } catch (error) {
+      console.error('Error posting data:', error);
+      throw error;
+    }
+  };
+
+  export const deleteData = async (endpoint: string, headers: any = {}) => {
+    try {
+      const response = await axios.delete(`${process.env.REACT_APP_}${endpoint}`, headers);
+      return response.data.response || response.data;
+    } catch (error) {
+      console.error('Error deleting data:', error);
+      throw error;
+    }
+  };
   export function formatDate(dateString: string) {
     const date = new Date(dateString);
     const options: Intl.DateTimeFormatOptions = {

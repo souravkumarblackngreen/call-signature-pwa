@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/logo.png'; // Replace with your logo path
+import logo from '../../assets/images/logo.png'; // Replace with your logo path
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
@@ -9,6 +9,7 @@ import { setPhoneNumber } from '../../redux/slices/UserTypeSlice';
 import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
 import { getData } from '../../services/Services';
+import '../../assets/css/variables.css';
 
 const Container = styled.div<{ isLoading: boolean }>`
   display: flex;
@@ -16,7 +17,7 @@ const Container = styled.div<{ isLoading: boolean }>`
   align-items: center;
   text-align: center;
   height: 100vh;
-  background: white;
+  background: var(--whiteColor);
   justify-content: flex-start;
   padding: 20px;
   ${({ isLoading }) =>
@@ -35,19 +36,19 @@ const Logo = styled.img`
 const Title = styled.h1`
   font-size: 1.8rem;
   margin: 10px 0;
-  color: black;
+  color: var(--blackColor);
 `;
 const WelComeTitle = styled.h1`
   font-size: 1.5rem;
   margin: 10px 0;
   padding-bottom: 25px;
-  color: black;
+  color: var(--blackColor);
 `;
 
 const Subtitle = styled.h2`
   font-size: 1rem;
   margin-bottom: 20px;
-  color: grey;
+  color: var(--greyColor);
 `;
 
 const InputContainer = styled.div`
@@ -68,13 +69,13 @@ const InputLabel = styled.div`
 const InputField = styled.input`
   padding: 10px;
   font-size: 1rem;
-  border: 1px solid #e4ebf3;
+  border: 1px solid var(--otpInputBorderColor);
   border-radius: 8px;
-  background: #f5f5f5;
-  color: black;
+  background: var(--background-color);
+  color: var(--blackColor);
 
   &::placeholder {
-    color: grey;
+    color: var(--greyColor);
     opacity: 1;
   }
 `;
@@ -85,7 +86,7 @@ const SendOtpButton = styled.button<{ disabled: boolean }>`
   cursor: pointer;
   border: none;
   border-radius: 25px;
-  background-color: #0032e3;
+  background-color: var(--otpLoginButtonColor);
   color: white;
   margin-top: 20px;
   width: 100%;
@@ -143,7 +144,7 @@ const PhoneNumberEntry: React.FC = () => {
     dispatch(startLoading());
     try {
       if (phoneNumber) {
-        const response = await getData(API_END_POINT.sendOTP + `?msisdn=${phoneNumber}&message=${selectedPlan}`); 
+        const response = await getData(API_END_POINT.sendOTP + `?msisdn=${phoneNumber}`); 
         if(response.statuscode == 200){
             navigate('/enter-otp');
             dispatch(stopLoading());

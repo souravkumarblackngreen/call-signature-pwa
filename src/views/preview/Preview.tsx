@@ -1,19 +1,20 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import mobileFrame from '../../assets/callScreen.png';
-import notch from '../../assets/notch.png';
+import mobileFrame from '../../assets/images/callScreen.png';
+import notch from '../../assets/images/notch.png';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
 
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
+import '../../assets/css/variables.css';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   height: 100%;
-  color: #000;
+  color: var(--text-color);
 `;
 
 const Header = styled.div`
@@ -22,7 +23,7 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fff;
+  background: var(--card-background-color);
   color: #000;
 `;
 
@@ -33,14 +34,14 @@ const Title = styled.h1`
 const BackButton = styled.button`
 font-size: 24px;
 cursor: pointer;
-border: 1px solid grey;
+border: 1px solid var(--greyColor);
 border-radius: 50%;
 padding: 5px;
 display: flex;
 justify-content: center;
 align-items: center;
 margin-left: 20px;
-background:white;
+background:var(--whiteColor);
 align-self:flex-start;
 `;
 
@@ -81,8 +82,8 @@ const PreviewContent = styled.div`
   width: 74%;
   text-align: center;
   height:90%;
-  background: black; /* Set the background to black */
-  color: white;
+  background: var(--blackColor); /* Set the background to black */
+  color: var(--whiteColor);
   padding: 20px;
   border-radius: 16px;
   display:flex;
@@ -98,7 +99,7 @@ const PhoneNumber = styled.div`
 `;
 
 const FlashMessageContainer = styled.div`
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--preview-flashmessage-containerBg);
   border-radius: 8px;
   padding: 10px;
   margin-bottom: 20px;

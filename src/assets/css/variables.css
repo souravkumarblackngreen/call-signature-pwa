@@ -1,0 +1,31 @@
+:root {
+  --background-color: #f5f5f5;
+  --text-color: #000;
+  --header-background-color: #fff;
+  --header-text-color: #000;
+  --button-background-color-primary: #0032DF;
+  --button-text-color-primary: #fff;
+  --button-border-color-primary: #0032DF;
+  --button-background-color-secondary: #fff;
+  --button-text-color-secondary: #0032DF;
+  --button-border-color-secondary: #0032DF;
+  --card-background-color: #fff;
+  --flash-message-background-color: #fff;
+  --flash-message-title-color: #000;
+  --flash-message-content-color: #000;
+  --flash-message-status-color: green;
+  --business-card-background-color: #f5f5f5;
+  --business-card-hover-background-color: #ccc;
+  --modal-background-color: rgba(0, 0, 0, 0.5);
+  --preview-flashmessage-containerBg:rgba(255, 255, 255, 0.2);
+  --modal-content-background-color: #fff;
+  --faq-item-border-color: #e4e4e4;
+  --greyColor:grey;
+  --whiteColor:white;
+  --blackColor:black;
+  --homeBackgroundColor:#451322;
+  --planButtonBorderColorSecondary:#1E90FF;
+  --planButtonBorderColorPrimary:#ccc;
+  --otpInputBorderColor:#e4ebf3;
+  --otpLoginButtonColor:#0032e3;
+}

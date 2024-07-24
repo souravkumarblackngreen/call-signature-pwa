@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Sidebar from '../../components/sidemenu/Sidebar';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/images/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from "axios";
+
 import Modal from '../../components/modal/Modal';
 import SignatrueTabs from '../../components/signatureTabs/SignatureTabs';
 import { setStatusMessage, setSignatureMessage, setSignatureId,setStatusId } from '../../redux/slices/DashboardSlice';
@@ -16,15 +16,16 @@ import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
-import {getData} from '../../services/Services'
+import {getData, postData} from '../../services/Services';
+import '../../assets/css/variables.css';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   height: 100vh;
-  background: #f5f5f5;
-  color: #000;
+  background: var(--background-color);
+  color: var(--text-color);
 `;
 
 const Header = styled.div`
@@ -33,8 +34,8 @@ const Header = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background: #fff;
-  color: #000;
+  background: var(--header-background-color);
+  color: var(--header-text-color);
 `;
 
 const Title = styled.h1`
@@ -64,7 +65,7 @@ const Logo = styled.img`
 `;
 
 const FlashMessageContainer = styled.div`
-  background: #fff;
+  background: var(--flash-message-background-color);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
@@ -74,15 +75,17 @@ const FlashMessageContainer = styled.div`
 const FlashMessageTitle = styled.h2`
   font-size: 1.2rem;
   margin-bottom: 10px;
+  color: var(--flash-message-title-color);
 `;
 
 const FlashMessageContent = styled.p`
   font-size: 1rem;
   margin-bottom: 10px;
+  color: var(--flash-message-content-color);
 `;
 
 const FlashMessageStatus = styled.div`
-  color: green;
+  color: var(--flash-message-status-color);
   font-weight: bold;
   margin-bottom: 10px;
 `;
@@ -94,9 +97,9 @@ const ButtonContainer = styled.div`
 `;
 
 const Button = styled.button<{ primary?: boolean }>`
-  background: ${(props) => (props.primary ? '#0032DF' : 'white')};
-  color: ${(props) => (props.primary ? 'white' : '#0032DF')};
-  border: 1px solid #0032DF;
+  background: ${(props) => (props.primary ? 'var(--button-background-color-primary)' : 'var(--button-background-color-secondary)')};
+  color: ${(props) => (props.primary ? 'var(--button-text-color-primary)' : 'var(--button-text-color-secondary)')};
+  border: 1px solid ${(props) => (props.primary ? 'var(--button-border-color-primary)' : 'var(--button-border-color-secondary)')};
   border-radius: 25px;
   padding: 10px 20px;
   cursor: pointer;
@@ -105,11 +108,11 @@ const Button = styled.button<{ primary?: boolean }>`
 `;
 
 const BusinessCardContainer = styled.div`
-  background: #fff;
+  background: var(--card-background-color);
   border-radius: 8px;
   padding: 20px;
-  max-height:250px;
-  overflow-y:auto;
+  max-height: 250px;
+  overflow-y: auto;
 `;
 
 const BusinessCardTitle = styled.h2`
@@ -118,14 +121,15 @@ const BusinessCardTitle = styled.h2`
 `;
 
 const BusinessCard = styled.div`
-  background: #f5f5f5;
+  background: var(--business-card-background-color);
   padding: 10px;
   border-radius: 8px;
   margin-bottom: 10px;
   text-align: left;
-  cursor:pointer;
+  cursor: pointer;
+
   &:hover {
-    background-color: #ccc;
+    background-color: var(--business-card-hover-background-color);
   }
 `;
 
@@ -135,9 +139,8 @@ const BusinessCardTitleText = styled.p`
 `;
 
 const ToggleButton = styled.div`
-display:flex;
-
-`
+  display: flex;
+`;
 
 const Dashboard: React.FC = () => {
 
@@ -249,7 +252,7 @@ const Dashboard: React.FC = () => {
   
   const setCardMessage = (template: any) => {
 
-    if (activeTab.toLocaleLowerCase() === 'signature') {
+    if (activeTab === configText.config.signature) {
       dispatch(setSignatureMessage(template))
     } else {
       dispatch(setStatusMessage(template))
@@ -267,8 +270,9 @@ const Dashboard: React.FC = () => {
     setToggleChecked(event.target.checked);
     setLoader(true);
     const action = event.target.checked ? "PUBLISH" : "UNPUBLISH";
+    const actionUrl = event.target.checked ? API_END_POINT.publishUrl : API_END_POINT.unPublishUrl;
     try {
-      await axios.post(`http://172.16.11.222:5442/crbtSignature/v1/dashboard/signature-action/${action}`, [], {
+      await postData(actionUrl, [], {
         headers: {
           Authorization: `Bearer ${token}`,
           langCode: lang,
@@ -292,8 +296,8 @@ const Dashboard: React.FC = () => {
 
   
 
-  const templates = activeTab.toLocaleLowerCase() === 'signature' ? signatureTemplates : statusTemplates
-  const flashMessageToShow = activeTab.toLocaleLowerCase() === 'signature' ? signatureMessage : statusMessage
+  const templates = activeTab === configText.config.signature ? signatureTemplates : statusTemplates
+  const flashMessageToShow = activeTab === configText.config.signature ? signatureMessage : statusMessage
   const modalToShow = firstTimeModal || showModal
   return (
     <Container>

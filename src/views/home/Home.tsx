@@ -5,7 +5,7 @@ import CryptoJS from 'crypto-js';
 
 import ArrowForwardSharpIcon from '@mui/icons-material/ArrowForwardSharp';
 import { API_END_POINT } from "../../services/Constant";
-import background from '../../assets/SplashScreenBg.png' // Replace with your background image path
+import background from '../../assets/images/SplashScreenBg.png' // Replace with your background image path
 import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -15,6 +15,7 @@ import {getData} from '../../services/Services'
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 import Loader from '../../components/loader/Loader';
 import axios from 'axios';
+import '../../assets/css/variables.css';
 
 const Container = styled.div`
   display: flex;
@@ -23,7 +24,7 @@ const Container = styled.div`
   justify-content: flex-end;
   text-align: center;
   height: 100vh;
-  background:#451322;
+  background:var(--homeBackgroundColor);
   gap:30px;
   color: white;
   background-image: url(${background});
@@ -51,7 +52,7 @@ const NextButton = styled.button`
   cursor: pointer;
   border: none;
   border-radius: 50%;
-  background-color: #0032E3;
+  background-color: var(--button-background-color-primary);
   border:1px dotted;
   color: white;
   display: flex;
@@ -106,6 +107,7 @@ const Home: React.FC = () => {
     {
       dispatch(startLoading());
       try {
+       
         const response = await axios.get("http://172.16.11.222:8099/header-augment-0.0.1-SNAPSHOT/v1/mobile/get-he-number",{
           headers:{
             'Service-Name':'callSignatureMobileView'
@@ -132,7 +134,7 @@ const Home: React.FC = () => {
             
           }
         } else {
-          console.log(response.headers.location,'dsfsdf')
+          dispatch(setIsHeaderEnrichment(false))
           
         }
       } catch (error) {
