@@ -149,7 +149,8 @@ const EditSignature: React.FC = () => {
           Authorization: `Bearer ${token}`,
           // Assuming the content type is JSON
         },
-      }
+        
+      },
     );
    
     setLoader(false)
@@ -161,7 +162,11 @@ const EditSignature: React.FC = () => {
     
   };
 
-  
+  const handleError = (errorMsg:any) => {
+    setModalMessage(errorMsg)
+    setModalType('error')
+    setModalSubMessage(' ')
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;

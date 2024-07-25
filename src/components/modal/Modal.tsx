@@ -39,6 +39,10 @@ const ModalContainer = styled.div`
   position: relative;
   height:40%;
   animation: ${fadeIn} 0.3s ease-out;
+  display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 `;
 
 const CloseButton = styled.button`
@@ -90,9 +94,10 @@ interface ModalProps {
   subMessage?:string;
   type?:string;
   modalTitle?:string;
+  buttonLabel?:string;
 }
 
-const Modal: React.FC<ModalProps> = ({ show, onClose, message , subMessage, type, modalTitle }) => {
+const Modal: React.FC<ModalProps> = ({ show, onClose, message , subMessage, type, modalTitle, buttonLabel='close' }) => {
   if (!show) {
     return null;
   }
@@ -107,7 +112,7 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, message , subMessage, type
         <Title>{type == 'error' ? "Oops!" :(modalTitle || "Successfully Subscribe")}</Title>
         <Message>{message||'Seems like there was a problem with your request.'}</Message>
         <SubMessage>{subMessage || 'Please try again later.'}</SubMessage>
-        <StyledCloseButton onClick={onClose}>Close</StyledCloseButton>
+        <StyledCloseButton onClick={onClose}>{buttonLabel}</StyledCloseButton>
       </ModalContainer>
     </ModalBackground>
   );

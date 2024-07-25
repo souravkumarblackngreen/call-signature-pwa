@@ -162,6 +162,7 @@ const Dashboard: React.FC = () => {
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
   const { token, userId, firstTimeModal } = useSelector((state: RootState) => state.user);
   const configText = useSelector((state: RootState) => state.configText);
+  const { privacyPolicy, termsncondition} = useSelector((state: RootState) => state.terms);
 
   const dispatch = useDispatch();
   const navigate = useNavigate()
@@ -170,10 +171,14 @@ const Dashboard: React.FC = () => {
     setSidebarOpen(!isSidebarOpen);
   };
 
-  useEffect(() => {
+  useEffect(()=>{
     getTemplate()
+  },[privacyPolicy,termsncondition])
+
+  useEffect(() => {
     getInfo()
     getTermsNcondition()
+    if(firstTimeModal)showSucessSubscriber()
   }, [])
 
   const getTermsNcondition = async () => {
@@ -267,10 +272,10 @@ const Dashboard: React.FC = () => {
   };
 
   const handleToggleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    setToggleChecked(event.target.checked);
     setLoader(true);
-    const action = event.target.checked ? "PUBLISH" : "UNPUBLISH";
-    const actionUrl = event.target.checked ? API_END_POINT.publishUrl : API_END_POINT.unPublishUrl;
+    const value = event.target.checked;
+    const action = value ? "PUBLISH" : "UNPUBLISH";
+    const actionUrl = value ? API_END_POINT.publishUrl : API_END_POINT.unPublishUrl;
     try {
       await postData(actionUrl, [], {
         headers: {
@@ -278,6 +283,7 @@ const Dashboard: React.FC = () => {
           langCode: lang,
         },
       });
+      setToggleChecked(value);
       setModalMessage(`Signature ${action.toLowerCase()}ed successfully.`);
       setModalType('success');
     } catch (err) {
@@ -291,6 +297,13 @@ const Dashboard: React.FC = () => {
   const showSucessSubscriber = () => {
     setModalMessage('You have sucessfully subscribed to this services.')
     setModalType('success')
+    setModalSubMessage(' ')
+  }
+
+  const handleError = () => {
+    setModalMessage('You have sucessfully subscribed to this services.')
+    setModalType('success')
+    setModalSubMessage(' ')
   }
 
 
@@ -302,7 +315,7 @@ const Dashboard: React.FC = () => {
   return (
     <Container>
       {loader && <Loader />}
-      <Modal show={modalToShow} onClose={closeModal} message={modalMessage} type={modalType} subMessage={modalSubMessage} />
+      <Modal show={modalToShow} onClose={closeModal} message={modalMessage} type={modalType} subMessage={modalSubMessage} buttonLabel={"Explore"}/>
       <Header>
         <HamburgerMenu onClick={toggleSidebar}>☰</HamburgerMenu>
         <CallSignatureHeader>

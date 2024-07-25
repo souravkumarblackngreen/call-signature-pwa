@@ -43,6 +43,7 @@
   "scripts": {
     "start": "PORT=8095 && react-scripts start",
     "build": "react-scripts build",
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -66,6 +67,7 @@
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "source-map-explorer": "^2.5.3"
   }
 }

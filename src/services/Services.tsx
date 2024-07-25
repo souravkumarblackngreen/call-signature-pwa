@@ -16,6 +16,7 @@ export const getData = async (endpoint: string, headers: any = {}) => {
       return response.data.response || response.data;
     } catch (error) {
       console.error('Error posting data:', error);
+      
       throw error;
     }
   };
