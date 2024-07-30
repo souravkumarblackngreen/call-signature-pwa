@@ -50,10 +50,10 @@ const ContentCard = styled.div`
   background: var(--header-background-color);
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 3px 36px #00000012;
   width: 80%;
   max-width: 400px;
-  max-height: 400px; /* Set your desired maximum height here */
+  max-height: 900px; /* Set your desired maximum height here */
   overflow-y: auto; /* Add vertical scroll when content exceeds max-height */
   display: flex;
   flex-direction: column;

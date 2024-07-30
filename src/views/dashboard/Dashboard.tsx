@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Sidebar from '../../components/sidemenu/Sidebar';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import logo from '../../assets/images/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../redux/store';
@@ -140,6 +140,7 @@ const BusinessCardTitleText = styled.p`
 
 const ToggleButton = styled.div`
   display: flex;
+  text-transform:capitalize;
 `;
 
 const Dashboard: React.FC = () => {
@@ -306,12 +307,30 @@ const Dashboard: React.FC = () => {
     setModalSubMessage(' ')
   }
 
+  const getToggleLabel = (toggleChecked:boolean)=>{
+    let valToReturn='';
+    if(activeTab == configText.config.signature){
+      valToReturn = toggleChecked ? 'signature active' : 'signature inactive'
+    }else{
+      valToReturn = toggleChecked ? 'status active' : 'status inactive'
+    }
+    return valToReturn;
+  }
+
 
   
 
   const templates = activeTab === configText.config.signature ? signatureTemplates : statusTemplates
-  const flashMessageToShow = activeTab === configText.config.signature ? signatureMessage : statusMessage
+  let flashMessageToShow = activeTab === configText.config.signature ? signatureMessage : statusMessage
+
   const modalToShow = firstTimeModal || showModal
+
+  let signatureButtonlabel = activeTab === configText.config.signature?configText.config.editSignature:"Edit Status"
+  if(flashMessageToShow == ''){
+    flashMessageToShow = `No ${activeTab === configText.config.signature ?configText.config.signature:configText.config.status } set, Please click on add signature to set.`;
+    signatureButtonlabel = `Add ${activeTab === configText.config.signature ?configText.config.signature:configText.config.status }`
+  }
+
   return (
     <Container>
       {loader && <Loader />}
@@ -322,7 +341,7 @@ const Dashboard: React.FC = () => {
           <Logo src={logo} alt="Call Signature" />
           <Title>{configText.config.callSignature}</Title>
         </CallSignatureHeader>
-        <NotificationsIcon onClick={() => setShowModal((p) => !p)} />
+        <AccountCircleRoundedIcon sx={{ fontSize: 30 }} onClick={() => navigate('/profile')} />
       </Header>
       <Content>
         <SignatrueTabs />
@@ -332,10 +351,9 @@ const Dashboard: React.FC = () => {
             {flashMessageToShow}
           </FlashMessageContent>
           
-          <FlashMessageStatus>Active</FlashMessageStatus>
           <ButtonContainer>
             <Button onClick={() => navigate('/preview')}>{configText.config.preview}</Button>
-            <Button primary onClick={() => navigate('/edit-signature')}>{configText.config.editSignature}</Button>
+            <Button primary onClick={() => navigate('/edit-signature')}>{signatureButtonlabel}</Button>
           </ButtonContainer>
           <ToggleButton>
           <FormControlLabel
@@ -346,9 +364,10 @@ const Dashboard: React.FC = () => {
                 name="toggleSwitch"
                 color="success"
                 inputProps={{ 'aria-label': 'primary checkbox' }}
+                sx={{'textTransform':"capitalize"}}
               />
             }
-            label={toggleChecked?configText.config.signature:configText.config.subscribeActive}
+            label={getToggleLabel(toggleChecked)}
           />
           </ToggleButton>
           

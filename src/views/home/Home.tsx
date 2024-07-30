@@ -16,6 +16,7 @@ import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 import Loader from '../../components/loader/Loader';
 import axios from 'axios';
 import '../../assets/css/variables.css';
+import { setPrivacy, setTerms } from '../../redux/slices/PrivacyPolicySlice';
 
 const Container = styled.div`
   display: flex;
@@ -75,7 +76,19 @@ const Home: React.FC = () => {
     getMediaContent()
     getRegex()
     helogin()
+    getTermsNcondition()
   }, []);
+
+
+  const getTermsNcondition = async () => {
+    dispatch(startLoading())
+    const response = await getData(API_END_POINT.privacyContent)
+    const { privacyPolicy, tearmsAndCondition } = response
+    dispatch(stopLoading())
+    dispatch(setPrivacy(privacyPolicy))
+    dispatch(setTerms(tearmsAndCondition))
+
+  }
 
   
   const getMediaContent = async()=>{

@@ -53,10 +53,10 @@ const SignatureTabs: React.FC = () => {
                         </Tab>
 
                     </TabsContainer>
-                    <InfoContainer>
+                    {/* <InfoContainer>
                         <InfoOutlinedIcon sx={{ 'fontSize': '1rem' }} />
                         <span>{configText.config.verificationInProcess}</span>
-                    </InfoContainer>
+                    </InfoContainer> */}
 
                 </div>
     );

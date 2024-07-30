@@ -81,7 +81,7 @@ const PlanButton = styled.div<{ selected: boolean }>`
 `;
 
 const Disclaimer = styled.p`
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   margin: 10px 0;
 `;
 
@@ -142,6 +142,16 @@ cursor:pointer;
   text-decoration: underline;
 }
 `;
+
+const TermsandPrivacyContainer = styled.span`
+  margin-left: 5px;
+  cursor: pointer;
+  color: var(--button-background-color-primary);
+  text-decoration: underline;
+  text-transform:capitalize;
+`;
+
+
 
 const PlanSelection: React.FC = () => {
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
@@ -232,7 +242,7 @@ const PlanSelection: React.FC = () => {
           ))}
         </PlanContainer>
         <Disclaimer>
-          {configText.config.disclaimer}
+          By registering yourself to this platform you have agreed to the <TermsandPrivacyContainer onClick={()=>navigate('/termsNconditions')}>terms and conditions</TermsandPrivacyContainer> and <TermsandPrivacyContainer onClick={()=>navigate('/privacy-policy')}>Privacy Policy </TermsandPrivacyContainer>  of the platform.
         </Disclaimer>
         <SendOtpButton onClick={moveToEnterPhonenoRoute} disabled={!isFormComplete}>
           {configText.config.subscribe}

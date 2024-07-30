@@ -5,7 +5,7 @@ import logo from '../../assets/images/logo.png'; // Replace with your logo path
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
-import { setToken, setRefreshToken, setUserId } from '../../redux/slices/UserTypeSlice';
+import { setToken, setRefreshToken, setUserId, setIsHeaderEnrichment, setFirstTimeModal } from '../../redux/slices/UserTypeSlice';
 import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
 import { getData } from '../../services/Services';
@@ -184,9 +184,15 @@ const OtpEntry: React.FC = () => {
         dispatch(setToken(token));
         dispatch(setRefreshToken(refreshToken));
         dispatch(setUserId(userId));
-      } else if (response.data.response.currentStatus === 'new') {
+      } else if (response.currentStatus === 'new') {
         const res = await getData(API_END_POINT.subscribe + `?msisdn=${phoneNumber}&planId=${selectedPlan}`);
-        if (res.data.response.currentStatus === 'new') {
+        if (res.currentStatus === 'active') {
+          const { refreshToken, token, userId } = res;
+          dispatch(stopLoading());
+          dispatch(setToken(token));
+          dispatch(setRefreshToken(refreshToken));
+          dispatch(setUserId(userId));
+          dispatch(setFirstTimeModal(true))
           navigate('/dashboard');
         }
       }
@@ -195,7 +201,7 @@ const OtpEntry: React.FC = () => {
 
   const handleResendOTP = async () => {
     dispatch(startLoading());
-    await getData(API_END_POINT.resendOTP + `?msisdn=${phoneNumber}&otp=${selectedPlan}`);
+    await getData(API_END_POINT.resendOTP + `?msisdn=${phoneNumber}`);
     dispatch(stopLoading());
   };
 
@@ -232,7 +238,7 @@ const OtpEntry: React.FC = () => {
             />
           ))}
         </OtpContainer>
-        <Disclaimer>{configText.config.sent_code + phoneNumber + configText.config.verify_registration}</Disclaimer>
+        <Disclaimer>{configText.config.sent_code + ' +91-'+phoneNumber + configText.config.verify_registration}</Disclaimer>
         <Disclaimer>
           {configText.config.not_got_code} <ResendOtp onClick={handleResendOTP}>{configText.config.resend_code}</ResendOtp>
         </Disclaimer>

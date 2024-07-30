@@ -7,8 +7,8 @@ interface DashboardState {
   statusId:number | null;
 }
 const initialState: DashboardState = {
-  statusMessage:"hey, i m status",
-  signatureMessage:"hey, i m signature",
+  statusMessage:"",
+  signatureMessage:"",
   globalShowModal:false,
   signatureId:0,
   statusId:0

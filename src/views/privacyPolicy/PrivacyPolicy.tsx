@@ -47,7 +47,7 @@ const ProfileCard = styled.div`
   background: #fff;
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 3px 36px #00000012;
   width: 80%;
   height:auto;
   max-width: 400px;

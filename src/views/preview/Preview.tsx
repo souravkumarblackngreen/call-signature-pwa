@@ -106,7 +106,7 @@ const FlashMessageContainer = styled.div`
 `;
 
 const FlashMessageTitle = styled.h2`
-  font-size: 1.2rem;
+  font-size: 1rem;
   margin-bottom: 10px;
 `;
 
