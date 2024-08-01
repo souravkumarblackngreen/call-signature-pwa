@@ -1,4 +1,11 @@
 import axios from "axios";
+import { resetDashboardState } from "../redux/slices/DashboardSlice";
+import { resetFilterState } from "../redux/slices/FilterSlice";
+import { resetLoadingState } from "../redux/slices/LoaderSlice";
+import { resetPrivacyPolicyState } from "../redux/slices/PrivacyPolicySlice";
+import { resetProfileState } from "../redux/slices/ProfileSlice";
+import { resetSignatureTabsState } from "../redux/slices/SignatureTabsSlice";
+import { resetUserState } from "../redux/slices/UserTypeSlice";
 
 export const getData = async (endpoint: string, headers: any = {}) => {
     try {
@@ -44,3 +51,16 @@ export const getData = async (endpoint: string, headers: any = {}) => {
   
     return `${formattedDate}`;
   } 
+
+  export const logoutfunc = async(navigate:any, dispatch:any) => {
+    //Reset the Redux state
+    resetDashboardState()
+    resetFilterState()
+    resetLoadingState()
+    resetPrivacyPolicyState()
+    resetProfileState()
+    resetSignatureTabsState()
+    resetUserState()
+    // Navigate to the home or login page
+    navigate("/");
+  };

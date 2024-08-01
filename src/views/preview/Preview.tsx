@@ -18,11 +18,12 @@ const Container = styled.div`
 `;
 
 const Header = styled.div`
-  width: 100%;
+  width: 90%;
   padding: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-right:10%;
   background: var(--card-background-color);
   color: #000;
 `;
@@ -127,7 +128,7 @@ const Preview: React.FC = () => {
   };
 
 
-  const flashMessageToShow = activeTab.toLocaleLowerCase() === 'signature' ? signatureMessage : statusMessage
+  const flashMessageToShow = activeTab === configText.config.signature ? signatureMessage : statusMessage
   return (
     <Container>
       <Header>

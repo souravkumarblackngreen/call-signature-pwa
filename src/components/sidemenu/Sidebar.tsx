@@ -20,6 +20,8 @@ import { resetSignatureTabsState } from '../../redux/slices/SignatureTabsSlice';
 import { resetDashboardState } from '../../redux/slices/DashboardSlice';
 import { resetUserState } from "../../redux/slices/UserTypeSlice"
 import { deleteData, getData } from '../../services/Services';
+import Loader from '../loader/Loader';
+import useJWTRefreshToken from '../../hooks/useJWTRefreshToken';
 
 
 const SidebarContainer = styled.div<{ isOpen: boolean }>`
@@ -93,7 +95,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const [menuData, setMenuData] = useState<[]>([]);
   const dispatch = useDispatch();
   const { token } = useSelector((state: RootState) => state.user);
+  const [updatedToken, setUpdatedToken] = React.useState(false);
   const configText = useSelector((state: RootState) => state.configText);
+  const isLoading = useSelector((state: RootState) => state.loader.isLoading);
+  const refreshJWT = useJWTRefreshToken();
 
   const toggleLanguageMenu = () => {
     setLanguageOpen(!isLanguageOpen);
@@ -103,22 +108,35 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   };
   useEffect(() => {
     handleLanguageChangeData();
-  }, [lang]);
+  }, [updatedToken,lang]);
   useEffect(() => {
     getMenu()
-  }, [])
+  }, [updatedToken,token])
   const handleLanguageChangeData = async () => {
+    dispatch(startLoading())
     try {
       const response = await getData(
         `${API_END_POINT.getAllData}/${lang}`
       );
       dispatch(setConfigText(response));
+      dispatch(stopLoading())
      
-    } catch (error) {
+    } catch (error:any) {
       console.log(error);
+      dispatch(stopLoading())
+      if (
+        error.response.data.statuscode === 4001 ||
+        error.response.data.statuscode === 4002
+         
+      ) {
+
+        const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
+        setUpdatedToken(Boolean(refreshSuccess));
+      }
     }
   };
   const Unsubscribe = async () => {
+    dispatch(startLoading())
 
     try {
       const response = await deleteData(`${API_END_POINT.unsubscribe}`, {
@@ -128,7 +146,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         },
       });
 
-      
+      dispatch(stopLoading())
       if (response.statuscode == 200) {
         dispatch(resetConfigState())
         dispatch(resetDashboardState())
@@ -141,8 +159,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         dispatch(resetUserState())
         navigate('/')
       }
-    } catch (error) {
+    } catch (error:any) {
       console.log(error);
+      dispatch(stopLoading())
+      if (
+        error.response.data.statuscode === 4001 ||
+        error.response.data.statuscode === 4002
+         
+      ) {
+
+        const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
+        setUpdatedToken(Boolean(refreshSuccess));
+      }
     }
   };
   const getMenu = async () => {
@@ -159,6 +187,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       dispatch(stopLoading())
     } catch (error: any) {
       dispatch(stopLoading())
+      if (
+        error.response.data.statuscode === 4001 ||
+        error.response.data.statuscode === 4002
+         
+      ) {
+
+        const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
+        setUpdatedToken(Boolean(refreshSuccess));
+      }
 
     }
   };
@@ -198,12 +235,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     }
   };
   return (
+    <>
+    {isLoading && <Loader/>}
     <SidebarContainer isOpen={isOpen}>
       <CloseButton onClick={toggleSidebar}>×</CloseButton>
       <Logo src={logo} alt="Call Signature" />
       {menuData.map((item: any) => renderMenuItem(item))}
       <UnsubscribeButton onClick={Unsubscribe}>{configText.config.unsubscribe}</UnsubscribeButton>
     </SidebarContainer>
+    </>
   );
 };
 export default Sidebar;

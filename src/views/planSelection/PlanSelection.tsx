@@ -26,7 +26,6 @@ const Container = styled.div<{ background: string }>`
   height: 100vh;
   background: var(--homeBackgroundColor);
   color: white;
-  padding: 20px;
   background-image: url(${background});
   background-size: cover;
   background-position: center;
@@ -65,19 +64,19 @@ const CallSignatureHeader = styled.div`
 const PlanButton = styled.div<{ selected: boolean }>`
   background: ${(props) => (props.selected ? 'var(--button-background-color-primary)' : 'white')};
   color: ${(props) => (props.selected ? 'white' : 'var(--button-background-color-primary)')};
-  border: 1px solid ${(props) => (props.selected ? 'var(--planButtonBorderColorSecondary)' : 'var(--planButtonBorderColorPrimary)')};
+  border: 1px solid;
   border-radius: 8px;
   padding: 20px;
   margin: 0 10px;
   cursor: pointer;
   font-size: 1rem;
-  min-height: 150px;
-  width: 25%;
+  min-height: 120px;
+  width: 20%;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: ${(props) => (!props.selected ? '0 4px 8px rgba(0, 0, 0, 0.1)' : '0px 0px 22px #fff')};
 `;
 
 const Disclaimer = styled.p`
@@ -127,7 +126,7 @@ const LoginLink = styled.div`
   color: white;
   font-size: 0.8rem;
   text-decoration: none;
-  margin-bottom: 10%;
+  margin-bottom: 15%;
   display:flex;
   gap:4px;
 `;

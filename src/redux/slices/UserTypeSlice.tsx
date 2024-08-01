@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface UserType {
   user: string;
   token: string;
-  refreshToken: string;
+  refrToken: string;
   userId: string;
   firstTimeModal:boolean;
   isHeaderEnrichment:boolean;
@@ -23,7 +23,7 @@ const initialState: UserType = {
   user: "",
   token: "",
   userId: "",
-  refreshToken: "",
+  refrToken: "",
   firstTimeModal:true,
   isHeaderEnrichment:false,
   phoneNumber:"",
@@ -49,7 +49,7 @@ const userSlice = createSlice({
       state.userId = action.payload;
     },
     setRefreshToken: (state, action: PayloadAction<string>) => {
-      state.refreshToken = action.payload;
+      state.refrToken = action.payload;
     },
     setFirstTimeModal: (state, action: PayloadAction<boolean>) => {
         state.firstTimeModal = action.payload;

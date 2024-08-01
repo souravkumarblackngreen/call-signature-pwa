@@ -15,6 +15,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   text-align: center;
+  gap:10px;
   height: 100vh;
   background: #f5f5f5;
   color: #000;
@@ -32,12 +33,12 @@ const Header = styled.div`
 const BackButton = styled.div`
   font-size: 24px;
   cursor: pointer;
-  margin-right: auto;
 `;
 
 const Title = styled.h1`
   font-size: 1.5rem;
   margin: 10px 0;
+  margin-left:22%;
 `;
 
 const Subtitle = styled.p`
@@ -55,22 +56,22 @@ const KeywordsContainer = styled.div`
   max-height: 200px; /* Set a maximum height */
   overflow-y: auto; 
 `;
-
+// --button-background-color-primary
 const KeywordChip = styled.div`
   background: white;
-  border: 1px solid #1E90FF;
+  border: 1px solid var(--button-background-color-primary);
   border-radius: 20px;
   padding: 6px 8px;
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #1E90FF;
+  color: var(--button-background-color-primary);
   font-size: 1rem;
   cursor: pointer;
 `;
 
 const RemoveButton = styled.span`
-  background: #1E90FF;
+  background: var(--button-background-color-primary);
   color: white;
   border-radius: 50%;
   padding: 5px;
@@ -81,16 +82,16 @@ const AddButton = styled.button`
   padding: 10px 20px;
   font-size: 1rem;
   cursor: pointer;
-  border: 1px solid #1E90FF;
+  border: 1px solid var(--button-background-color-primary);
   border-radius: 25px;
   background-color: transparent;
-  color: #1E90FF;
+  color: var(--button-background-color-primary);
 `;
 
 const Input = styled.input`
   padding: 10px;
   font-size: 1rem;
-  border: 1px solid #1E90FF;
+  border: 1px solid var(--button-background-color-primary);
   border-radius: 25px;
   margin-bottom: 20px;
   width: 80%;

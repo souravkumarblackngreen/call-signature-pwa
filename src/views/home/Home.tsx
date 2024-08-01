@@ -17,6 +17,9 @@ import Loader from '../../components/loader/Loader';
 import axios from 'axios';
 import '../../assets/css/variables.css';
 import { setPrivacy, setTerms } from '../../redux/slices/PrivacyPolicySlice';
+import { setConfigText } from '../../redux/slices/GloabalTextDataSlice';
+import { setLanguage } from '../../redux/slices/LanguageSlice';
+import Modal from '../../components/modal/Modal';
 
 const Container = styled.div`
   display: flex;
@@ -67,10 +70,47 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [redirectData,setRedirectData] = useState()
-  const { mediaContent, isHeaderEnrichment, phoneNumber } = useSelector((state: RootState) => state.user);
+  const { mediaContent } = useSelector((state: RootState) => state.user);
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
+  const configText = useSelector((state: RootState) => state.configText);
+  const { lang,languages } = useSelector((state: RootState) => state.lang);
+  const [showModal,setShowModal] = useState(false);
+  const [modalType,setModalType] = useState('error');
+  const [modalTitle, setModalTitle] = useState('')
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalSubMessage, setModalSubMessage] = useState('')
+
  
+
+  const handleChange = (event:any) => {
+    dispatch(setLanguage(event.target.value));
+  };
+
   
+  useEffect(() => {
+    handleLanguageChangeData();
+  }, [lang]);
+
+  const handleLanguageChangeData = async () => {
+    dispatch(startLoading())
+    try {
+      const response = await getData(
+        `${API_END_POINT.getAllData}/${lang}`
+      );
+      dispatch(setConfigText(response));
+      dispatch(startLoading())
+      
+    } catch (error:any) {
+      console.log(error);
+      dispatch(startLoading())
+      const message = error.response?.data?.message || 'An error occurred during subscription';
+            setModalTitle('Opps');
+            setModalMessage(message);
+            setModalSubMessage(' ');
+            setShowModal(true);
+    }
+    
+  };
 
   useEffect(() => {  
     getMediaContent()
@@ -81,34 +121,52 @@ const Home: React.FC = () => {
 
 
   const getTermsNcondition = async () => {
-    dispatch(startLoading())
+    try{
+      dispatch(startLoading())
     const response = await getData(API_END_POINT.privacyContent)
     const { privacyPolicy, tearmsAndCondition } = response
     dispatch(stopLoading())
     dispatch(setPrivacy(privacyPolicy))
     dispatch(setTerms(tearmsAndCondition))
+    }
+    catch(err:any){
+
+    }
+    
 
   }
 
   
   const getMediaContent = async()=>{
+
+    try{
       dispatch(startLoading())
       const response = await getData(API_END_POINT.mediaContent)
       dispatch(setMediaContent(response))
       dispatch(stopLoading())
+    } catch(err:any){
+
+      }
     
     
   }
 
   const getRegex = async()=>{
-    dispatch(startLoading())
+    try{
+      dispatch(startLoading())
     const response = await getData(API_END_POINT.regexUrl)
     dispatch(setRegax(response))
+    }
+    catch(err:any){
+
+    }
+    
    
   }
 
   const decryptParam = (encryptedParam: string) => {
-  const key = CryptoJS.enc.Utf8.parse('p@4DnhsE1jF-t(GN06k}eL9B7Z8h&Ay*');
+
+  const key = CryptoJS.enc.Utf8.parse(process.env.CryptoJS_KEY || "");
   const decrypted = CryptoJS.AES.decrypt(encryptedParam, key, {
     mode: CryptoJS.mode.ECB,
     padding: CryptoJS.pad.Pkcs7
@@ -120,8 +178,8 @@ const Home: React.FC = () => {
     {
       dispatch(startLoading());
       try {
-       
-        const response = await axios.get("http://172.16.11.222:8099/header-augment-0.0.1-SNAPSHOT/v1/mobile/get-he-number",{
+        // cant use common getData method as baseURL is different
+        const response = await axios.get(API_END_POINT.headerEnrichmentCheckAPI,{
           headers:{
             'Service-Name':'callSignatureMobileView'
           }
@@ -130,7 +188,7 @@ const Home: React.FC = () => {
         const encryptedParam = urlParams.get('param');
         if (encryptedParam) {
           const decryptedParam = decryptParam(encryptedParam);
-          console.log('Decrypted Parameter:', decryptedParam);
+        
           dispatch(setIsHeaderEnrichment(true))
           dispatch(setPhoneNumber(decryptedParam))
         }else{
@@ -139,7 +197,7 @@ const Home: React.FC = () => {
         
       } catch (error) {
         dispatch(setIsHeaderEnrichment(false))
-        console.log('Error fetching media content:', error);
+        
       }
       dispatch(stopLoading());
     };
@@ -148,13 +206,18 @@ const Home: React.FC = () => {
     navigate('/plan-selection');
   };
 
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
 
   
   return (
     <Container>
       {isLoading && <Loader/>}
+      <Modal modalTitle={modalTitle} show={showModal} onClose={closeModal} message={modalMessage} subMessage={modalSubMessage} type={modalType}/>
       {<Logo src={mediaContent.logo} alt="Call Signature" />}
-      <Title>Call Signature</Title>
+      <Title>{configText.config.callSignature}</Title>
       <NextButton onClick={handleNext}>
       <ArrowForwardSharpIcon fontSize='large'/>
       </NextButton>

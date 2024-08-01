@@ -10,6 +10,7 @@ import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
 import { getData } from '../../services/Services';
 import '../../assets/css/variables.css';
+import Modal from '../../components/modal/Modal';
 
 const Container = styled.div<{ isLoading: boolean }>`
   display: flex;
@@ -19,7 +20,7 @@ const Container = styled.div<{ isLoading: boolean }>`
   height: 100vh;
   background: var(--whiteColor);
   justify-content: flex-start;
-  padding: 20px;
+  gap:10px;
   ${({ isLoading }) =>
     isLoading &&
     css`
@@ -54,7 +55,7 @@ const Subtitle = styled.h2`
 const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 94%;
   max-width: 400px;
   margin-bottom: 20px;
 `;
@@ -89,7 +90,7 @@ const SendOtpButton = styled.button<{ disabled: boolean }>`
   background-color: var(--otpLoginButtonColor);
   color: white;
   margin-top: 20px;
-  width: 100%;
+  width: 94%;
   max-width: 400px;
   opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
   pointer-events: ${({ disabled }) => (disabled ? 'none' : 'auto')};
@@ -118,9 +119,14 @@ const PhoneNumberEntry: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
-  const { selectedPlan, phoneNumber } = useSelector((state: RootState) => state.user);
+  const {  phoneNumber } = useSelector((state: RootState) => state.user);
+  const { lang } = useSelector((state: RootState) => state.lang);
   const configText = useSelector((state: RootState) => state.configText);
-
+  const [showModal,setShowModal] = useState(false);
+  const [modalType,setModalType] = useState('error');
+  const [modalTitle, setModalTitle] = useState('')
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalSubMessage, setModalSubMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('');
 
 
@@ -132,28 +138,41 @@ const PhoneNumberEntry: React.FC = () => {
       dispatch(setPhoneNumber(value));
       setErrorMessage('');
     } else {
-      setErrorMessage('Please enter a valid 10-digit phone number');
+      setErrorMessage(configText.config.validPhoneNumber);
     }
   };
 
   const handleSendOtp = async () => {
     if (phoneNumber.length !== 10) {
-      setErrorMessage('Please enter a valid 10-digit phone number');
+      setErrorMessage(configText.config.validPhoneNumber||'Please enter a valid 10-digit phone number');
       return;
     }
     dispatch(startLoading());
     try {
       if (phoneNumber) {
-        const response = await getData(API_END_POINT.sendOTP + `?msisdn=${phoneNumber}`); 
+        const response = await getData(API_END_POINT.sendOTP + `?msisdn=${phoneNumber}`,{headers: {
+          langCode: lang,
+        }}); 
         if(response.statuscode == 200){
             navigate('/enter-otp');
             dispatch(stopLoading());
         }
         
       }
-    } catch {
+    } catch(err:any) {
       // Handle error
+  
+            dispatch(stopLoading());
+            const message = err.response?.data?.message || 'An error occurred during subscription';
+            setModalTitle('Opps');
+            setModalMessage(message);
+            setModalSubMessage(' ');
+            setShowModal(true);
     }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   return (
@@ -164,6 +183,7 @@ const PhoneNumberEntry: React.FC = () => {
         </LoaderOverlay>
       )}
       <Container isLoading={isLoading}>
+      <Modal modalTitle={modalTitle} show={showModal} onClose={closeModal} message={modalMessage} subMessage={modalSubMessage} type={modalType}/>
         <Logo src={logo} alt="Call Signature" />
         <Title>{configText.config.callSignature}</Title>
         <Subtitle>{configText.config.your_voice_your_mark}</Subtitle>

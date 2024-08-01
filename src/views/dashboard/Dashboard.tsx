@@ -18,6 +18,7 @@ import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
 import {getData, postData} from '../../services/Services';
 import '../../assets/css/variables.css';
+import useJWTRefreshToken from '../../hooks/useJWTRefreshToken';
 
 const Container = styled.div`
   display: flex;
@@ -30,7 +31,6 @@ const Container = styled.div`
 
 const Header = styled.div`
   width: 100%;
-  padding: 10px;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -50,7 +50,7 @@ const HamburgerMenu = styled.div`
 const Content = styled.div`
   flex: 1;
   width: 100%;
-  padding: 20px;
+
 `;
 
 const CallSignatureHeader = styled.div`
@@ -155,10 +155,13 @@ const Dashboard: React.FC = () => {
   const [signatureTemplates, setSignatureTemplates] = useState<string[]>([]);
   const [statusTemplates, setStatusTemplates] = useState<string[]>([]);
   const [toggleChecked, setToggleChecked] = useState(false);
+  const [modalTitle, setModalTitle] = useState('')
+  const [updatedToken, setUpdatedToken] = React.useState(false);
+  const refreshJWT = useJWTRefreshToken();
   
   
   
-  const { statusMessage, signatureMessage } = useSelector((state: RootState) => state.dashboard);
+  const { statusMessage, signatureMessage,signatureId, statusId } = useSelector((state: RootState) => state.dashboard);
   const { lang } = useSelector((state: RootState) => state.lang);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
   const { token, userId, firstTimeModal } = useSelector((state: RootState) => state.user);
@@ -174,27 +177,42 @@ const Dashboard: React.FC = () => {
 
   useEffect(()=>{
     getTemplate()
-  },[privacyPolicy,termsncondition])
+  },[privacyPolicy,termsncondition, token])
 
   useEffect(() => {
     getInfo()
     getTermsNcondition()
     if(firstTimeModal)showSucessSubscriber()
-  }, [])
+  }, [token])
 
   const getTermsNcondition = async () => {
-    setLoader(true)
-    const response = await getData(API_END_POINT.privacyContent, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        langCode: lang,
-      },
+    try{
+      setLoader(true)
+      const response = await getData(API_END_POINT.privacyContent, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          langCode: lang,
+        },
+  
+      })
+      const { privacyPolicy, tearmsAndCondition } = response
+      setLoader(false)
+      dispatch(setPrivacy(privacyPolicy))
+      dispatch(setTerms(tearmsAndCondition))
+    }
+    catch(error:any){
+    
+      setLoader(false)
+      if (
+        error.response.data.statuscode === 4001 ||
+        error.response.data.statuscode === 4002
+         
+      ) {
 
-    })
-    const { privacyPolicy, tearmsAndCondition } = response
-    setLoader(false)
-    dispatch(setPrivacy(privacyPolicy))
-    dispatch(setTerms(tearmsAndCondition))
+        const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
+        setUpdatedToken(Boolean(refreshSuccess));
+      }
+    }
 
   }
 
@@ -213,8 +231,18 @@ const Dashboard: React.FC = () => {
       
       setSignatureTemplates(businessCard);
       setStatusTemplates(statusCard);
-    } catch (e) {
-      console.log(e)
+    } catch (error:any) {
+    
+     setLoader(false)
+      if (
+        error.response.data.statuscode === 4001 ||
+        error.response.data.statuscode === 4002
+         
+      ) {
+
+        const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
+        setUpdatedToken(Boolean(refreshSuccess));
+      }
     }
   }
 
@@ -227,8 +255,18 @@ const Dashboard: React.FC = () => {
         },
       })
       preprocessData(response)
-    } catch (e) {
-      console.log(e)
+    } catch (error:any) {
+     
+      setLoader(false)
+      if (
+        error.response.data.statuscode === 4001 ||
+        error.response.data.statuscode === 4002
+         
+      ) {
+
+        const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
+        setUpdatedToken(Boolean(refreshSuccess));
+      }
     }
   }
 
@@ -275,8 +313,11 @@ const Dashboard: React.FC = () => {
   const handleToggleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setLoader(true);
     const value = event.target.checked;
-    const action = value ? "PUBLISH" : "UNPUBLISH";
+    
     const actionUrl = value ? API_END_POINT.publishUrl : API_END_POINT.unPublishUrl;
+    
+   
+    
     try {
       await postData(actionUrl, [], {
         headers: {
@@ -284,35 +325,47 @@ const Dashboard: React.FC = () => {
           langCode: lang,
         },
       });
-      setToggleChecked(value);
-      setModalMessage(`Signature ${action.toLowerCase()}ed successfully.`);
-      setModalType('success');
-    } catch (err) {
-      setModalMessage(`Failed to ${action.toLowerCase()} signature.`);
-      setModalType('error');
+         setToggleChecked(value);
+          setModalType('success');
+          setModalTitle('Success');
+          setModalMessage(configText.config.publishedSuccessfully)
+          setModalSubMessage(' ')
+          setShowModal(true)
+    } catch (error:any) {
+          const message = error.response?.data?.message || configText.config.genericError;
+          setModalType('error');
+          setModalTitle('Opps');
+          setModalMessage(message)
+          setModalSubMessage(' ')
+          setShowModal(true)
+      if (
+        error.response.data.statuscode === 4001 ||
+        error.response.data.statuscode === 4002
+         
+      ) {
+
+        const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
+        setUpdatedToken(Boolean(refreshSuccess));
+      }
     }
     setLoader(false);
     setShowModal(true);
   };
 
   const showSucessSubscriber = () => {
-    setModalMessage('You have sucessfully subscribed to this services.')
+    setModalMessage(configText.config.successfulSubscription)
     setModalType('success')
     setModalSubMessage(' ')
   }
 
-  const handleError = () => {
-    setModalMessage('You have sucessfully subscribed to this services.')
-    setModalType('success')
-    setModalSubMessage(' ')
-  }
+
 
   const getToggleLabel = (toggleChecked:boolean)=>{
     let valToReturn='';
     if(activeTab == configText.config.signature){
-      valToReturn = toggleChecked ? 'signature active' : 'signature inactive'
+      valToReturn = toggleChecked ? configText.config.signatureActive : configText.config.signatureInactive
     }else{
-      valToReturn = toggleChecked ? 'status active' : 'status inactive'
+      valToReturn = toggleChecked ? configText.config.statusActive : configText.config.statusInactive
     }
     return valToReturn;
   }
@@ -325,16 +378,16 @@ const Dashboard: React.FC = () => {
 
   const modalToShow = firstTimeModal || showModal
 
-  let signatureButtonlabel = activeTab === configText.config.signature?configText.config.editSignature:"Edit Status"
+  let signatureButtonlabel = activeTab === configText.config.signature?configText.config.editSignature:configText.config.editStatus
   if(flashMessageToShow == ''){
-    flashMessageToShow = `No ${activeTab === configText.config.signature ?configText.config.signature:configText.config.status } set, Please click on add signature to set.`;
-    signatureButtonlabel = `Add ${activeTab === configText.config.signature ?configText.config.signature:configText.config.status }`
+    flashMessageToShow = `${configText.config.no} ${activeTab === configText.config.signature ?configText.config.signature:configText.config.status } ${configText.config.pleaseAdd}`;
+    signatureButtonlabel = `${configText.config.add}   ${activeTab === configText.config.signature ?configText.config.signature:configText.config.status }`
   }
 
   return (
     <Container>
       {loader && <Loader />}
-      <Modal show={modalToShow} onClose={closeModal} message={modalMessage} type={modalType} subMessage={modalSubMessage} buttonLabel={"Explore"}/>
+      <Modal modalTitle={modalTitle} show={modalToShow} onClose={closeModal} message={modalMessage} type={modalType} subMessage={modalSubMessage} buttonLabel={firstTimeModal?configText.config.explore:configText.config.close}/>
       <Header>
         <HamburgerMenu onClick={toggleSidebar}>☰</HamburgerMenu>
         <CallSignatureHeader>

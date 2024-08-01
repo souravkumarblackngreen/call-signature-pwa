@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setActiveTab } from '../../redux/slices/SignatureTabsSlice';
@@ -8,7 +8,7 @@ import { setActiveTab } from '../../redux/slices/SignatureTabsSlice';
 const TabsContainer = styled.div`
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  margin: 20px;
 `;
 
 const Tab = styled.div<{ active: boolean }>`

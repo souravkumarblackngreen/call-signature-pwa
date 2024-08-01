@@ -2,6 +2,8 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { PiSmileySad } from "react-icons/pi";
 import { FaCheck } from "react-icons/fa";
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 
 const fadeIn = keyframes`
@@ -31,7 +33,6 @@ const ModalBackground = styled.div`
 const ModalContainer = styled.div`
   background: linear-gradient(210deg, #0000FF 0%, #451322 100%);
   border-radius: 16px 16px 0 0;
-  padding: 20px;
   text-align: center;
   width: 100%;
   max-width: 400px;
@@ -98,6 +99,8 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ show, onClose, message , subMessage, type, modalTitle, buttonLabel='close' }) => {
+
+  const configText = useSelector((state: RootState) => state.configText);
   if (!show) {
     return null;
   }
@@ -109,9 +112,9 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, message , subMessage, type
         <IconContainer>
           {type == 'error'? <PiSmileySad style={{'width':'48px','height':'48px'}}/> :<FaCheck style={{'width':'48px','height':'48px'}} /> }
         </IconContainer>
-        <Title>{type == 'error' ? "Oops!" :(modalTitle || "Successfully Subscribe")}</Title>
-        <Message>{message||'Seems like there was a problem with your request.'}</Message>
-        <SubMessage>{subMessage || 'Please try again later.'}</SubMessage>
+        <Title>{type == 'error' ? configText.config.oops :(modalTitle || configText.config.successful)}</Title>
+        <Message>{message}</Message>
+        <SubMessage>{subMessage }</SubMessage>
         <StyledCloseButton onClick={onClose}>{buttonLabel}</StyledCloseButton>
       </ModalContainer>
     </ModalBackground>

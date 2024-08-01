@@ -23,6 +23,7 @@ const Header = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-right:10%;
   background:var(--header-background-color);
 `;
 

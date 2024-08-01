@@ -15,6 +15,7 @@ import { setStatusMessage, setSignatureMessage } from '../../redux/slices/Dashbo
 import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
 import { postData } from '../../services/Services';
+import useJWTRefreshToken from '../../hooks/useJWTRefreshToken';
 
 const Container = styled.div`
   display: flex;
@@ -108,21 +109,23 @@ const Button = styled.button<{ primary?: boolean }>`
   width: auto;
 `;
 
-const filteredWords = [ 'fraud', 'spam'];
+const filteredWords = ['fraud', 'spam'];
 
 const EditSignature: React.FC = () => {
-  
-  const { statusMessage, signatureMessage , signatureId, statusId} = useSelector((state: RootState) => state.dashboard);
+
+  const { statusMessage, signatureMessage, signatureId, statusId } = useSelector((state: RootState) => state.dashboard);
   const { lang } = useSelector((state: RootState) => state.lang);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
   const { token } = useSelector((state: RootState) => state.user);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [loader, setLoader] = useState<boolean>(false);
-  const [showModal,setShowModal] = useState(false);
-  const [modalType,setModalType] = useState('error');
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState('error');
   const [modalMessage, setModalMessage] = useState('');
   const [modalTitle, setModalTitle] = useState('')
   const [modalSubMessage, setModalSubMessage] = useState('')
+  const [updatedToken, setUpdatedToken] = React.useState(false);
+  const refreshJWT = useJWTRefreshToken();
   const configText = useSelector((state: RootState) => state.configText);
 
   const navigate = useNavigate();
@@ -132,37 +135,60 @@ const EditSignature: React.FC = () => {
     setSidebarOpen(!isSidebarOpen);
   };
 
-  const handleSaveToTemplates = async() => {
+  const handleSaveToTemplates = async () => {
     // Implement save to templates logic
-    setLoader(true)
-    const response = await postData(
-      API_END_POINT.updateSignature,
-      {
-       signatureId:activeTab === configText.config.signature ? signatureId : statusId,
-        signatureLangCode: lang,
-        text: activeTab === configText.config.signature ? signatureMessage : statusMessage,
-        signatureType: activeTab === configText.config.signature ? "BUSINESS_CARD" : "STATUS",
-        
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // Assuming the content type is JSON
+    try {
+      setLoader(true)
+      const response = await postData(
+        API_END_POINT.updateSignature,
+        {
+          signatureId: activeTab === configText.config.signature ? signatureId : statusId,
+          signatureLangCode: lang,
+          text: activeTab === configText.config.signature ? signatureMessage : statusMessage,
+          signatureType: activeTab === configText.config.signature ? "BUSINESS_CARD" : "STATUS",
+
         },
-        
-      },
-    );
-   
-    setLoader(false)
-    setShowModal(true)
-    setModalType('success')
-    setModalTitle(`Successfull `)
-    setModalMessage(`Your ${activeTab} is Saved successfully.  `)
-    setModalSubMessage(' ')
-    
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            langCode: lang,
+            // Assuming the content type is JSON
+          },
+
+        },
+      );
+
+      setLoader(false)
+      setShowModal(true)
+      setModalType('success')
+      setModalTitle(configText.config.successful)
+      setModalMessage(`${activeTab +' '+ configText.config.savedSuccessfully} `)
+      setModalSubMessage(' ')
+    } catch (error: any) {
+
+      const message = error.response?.data?.message || configText.config.genericError;
+      setLoader(false)
+      setShowModal(true);
+      setModalType('error')
+      setModalTitle('Opps');
+      setModalMessage(message);
+      setModalSubMessage(' ');
+
+      if (
+        error.response.data.statuscode === 4001 ||
+        error.response.data.statuscode === 4002
+
+      ) {
+
+        const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
+        setUpdatedToken(Boolean(refreshSuccess));
+      }
+    }
+
+
   };
 
-  const handleError = (errorMsg:any) => {
+  const handleError = (errorMsg: any) => {
     setModalMessage(errorMsg)
     setModalType('error')
     setModalSubMessage(' ')
@@ -171,19 +197,19 @@ const EditSignature: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     const foundFilteredWord = filteredWords.find(word => value.toLowerCase().includes(word));
-    
-    
+
+
     if (foundFilteredWord) {
-      setModalMessage(`The word "${foundFilteredWord}" is not allowed. Please remove it.`);
-      setModalSubMessage('Your post contains content that voilates our guidelines.')
+      setModalMessage(`"${foundFilteredWord}"  ${configText.config.notAllowedRemove}`);
+      setModalSubMessage(configText.config.postViolatesGuidelines)
       setShowModal(true);
     } else {
-      if(activeTab === configText.config.signature){
+      if (activeTab === configText.config.signature) {
         dispatch(setSignatureMessage(value))
-      }else{
+      } else {
         dispatch(setStatusMessage(value))
       }
-      
+
     }
   };
 
@@ -200,8 +226,8 @@ const EditSignature: React.FC = () => {
   const flashMessageToShow = activeTab === configText.config.signature ? signatureMessage : statusMessage
   return (
     <Container>
-      {loader && <Loader/>}
-      <Modal modalTitle={modalTitle} show={showModal} onClose={closeModal} message={modalMessage} subMessage={modalSubMessage} type={modalType}/>
+      {loader && <Loader />}
+      <Modal modalTitle={modalTitle} show={showModal} onClose={closeModal} message={modalMessage} subMessage={modalSubMessage} type={modalType} />
       <Header>
         <HamburgerMenu onClick={toggleSidebar}>☰</HamburgerMenu>
         <CallSignatureHeader>
@@ -211,7 +237,7 @@ const EditSignature: React.FC = () => {
         <NotificationsIcon />
       </Header>
       <Content>
-      <SignatrueTabs/>
+        <SignatrueTabs />
         <FlashMessageContainer>
           <FlashMessageTitle>{configText.config.flashMessage}</FlashMessageTitle>
           <FlashMessageInput

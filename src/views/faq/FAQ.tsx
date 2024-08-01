@@ -10,6 +10,7 @@ import { API_END_POINT } from '../../services/Constant';
 import { RootState } from '../../redux/store';
 import { useSelector } from 'react-redux';
 import { getData } from '../../services/Services';
+import useJWTRefreshToken from '../../hooks/useJWTRefreshToken';
 
 const Container = styled.div`
   display: flex;
@@ -27,6 +28,7 @@ const Header = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  
   background: #fff;
   color: #000;
 `;
@@ -103,13 +105,16 @@ const FAQ: React.FC = () => {
   const { token} = useSelector((state: RootState) => state.user);
   const configText = useSelector((state: RootState) => state.configText);
   const { lang } = useSelector((state: RootState) => state.lang);
+  const refreshJWT = useJWTRefreshToken();
+  const [updatedToken, setUpdatedToken] = React.useState(false);
+  
   
  
 
 
   useEffect(()=>{
     getFAQ()
-  },[])
+  },[updatedToken])
 
   const getFAQ = async()=>{
     try{
@@ -122,8 +127,17 @@ const FAQ: React.FC = () => {
       setFaqs(response.faqs)
     
     }
-    catch{
+    catch(error:any){
+      if (
+        error.response.data.statuscode === 4001 ||
+        error.response.data.statuscode === 4002
+         
+      ) {
 
+        const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
+        
+        setUpdatedToken(Boolean(refreshSuccess));
+      }
     }
     
   }

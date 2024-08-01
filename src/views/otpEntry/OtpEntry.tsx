@@ -5,12 +5,13 @@ import logo from '../../assets/images/logo.png'; // Replace with your logo path
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
-import { setToken, setRefreshToken, setUserId, setIsHeaderEnrichment, setFirstTimeModal } from '../../redux/slices/UserTypeSlice';
+import { setToken, setRefreshToken, setUserId, setFirstTimeModal } from '../../redux/slices/UserTypeSlice';
 import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
 import { getData } from '../../services/Services';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
 import '../../assets/css/variables.css';
+import Modal from '../../components/modal/Modal';
 
 const Container = styled.div<{ isLoading: boolean }>`
   display: flex;
@@ -20,7 +21,7 @@ const Container = styled.div<{ isLoading: boolean }>`
   height: 100vh;
   background: var(--whiteColor);
   justify-content: flex-start;
-  padding: 20px;
+  gap:10px;
   ${({ isLoading }) =>
     isLoading &&
     css`
@@ -92,7 +93,7 @@ const LoginButton = styled.button<{ disabled: boolean }>`
   color: white;
   max-width:400px;
   margin-top: 20px;
-  width: 100%;
+  width: 94%;
   opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
   pointer-events: ${({ disabled }) => (disabled ? 'none' : 'auto')};
 `;
@@ -126,7 +127,7 @@ padding: 5px;
 display: flex;
 justify-content: center;
 align-items: center;
-margin-left: 20px;
+margin:20px 0 0 20px;
 background:white;
 align-self:flex-start;
 
@@ -134,12 +135,19 @@ align-self:flex-start;
 
 const OtpEntry: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(new Array(4).fill(''));
+  const [showModal,setShowModal] = useState(false);
+  const [modalType,setModalType] = useState('error');
+  const [modalTitle, setModalTitle] = useState('')
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalSubMessage, setModalSubMessage] = useState('')
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
   const { phoneNumber, selectedPlan } = useSelector((state: RootState) => state.user);
   const configText = useSelector((state: RootState) => state.configText);
+  const { lang } = useSelector((state: RootState) => state.lang);
 
   const handleChange = (value: string, index: number) => {
     if (/^[0-9]$/.test(value)) {
@@ -176,33 +184,78 @@ const OtpEntry: React.FC = () => {
   const handleLogin = async () => {
     if (otp.join('').length === 4) {
       dispatch(startLoading());
-      const response = await getData(`${API_END_POINT.validateOTP}?msisdn=${phoneNumber}&otp=${otp.join('')}`);
-      if (response.currentStatus === 'active') {
-        const { refreshToken, token, userId } = response;
-        navigate('/dashboard');
-        dispatch(stopLoading());
-        dispatch(setToken(token));
-        dispatch(setRefreshToken(refreshToken));
-        dispatch(setUserId(userId));
-      } else if (response.currentStatus === 'new') {
-        const res = await getData(API_END_POINT.subscribe + `?msisdn=${phoneNumber}&planId=${selectedPlan}`);
-        if (res.currentStatus === 'active') {
-          const { refreshToken, token, userId } = res;
+      
+      try {
+        const response = await getData(`${API_END_POINT.validateOTP}?msisdn=${phoneNumber}&otp=${otp.join('')}`,{headers: {
+          langCode: lang,
+        }});
+        
+        if (response.currentStatus === 'active') {
+          const { refreshToken, token, userId } = response;
+          navigate('/dashboard');
           dispatch(stopLoading());
           dispatch(setToken(token));
           dispatch(setRefreshToken(refreshToken));
           dispatch(setUserId(userId));
-          dispatch(setFirstTimeModal(true))
-          navigate('/dashboard');
+        } else if (response.currentStatus === 'new') {
+          try {
+            const res = await getData(API_END_POINT.subscribe + `?msisdn=${phoneNumber}&planId=${selectedPlan}`,{headers: {
+              langCode: lang,
+            }});
+            
+            if (res.currentStatus === 'active') {
+              const { refreshToken, token, userId } = res;
+              dispatch(stopLoading());
+              dispatch(setToken(token));
+              dispatch(setRefreshToken(refreshToken));
+              dispatch(setUserId(userId));
+              dispatch(setFirstTimeModal(true));
+              navigate('/dashboard');
+            }
+          } catch (err:any) {
+            console.log(err);
+            dispatch(stopLoading());
+            const message = err.response?.data?.message || 'An error occurred during subscription';
+            setModalTitle('Opps');
+            setModalMessage(message);
+            setModalSubMessage(' ');
+            setShowModal(true);
+          }
         }
+      } catch (err:any) {
+        console.log(err);
+        dispatch(stopLoading());
+        const message = err.response?.data?.message || 'An error occurred while validating OTP';
+        setModalTitle('Opps');
+        setModalMessage(message);
+        setModalSubMessage(' ');
+        setShowModal(true);
       }
     }
   };
 
   const handleResendOTP = async () => {
     dispatch(startLoading());
-    await getData(API_END_POINT.resendOTP + `?msisdn=${phoneNumber}`);
-    dispatch(stopLoading());
+    try{
+      await getData(API_END_POINT.resendOTP + `?msisdn=${phoneNumber}`,{headers: {
+        langCode: lang,
+      }});
+      dispatch(stopLoading());
+    }catch(err:any){
+      dispatch(stopLoading());
+      console.log(err);
+        const message = err.response?.data?.message || 'An error occurred while resending OTP';
+        setModalTitle('Opps');
+        setModalMessage(message);
+        setModalSubMessage(' ');
+        setShowModal(true);
+    }
+    
+   
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   const handleBack = () => {
@@ -220,6 +273,7 @@ const OtpEntry: React.FC = () => {
         </LoaderOverlay>
       )}
       <Container isLoading={isLoading}>
+      <Modal modalTitle={modalTitle} show={showModal} onClose={closeModal} message={modalMessage} subMessage={modalSubMessage} type={modalType}/>
       <BackButton onClick={handleBack}><KeyboardArrowLeftSharpIcon /></BackButton>
         <Logo src={logo} alt="Call Signature" />
         <Title>{configText.config.callSignature}</Title>

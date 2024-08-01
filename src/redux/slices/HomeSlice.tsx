@@ -8,8 +8,8 @@ interface HomeState {
 
 const initialState: HomeState = {
   count: 0,
-  statusMessage:"hey, i m status",
-  signatureMessage:"hey, i m signature"
+  statusMessage:"",
+  signatureMessage:""
 
 };
 
