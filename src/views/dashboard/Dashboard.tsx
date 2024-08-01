@@ -321,7 +321,15 @@ const Dashboard: React.FC = () => {
     const valToPost = activeTab == configText.config.signature ? [signatureId?.toString()] :[statusId?.toString()]
 
 
-    
+    if(valToPost[0] == "0"){
+          setLoader(false)
+          setModalType('error');
+          setModalTitle(configText.config.oops);
+          setModalMessage(` ${configText.config.pleaseFirstSet + " "+ activeTab + " "+ configText.config.toPublish}`)
+          setModalSubMessage(' ')
+          setShowModal(true)
+      return;
+    }
    
     
     try {
@@ -331,7 +339,7 @@ const Dashboard: React.FC = () => {
           langCode: lang,
         },
       });
-          // setToggleChecked(value);
+          
           activeTab === configText.config.signature ? setIsSignaturePublished(value):setIsStatusPublished(value)
           setModalType('success');
           setModalTitle(configText.config.successful);
