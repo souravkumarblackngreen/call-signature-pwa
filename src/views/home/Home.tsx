@@ -69,13 +69,13 @@ const NextButton = styled.button`
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [redirectData,setRedirectData] = useState()
+
   const { mediaContent } = useSelector((state: RootState) => state.user);
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
   const configText = useSelector((state: RootState) => state.configText);
-  const { lang,languages } = useSelector((state: RootState) => state.lang);
+  const { lang  } = useSelector((state: RootState) => state.lang);
   const [showModal,setShowModal] = useState(false);
-  const [modalType,setModalType] = useState('error');
+  const [modalType ] = useState('error');
   const [modalTitle, setModalTitle] = useState('')
   const [modalMessage, setModalMessage] = useState('');
   const [modalSubMessage, setModalSubMessage] = useState('')

@@ -241,7 +241,7 @@ const PlanSelection: React.FC = () => {
           ))}
         </PlanContainer>
         <Disclaimer>
-          By registering yourself to this platform you have agreed to the <TermsandPrivacyContainer onClick={()=>navigate('/termsNconditions')}>terms and conditions</TermsandPrivacyContainer> and <TermsandPrivacyContainer onClick={()=>navigate('/privacy-policy')}>Privacy Policy </TermsandPrivacyContainer>  of the platform.
+          {configText.config.byRegistering+" "} <TermsandPrivacyContainer onClick={()=>navigate('/termsNconditions')}>{configText.config.termsNconditions}</TermsandPrivacyContainer> and <TermsandPrivacyContainer onClick={()=>navigate('/privacy-policy')}>{configText.config.privacyPolicy} </TermsandPrivacyContainer>  {" "+configText.config.ofThePlatform}
         </Disclaimer>
         <SendOtpButton onClick={moveToEnterPhonenoRoute} disabled={!isFormComplete}>
           {configText.config.subscribe}
