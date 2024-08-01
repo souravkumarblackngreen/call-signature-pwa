@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import {  setIsHeaderEnrichment, setMediaContent, setPhoneNumber, setRegax } from '../../redux/slices/UserTypeSlice'
 
-import {getData} from '../../services/Services'
+import {getData, logoutfunc} from '../../services/Services'
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 import Loader from '../../components/loader/Loader';
 import axios from 'axios';
@@ -111,12 +111,17 @@ const Home: React.FC = () => {
     }
     
   };
+  useEffect(()=>{
+    logoutfunc(navigate,dispatch)
+  },[])
 
-  useEffect(() => {  
+  useEffect(() => {
+    
     getMediaContent()
     getRegex()
     helogin()
     getTermsNcondition()
+
   }, []);
 
 

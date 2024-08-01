@@ -172,6 +172,11 @@ const PlanSelection: React.FC = () => {
     }
   }, [lang]);
 
+  useEffect(() => {
+    if (plans.length === 1) {
+      dispatch(setSelectedPlan(plans[0].planId));
+    }
+  }, [plans, dispatch]);
   const checkSum = async () => {
     const response = await getData(API_END_POINT.checkSubApi+phoneNumber)
     if (response.currentStatus === 'active') {

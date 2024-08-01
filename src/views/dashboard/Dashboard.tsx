@@ -9,14 +9,14 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import Modal from '../../components/modal/Modal';
 import SignatrueTabs from '../../components/signatureTabs/SignatureTabs';
-import { setStatusMessage, setSignatureMessage, setSignatureId,setStatusId ,setIsSignaturePublished,setIsStatusPublished} from '../../redux/slices/DashboardSlice';
+import { setStatusMessage, setSignatureMessage, setSignatureId, setStatusId, setIsSignaturePublished, setIsStatusPublished } from '../../redux/slices/DashboardSlice';
 import { setFirstTimeModal } from '../../redux/slices/UserTypeSlice';
 import { setPrivacy, setTerms } from '../../redux/slices/PrivacyPolicySlice';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
-import {getData, postData} from '../../services/Services';
+import { getData, postData } from '../../services/Services';
 import '../../assets/css/variables.css';
 import useJWTRefreshToken from '../../hooks/useJWTRefreshToken';
 
@@ -158,15 +158,15 @@ const Dashboard: React.FC = () => {
   const [modalTitle, setModalTitle] = useState('')
   const [updatedToken, setUpdatedToken] = React.useState(false);
   const refreshJWT = useJWTRefreshToken();
-  
-  
-  
-  const { statusMessage, signatureMessage,signatureId, statusId, isSignaturePublished,isStatusPublished } = useSelector((state: RootState) => state.dashboard);
+
+
+
+  const { statusMessage, signatureMessage, signatureId, statusId, isSignaturePublished, isStatusPublished } = useSelector((state: RootState) => state.dashboard);
   const { lang } = useSelector((state: RootState) => state.lang);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
   const { token, userId, firstTimeModal } = useSelector((state: RootState) => state.user);
   const configText = useSelector((state: RootState) => state.configText);
-  const { privacyPolicy, termsncondition} = useSelector((state: RootState) => state.terms);
+  const { privacyPolicy, termsncondition } = useSelector((state: RootState) => state.terms);
 
   const dispatch = useDispatch();
   const navigate = useNavigate()
@@ -175,38 +175,38 @@ const Dashboard: React.FC = () => {
     setSidebarOpen(!isSidebarOpen);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     getTemplate()
-  },[privacyPolicy,termsncondition, token, lang])
+  }, [privacyPolicy, termsncondition, token, lang])
 
   useEffect(() => {
     getInfo()
     getTermsNcondition()
-    if(firstTimeModal)showSucessSubscriber()
-  }, [token,lang])
+    if (firstTimeModal) showSucessSubscriber()
+  }, [token, lang])
 
   const getTermsNcondition = async () => {
-    try{
+    try {
       setLoader(true)
       const response = await getData(API_END_POINT.privacyContent, {
         headers: {
           Authorization: `Bearer ${token}`,
           langCode: lang,
         },
-  
+
       })
       const { privacyPolicy, tearmsAndCondition } = response
       setLoader(false)
       dispatch(setPrivacy(privacyPolicy))
       dispatch(setTerms(tearmsAndCondition))
     }
-    catch(error:any){
-    
+    catch (error: any) {
+
       setLoader(false)
       if (
         error.response.data.statuscode === 4001 ||
         error.response.data.statuscode === 4002
-         
+
       ) {
 
         const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
@@ -217,27 +217,27 @@ const Dashboard: React.FC = () => {
   }
 
 
-  
+
 
   const getTemplate = async () => {
     try {
-      const response = await getData(API_END_POINT.getTemplates+userId, {
+      const response = await getData(API_END_POINT.getTemplates + userId, {
         headers: {
           Authorization: `Bearer ${token}`,
           langCode: lang,
         },
       })
       const { businessCard, statusCard } = response;
-      
+
       setSignatureTemplates(businessCard);
       setStatusTemplates(statusCard);
-    } catch (error:any) {
-    
-     setLoader(false)
+    } catch (error: any) {
+
+      setLoader(false)
       if (
         error.response.data.statuscode === 4001 ||
         error.response.data.statuscode === 4002
-         
+
       ) {
 
         const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
@@ -255,13 +255,13 @@ const Dashboard: React.FC = () => {
         },
       })
       preprocessData(response)
-    } catch (error:any) {
-     
+    } catch (error: any) {
+
       setLoader(false)
       if (
         error.response.data.statuscode === 4001 ||
         error.response.data.statuscode === 4002
-         
+
       ) {
 
         const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
@@ -275,14 +275,14 @@ const Dashboard: React.FC = () => {
   const preprocessData = (data: any) => {
     if (data) {
       const { signatureData } = data;
-     
+
       const businessCard = signatureData.find(
-        (sig:any) => sig.signatureType === "BUSINESS_CARD"
+        (sig: any) => sig.signatureType === "BUSINESS_CARD"
       );
       const statusCard = signatureData.find(
-        (sig:any) => sig.signatureType === "STATUS"
+        (sig: any) => sig.signatureType === "STATUS"
       );
-      
+
       if (businessCard) {
         dispatch(setSignatureMessage(businessCard.text));
         dispatch(setSignatureId(businessCard.signatureId))
@@ -295,7 +295,7 @@ const Dashboard: React.FC = () => {
       }
     }
   };
-  
+
   const setCardMessage = (template: any) => {
 
     if (activeTab === configText.config.signature) {
@@ -305,7 +305,7 @@ const Dashboard: React.FC = () => {
     }
   }
 
-  
+
 
   const closeModal = () => {
     setShowModal(false);
@@ -315,23 +315,23 @@ const Dashboard: React.FC = () => {
   const handleToggleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setLoader(true);
     const value = event.target.checked;
-    
+
     const actionUrl = value ? API_END_POINT.publishUrl : API_END_POINT.unPublishUrl;
 
-    const valToPost = activeTab == configText.config.signature ? [signatureId?.toString()] :[statusId?.toString()]
+    const valToPost = activeTab == configText.config.signature ? [signatureId?.toString()] : [statusId?.toString()]
 
 
-    if(valToPost[0] == "0"){
-          setLoader(false)
-          setModalType('error');
-          setModalTitle(configText.config.oops);
-          setModalMessage(` ${configText.config.pleaseFirstSet + " "+ activeTab + " "+ configText.config.toPublish}`)
-          setModalSubMessage(' ')
-          setShowModal(true)
+    if (valToPost[0] == "0") {
+      setLoader(false)
+      setModalType('error');
+      setModalTitle(configText.config.oops);
+      setModalMessage(` ${configText.config.pleaseFirstSet + " " + activeTab + " " + configText.config.toPublish}`)
+      setModalSubMessage(' ')
+      setShowModal(true)
       return;
     }
-   
-    
+
+
     try {
       await postData(actionUrl, valToPost, {
         headers: {
@@ -339,24 +339,24 @@ const Dashboard: React.FC = () => {
           langCode: lang,
         },
       });
-          
-          activeTab === configText.config.signature ? setIsSignaturePublished(value):setIsStatusPublished(value)
-          setModalType('success');
-          setModalTitle(configText.config.successful);
-          setModalMessage(configText.config.publishedSuccessfully)
-          setModalSubMessage(' ')
-          setShowModal(true)
-    } catch (error:any) {
-          const message = error.response?.data?.message || configText.config.genericError;
-          setModalType('error');
-          setModalTitle(configText.config.oops);
-          setModalMessage(message)
-          setModalSubMessage(' ')
-          setShowModal(true)
+
+      activeTab === configText.config.signature ? dispatch(setIsSignaturePublished(value)) : dispatch(setIsStatusPublished(value))
+      setModalType('success');
+      setModalTitle(configText.config.successful);
+      setModalMessage(activeTab + ` ${value ? configText.config.publishedSuccessfully : configText.config.unPublishedSuccessfully}`)
+      setModalSubMessage(' ')
+      setShowModal(true)
+    } catch (error: any) {
+      const message = error.response?.data?.message || configText.config.genericError;
+      setModalType('error');
+      setModalTitle(configText.config.oops);
+      setModalMessage(message)
+      setModalSubMessage(' ')
+      setShowModal(true)
       if (
         error.response.data.statuscode === 4001 ||
         error.response.data.statuscode === 4002
-         
+
       ) {
 
         const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
@@ -375,35 +375,35 @@ const Dashboard: React.FC = () => {
 
 
 
-  const getToggleLabel = (toggleChecked:boolean)=>{
-    let valToReturn='';
-    if(activeTab == configText.config.signature){
+  const getToggleLabel = (toggleChecked: boolean) => {
+    let valToReturn = '';
+    if (activeTab == configText.config.signature) {
       valToReturn = toggleChecked ? configText.config.signatureActive : configText.config.signatureInactive
-    }else{
+    } else {
       valToReturn = toggleChecked ? configText.config.statusActive : configText.config.statusInactive
     }
     return valToReturn;
   }
 
 
-  
+
 
   const templates = activeTab === configText.config.signature ? signatureTemplates : statusTemplates
   let flashMessageToShow = activeTab === configText.config.signature ? signatureMessage : statusMessage
 
   const modalToShow = firstTimeModal || showModal
 
-  let signatureButtonlabel = activeTab === configText.config.signature?configText.config.editSignature:configText.config.editStatus
-  if(flashMessageToShow == ''){
-    flashMessageToShow = `${configText.config.no} ${activeTab === configText.config.signature ?configText.config.signature:configText.config.status } ${configText.config.pleaseAdd}`;
-    signatureButtonlabel = `${configText.config.add}   ${activeTab === configText.config.signature ?configText.config.signature:configText.config.status }`
+  let signatureButtonlabel = activeTab === configText.config.signature ? configText.config.editSignature : configText.config.editStatus
+  if (flashMessageToShow == '') {
+    flashMessageToShow = `${configText.config.no} ${activeTab === configText.config.signature ? configText.config.signature : configText.config.status} ${configText.config.pleaseAdd}`;
+    signatureButtonlabel = `${configText.config.add}   ${activeTab === configText.config.signature ? configText.config.signature : configText.config.status}`
   }
 
   const toggleChecked = activeTab === configText.config.signature ? isSignaturePublished : isStatusPublished;
   return (
     <Container>
       {loader && <Loader />}
-      <Modal modalTitle={modalTitle} show={modalToShow} onClose={closeModal} message={modalMessage} type={modalType} subMessage={modalSubMessage} buttonLabel={firstTimeModal?configText.config.explore:configText.config.close}/>
+      <Modal modalTitle={modalTitle} show={modalToShow} onClose={closeModal} message={modalMessage} type={modalType} subMessage={modalSubMessage} buttonLabel={firstTimeModal ? configText.config.explore : configText.config.close} />
       <Header>
         <HamburgerMenu onClick={toggleSidebar}>☰</HamburgerMenu>
         <CallSignatureHeader>
@@ -419,27 +419,27 @@ const Dashboard: React.FC = () => {
           <FlashMessageContent>
             {flashMessageToShow}
           </FlashMessageContent>
-          
+
           <ButtonContainer>
             <Button onClick={() => navigate('/preview')}>{configText.config.preview}</Button>
             <Button primary onClick={() => navigate('/edit-signature')}>{signatureButtonlabel}</Button>
           </ButtonContainer>
           <ToggleButton>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={toggleChecked}
-                onChange={handleToggleChange}
-                name="toggleSwitch"
-                color="success"
-                inputProps={{ 'aria-label': 'primary checkbox' }}
-                sx={{'textTransform':"capitalize"}}
-              />
-            }
-            label={getToggleLabel(toggleChecked)}
-          />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={toggleChecked}
+                  onChange={handleToggleChange}
+                  name="toggleSwitch"
+                  color="success"
+                  inputProps={{ 'aria-label': 'primary checkbox' }}
+                  sx={{ 'textTransform': "capitalize" }}
+                />
+              }
+              label={getToggleLabel(toggleChecked)}
+            />
           </ToggleButton>
-          
+
         </FlashMessageContainer>
         <BusinessCardContainer>
           <BusinessCardTitle>{configText.config.templateBusinessCard}</BusinessCardTitle>

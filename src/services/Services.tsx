@@ -54,13 +54,13 @@ export const getData = async (endpoint: string, headers: any = {}) => {
 
   export const logoutfunc = async(navigate:any, dispatch:any) => {
     //Reset the Redux state
-    resetDashboardState()
-    resetFilterState()
-    resetLoadingState()
-    resetPrivacyPolicyState()
-    resetProfileState()
-    resetSignatureTabsState()
-    resetUserState()
+    dispatch(resetDashboardState())
+    dispatch(resetFilterState())
+    dispatch(resetLoadingState())
+    dispatch(resetPrivacyPolicyState())
+    dispatch(resetProfileState())
+    dispatch(resetSignatureTabsState())
+    dispatch(resetUserState())
     // Navigate to the home or login page
     navigate("/");
   };
