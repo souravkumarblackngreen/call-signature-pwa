@@ -177,13 +177,13 @@ const Dashboard: React.FC = () => {
 
   useEffect(()=>{
     getTemplate()
-  },[privacyPolicy,termsncondition, token])
+  },[privacyPolicy,termsncondition, token, lang])
 
   useEffect(() => {
     getInfo()
     getTermsNcondition()
     if(firstTimeModal)showSucessSubscriber()
-  }, [token])
+  }, [token,lang])
 
   const getTermsNcondition = async () => {
     try{
