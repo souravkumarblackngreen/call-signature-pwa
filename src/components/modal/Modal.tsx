@@ -110,7 +110,7 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, message , subMessage, type
       <ModalContainer>
         <CloseButton onClick={onClose}>✕</CloseButton>
         <IconContainer>
-          {type == 'error'? <PiSmileySad style={{'width':'48px','height':'48px'}}/> :<FaCheck style={{'width':'48px','height':'48px'}} /> }
+          {type == 'error'? <PiSmileySad  className='modal-icon' style={{'width':'48px','height':'48px'}}/> :<FaCheck style={{'width':'48px','height':'48px'}} /> }
         </IconContainer>
         <Title>{type == 'error' ? configText.config.oops :(modalTitle || configText.config.successful)}</Title>
         <Message>{message}</Message>

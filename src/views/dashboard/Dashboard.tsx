@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import Modal from '../../components/modal/Modal';
 import SignatrueTabs from '../../components/signatureTabs/SignatureTabs';
-import { setStatusMessage, setSignatureMessage, setSignatureId,setStatusId } from '../../redux/slices/DashboardSlice';
+import { setStatusMessage, setSignatureMessage, setSignatureId,setStatusId ,setIsSignaturePublished,setIsStatusPublished} from '../../redux/slices/DashboardSlice';
 import { setFirstTimeModal } from '../../redux/slices/UserTypeSlice';
 import { setPrivacy, setTerms } from '../../redux/slices/PrivacyPolicySlice';
 import Switch from '@mui/material/Switch';
@@ -154,14 +154,14 @@ const Dashboard: React.FC = () => {
   const [loader, setLoader] = useState<boolean>(false);
   const [signatureTemplates, setSignatureTemplates] = useState<string[]>([]);
   const [statusTemplates, setStatusTemplates] = useState<string[]>([]);
-  const [toggleChecked, setToggleChecked] = useState(false);
+  // const [toggleChecked, setToggleChecked] = useState(false);
   const [modalTitle, setModalTitle] = useState('')
   const [updatedToken, setUpdatedToken] = React.useState(false);
   const refreshJWT = useJWTRefreshToken();
   
   
   
-  const { statusMessage, signatureMessage,signatureId, statusId } = useSelector((state: RootState) => state.dashboard);
+  const { statusMessage, signatureMessage,signatureId, statusId, isSignaturePublished,isStatusPublished } = useSelector((state: RootState) => state.dashboard);
   const { lang } = useSelector((state: RootState) => state.lang);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
   const { token, userId, firstTimeModal } = useSelector((state: RootState) => state.user);
@@ -286,10 +286,12 @@ const Dashboard: React.FC = () => {
       if (businessCard) {
         dispatch(setSignatureMessage(businessCard.text));
         dispatch(setSignatureId(businessCard.signatureId))
+        dispatch(setIsSignaturePublished(businessCard.isPublish))
       }
       if (statusCard) {
         dispatch(setStatusMessage(statusCard.text));
-        dispatch(setStatusId(businessCard.signatureId))
+        dispatch(setStatusId(statusCard.signatureId))
+        dispatch(setIsStatusPublished(statusCard.isPublish))
       }
     }
   };
@@ -315,26 +317,31 @@ const Dashboard: React.FC = () => {
     const value = event.target.checked;
     
     const actionUrl = value ? API_END_POINT.publishUrl : API_END_POINT.unPublishUrl;
+
+    const valToPost = activeTab == configText.config.signature ? [signatureId?.toString()] :[statusId?.toString()]
+
+
     
    
     
     try {
-      await postData(actionUrl, [], {
+      await postData(actionUrl, valToPost, {
         headers: {
           Authorization: `Bearer ${token}`,
           langCode: lang,
         },
       });
-         setToggleChecked(value);
+          // setToggleChecked(value);
+          activeTab === configText.config.signature ? setIsSignaturePublished(value):setIsStatusPublished(value)
           setModalType('success');
-          setModalTitle('Success');
+          setModalTitle(configText.config.successful);
           setModalMessage(configText.config.publishedSuccessfully)
           setModalSubMessage(' ')
           setShowModal(true)
     } catch (error:any) {
           const message = error.response?.data?.message || configText.config.genericError;
           setModalType('error');
-          setModalTitle('Opps');
+          setModalTitle(configText.config.oops);
           setModalMessage(message)
           setModalSubMessage(' ')
           setShowModal(true)
@@ -384,6 +391,7 @@ const Dashboard: React.FC = () => {
     signatureButtonlabel = `${configText.config.add}   ${activeTab === configText.config.signature ?configText.config.signature:configText.config.status }`
   }
 
+  const toggleChecked = activeTab === configText.config.signature ? isSignaturePublished : isStatusPublished;
   return (
     <Container>
       {loader && <Loader />}

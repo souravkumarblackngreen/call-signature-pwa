@@ -5,13 +5,18 @@ interface DashboardState {
   globalShowModal:boolean;
   signatureId:number | null;
   statusId:number | null;
+  isSignaturePublished:boolean;
+  isStatusPublished:boolean;
 }
 const initialState: DashboardState = {
   statusMessage:"",
   signatureMessage:"",
   globalShowModal:false,
   signatureId:0,
-  statusId:0
+  statusId:0,
+  isSignaturePublished:false,
+  isStatusPublished:false
+
 };
 const dashboareSlice = createSlice({
   name: 'dashboard',
@@ -32,8 +37,14 @@ const dashboareSlice = createSlice({
       setStatusId:(state, action: PayloadAction<number>) => {
         state.statusId = action.payload;
       },
+      setIsSignaturePublished:(state, action: PayloadAction<boolean>) => {
+        state.isSignaturePublished = action.payload;
+      },
+      setIsStatusPublished:(state, action: PayloadAction<boolean>) => {
+        state.isStatusPublished = action.payload;
+      },
       resetDashboardState: () => initialState,
   },
 });
-export const { setStatusMessage, setSignatureId,setStatusId,setSignatureMessage , setGlobalShowModal, resetDashboardState} = dashboareSlice.actions;
+export const { setStatusMessage, setSignatureId,setIsStatusPublished,setIsSignaturePublished,setStatusId,setSignatureMessage , setGlobalShowModal, resetDashboardState} = dashboareSlice.actions;
 export default dashboareSlice.reducer;
