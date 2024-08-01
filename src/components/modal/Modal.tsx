@@ -5,7 +5,6 @@ import { FaCheck } from "react-icons/fa";
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 
-
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -38,12 +37,23 @@ const ModalContainer = styled.div`
   max-width: 400px;
   color: white;
   position: relative;
-  height:40%;
+  padding: 20px;
+  height: auto;
   animation: ${fadeIn} 0.3s ease-out;
   display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  @media (max-width: 600px) {
+    border-radius: 16px 16px 0 0;
+    max-width: 100%;
+    padding: 15px;
+  }
+
+  @media (max-width: 375px) {
+    padding: 10px;
+  }
 `;
 
 const CloseButton = styled.button`
@@ -55,21 +65,55 @@ const CloseButton = styled.button`
   font-size: 20px;
   color: white;
   cursor: pointer;
+
+  @media (max-width: 600px) {
+    font-size: 18px;
+  }
+
+  @media (max-width: 375px) {
+    font-size: 16px;
+  }
 `;
 
 const Title = styled.h2`
-  margin-top: 40px;
+  margin-top: 20px;
   font-size: 1.5rem;
+
+  @media (max-width: 600px) {
+    font-size: 1.4rem;
+    margin-top: 15px;
+  }
+
+  @media (max-width: 375px) {
+    font-size: 1.3rem;
+  }
 `;
 
 const Message = styled.p`
   font-size: 1.2rem;
   margin: 10px 0;
-  font-weight:600;
+  font-weight: 600;
+
+  @media (max-width: 600px) {
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 375px) {
+    font-size: 1rem;
+  }
 `;
+
 const SubMessage = styled.p`
   font-size: 1rem;
   margin: 10px 0;
+
+  @media (max-width: 600px) {
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 375px) {
+    font-size: 0.8rem;
+  }
 `;
 
 const StyledCloseButton = styled.button`
@@ -81,26 +125,51 @@ const StyledCloseButton = styled.button`
   cursor: pointer;
   font-size: 1rem;
   margin-top: 20px;
-  width:24rem;
+  width: 90%;
+
+  @media (max-width: 600px) {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 375px) {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
 `;
 
 const IconContainer = styled.div`
   margin: 20px 0;
+
+  .modal-icon {
+    width: 48px;
+    height: 48px;
+
+    @media (max-width: 600px) {
+      width: 40px;
+      height: 40px;
+    }
+
+    @media (max-width: 375px) {
+      width: 32px;
+      height: 32px;
+    }
+  }
 `;
 
 interface ModalProps {
   show: boolean;
   onClose: () => void;
   message?: string;
-  subMessage?:string;
-  type?:string;
-  modalTitle?:string;
-  buttonLabel?:string;
+  subMessage?: string;
+  type?: string;
+  modalTitle?: string;
+  buttonLabel?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ show, onClose, message , subMessage, type, modalTitle, buttonLabel='close' }) => {
-
+const Modal: React.FC<ModalProps> = ({ show, onClose, message, subMessage, type, modalTitle, buttonLabel = 'Close' }) => {
   const configText = useSelector((state: RootState) => state.configText);
+
   if (!show) {
     return null;
   }
@@ -110,11 +179,11 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, message , subMessage, type
       <ModalContainer>
         <CloseButton onClick={onClose}>✕</CloseButton>
         <IconContainer>
-          {type == 'error'? <PiSmileySad  className='modal-icon' style={{'width':'48px','height':'48px'}}/> :<FaCheck style={{'width':'48px','height':'48px'}} /> }
+          {type === 'error' ? <PiSmileySad className="modal-icon" /> : <FaCheck className="modal-icon" />}
         </IconContainer>
-        <Title>{type == 'error' ? configText.config.oops :(modalTitle || configText.config.successful)}</Title>
+        <Title>{type === 'error' ? configText.config.oops : (modalTitle || configText.config.successful)}</Title>
         <Message>{message}</Message>
-        <SubMessage>{subMessage }</SubMessage>
+        <SubMessage>{subMessage}</SubMessage>
         <StyledCloseButton onClick={onClose}>{buttonLabel}</StyledCloseButton>
       </ModalContainer>
     </ModalBackground>
