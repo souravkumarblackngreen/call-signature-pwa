@@ -29,7 +29,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['lang','home','profile','dashboard','user','configText'] // Specify the slices you want to persist
+  whitelist: ['lang','home','profile','dashboard','user','configText','terms'] // Specify the slices you want to persist
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
