@@ -9,7 +9,7 @@ import background from '../../assets/images/SplashScreenBg.png' // Replace with 
 import { RootState } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 
-import {  setIsHeaderEnrichment, setMediaContent, setPhoneNumber, setRegax } from '../../redux/slices/UserTypeSlice'
+import {  setIsHeaderEnrichment, setPhoneNumber, setRegax } from '../../redux/slices/UserTypeSlice'
 
 import {getData, logoutfunc} from '../../services/Services'
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
@@ -18,8 +18,9 @@ import axios from 'axios';
 import '../../assets/css/variables.css';
 import { setPrivacy, setTerms } from '../../redux/slices/PrivacyPolicySlice';
 import { setConfigText } from '../../redux/slices/GloabalTextDataSlice';
-import { setLanguage } from '../../redux/slices/LanguageSlice';
+
 import Modal from '../../components/modal/Modal';
+import { setMediaContent } from '../../redux/slices/MediaContent';
 
 const Container = styled.div`
   display: flex;
@@ -70,7 +71,7 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { mediaContent } = useSelector((state: RootState) => state.user);
+  const { mediaContent } = useSelector((state: RootState) => state.mediaContent);
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
   const configText = useSelector((state: RootState) => state.configText);
   const { lang  } = useSelector((state: RootState) => state.lang);
@@ -82,10 +83,7 @@ const Home: React.FC = () => {
 
  
 
-  const handleChange = (event:any) => {
-    dispatch(setLanguage(event.target.value));
-  };
-
+ 
   
   useEffect(() => {
     handleLanguageChangeData();
@@ -134,8 +132,14 @@ const Home: React.FC = () => {
     dispatch(setPrivacy(privacyPolicy))
     dispatch(setTerms(tearmsAndCondition))
     }
-    catch(err:any){
-
+    catch (error:any) {
+      console.log(error);
+      dispatch(startLoading())
+      const message = error.response?.data?.message || 'An error occurred during subscription';
+            setModalTitle('Opps');
+            setModalMessage(message);
+            setModalSubMessage(' ');
+            setShowModal(true);
     }
     
 
@@ -149,9 +153,15 @@ const Home: React.FC = () => {
       const response = await getData(API_END_POINT.mediaContent)
       dispatch(setMediaContent(response))
       dispatch(stopLoading())
-    } catch(err:any){
-
-      }
+    } catch (error:any) {
+      console.log(error);
+      dispatch(startLoading())
+      const message = error.response?.data?.message || 'An error occurred during subscription';
+            setModalTitle('Opps');
+            setModalMessage(message);
+            setModalSubMessage(' ');
+            setShowModal(true);
+    }
     
     
   }
@@ -162,17 +172,23 @@ const Home: React.FC = () => {
     const response = await getData(API_END_POINT.regexUrl)
     dispatch(setRegax(response))
     }
-    catch(err:any){
-
+    catch (error:any) {
+      console.log(error);
+      dispatch(startLoading())
+      const message = error.response?.data?.message || 'An error occurred during subscription';
+            setModalTitle('Opps');
+            setModalMessage(message);
+            setModalSubMessage(' ');
+            setShowModal(true);
     }
     
    
   }
 
   const decryptParam = (encryptedParam: string) => {
-
-  const key = CryptoJS.enc.Utf8.parse(process.env.CryptoJS_KEY || "");
-  const decrypted = CryptoJS.AES.decrypt(encryptedParam, key, {
+    const cryptoJsKey = process.env.REACT_APP_CryptoJS_KEY as string;
+    const key = CryptoJS.enc.Utf8.parse(cryptoJsKey);
+    const decrypted = CryptoJS.AES.decrypt(encryptedParam, key, {
     mode: CryptoJS.mode.ECB,
     padding: CryptoJS.pad.Pkcs7
   });

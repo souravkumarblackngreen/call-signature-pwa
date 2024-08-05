@@ -13,8 +13,11 @@ import Preview from './views/preview/Preview';
 import FAQ from './views/faq/FAQ';
 import PhoneNumberEntry from './views/phoneNumberEntry/PhoneNumberEntry';
 import FilterKeywords from './views/filterKeywords/FilterKeywords';
+import { useSelector } from 'react-redux';
+import { RootState } from './redux/store';
 
 const App: React.FC = () => {
+  const { token } = useSelector((state: RootState) => state.user);
   return (
     <Router>
       <Routes>
@@ -30,7 +33,7 @@ const App: React.FC = () => {
         <Route path="/edit-signature" element={<EditSignature />} />
         <Route path="/preview" element={<Preview />} />
         <Route path="/faq" element={<FAQ />} />
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={token ? <Navigate to="/dashboard" /> : <Navigate to="/" />} />
       </Routes>
     </Router>
   );

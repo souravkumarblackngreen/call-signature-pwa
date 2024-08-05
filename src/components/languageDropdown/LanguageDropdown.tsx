@@ -66,6 +66,8 @@ const LanguageDropdown: React.FC = () => {
               style: {
                 backgroundColor: '#0032DF',
                 color: 'white',
+                maxHeight: 200, // Adjust max-height for scroll
+                overflowY: 'auto',
               },
             },
           }}

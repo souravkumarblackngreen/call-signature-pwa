@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import logo from '../../assets/images/logo.png';
 import { useNavigate } from 'react-router-dom';
@@ -39,16 +39,19 @@ const SidebarContainer = styled.div<{ isOpen: boolean }>`
   flex-direction: column;
   align-items: flex-start;
 `;
+
 const Logo = styled.img`
-  width: 50px;
-  margin-bottom: 20px;
+  width: 38px;
 `;
+
 const CloseButton = styled.div`
-  align-self: flex-end;
+  align-self: center;
   font-size: 24px;
   cursor: pointer;
   color: white;
+  margin-left:auto;
 `;
+
 const MenuItem = styled.div`
   color: white;
   text-decoration: none;
@@ -58,11 +61,12 @@ const MenuItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-direction:column;
+  flex-direction: column;
   &:hover {
     text-decoration: underline;
   }
 `;
+
 const SubMenuItem = styled.div`
   color: white;
   text-decoration: none;
@@ -75,15 +79,33 @@ const SubMenuItem = styled.div`
     text-decoration: underline;
   }
 `;
+
 const SubMenuContainer = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 20px;
+  max-height: 150px;
+  overflow-y: auto;
 `;
+
 const UnsubscribeButton = styled(MenuItem)`
-  margin-top: auto; /* Added this line to push it to the bottom */
-  margin-bottom:25%;
+  margin-top: auto;
+  margin-bottom: 25%;
 `;
+
+const SideMenuHeader = styled.div`
+  color: white;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+`;
+
+const SideMenuHeaderContainer = styled.div`
+  display: flex;
+  width: 100%;
+`;
+
 interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
@@ -98,6 +120,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const [updatedToken, setUpdatedToken] = React.useState(false);
   const configText = useSelector((state: RootState) => state.configText);
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const refreshJWT = useJWTRefreshToken();
 
   const toggleLanguageMenu = () => {
@@ -106,6 +129,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const handleLanguageSelect = (language: string) => {
     dispatch(setLanguage(language));
   };
+
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+        toggleSidebar();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, toggleSidebar]);
   useEffect(() => {
     handleLanguageChangeData();
   }, [updatedToken,lang]);
@@ -237,9 +279,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   return (
     <>
     {isLoading && <Loader/>}
-    <SidebarContainer isOpen={isOpen}>
+    <SidebarContainer isOpen={isOpen} ref={sidebarRef}>
+      <SideMenuHeaderContainer>
+      <SideMenuHeader ><Logo src={logo} alt="Call Signature" /><h3>{configText.config.callSignature}</h3></SideMenuHeader>
       <CloseButton onClick={toggleSidebar}>×</CloseButton>
-      <Logo src={logo} alt="Call Signature" />
+      </SideMenuHeaderContainer>
+      
       {menuData.map((item: any) => renderMenuItem(item))}
       <UnsubscribeButton onClick={Unsubscribe}>{configText.config.unsubscribe}</UnsubscribeButton>
     </SidebarContainer>

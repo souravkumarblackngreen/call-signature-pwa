@@ -12,6 +12,7 @@ import UserTypeSlice from './slices/UserTypeSlice';
 import PrivacyPolicySlice from './slices/PrivacyPolicySlice';
 import LanguageSlice from './slices/LanguageSlice';
 import GloabalTextDataSlice from './slices/GloabalTextDataSlice';
+import MediaContent from './slices/MediaContent';
 
 const rootReducer = combineReducers({
   home: homeReducer,
@@ -23,13 +24,14 @@ const rootReducer = combineReducers({
   user: UserTypeSlice,
   terms: PrivacyPolicySlice,
   lang: LanguageSlice,
-  configText: GloabalTextDataSlice
+  configText: GloabalTextDataSlice,
+  mediaContent:MediaContent
 });
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['lang','home','profile','dashboard','user','configText','terms'] // Specify the slices you want to persist
+  whitelist: ['lang','home','profile','dashboard','user','configText','terms','mediaContent'] // Specify the slices you want to persist
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

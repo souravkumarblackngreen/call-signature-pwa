@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import background from '../../assets/images/SplashScreenBg.png';
 import LanguageDropdown from '../../components/languageDropdown/LanguageDropdown';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
-import { setPhoneNumber, setRefreshToken, setSelectedPlan, setToken, setUserId } from '../../redux/slices/UserTypeSlice';
+import { setFirstTimeModal, setPhoneNumber, setRefreshToken, setSelectedPlan, setToken, setUserId } from '../../redux/slices/UserTypeSlice';
 import { setLanguages } from '../../redux/slices/LanguageSlice';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,6 +16,7 @@ import { RootState } from '../../redux/store';
 import { API_END_POINT } from "../../services/Constant";
 import { getData } from '../../services/Services';
 import '../../assets/css/variables.css';
+import Modal from '../../components/modal/Modal';
 
 const Container = styled.div<{ background: string }>`
   display: flex;
@@ -108,7 +109,7 @@ const PlanPrice = styled.span`
   font-size: 2rem;
 `;
 
-const SendOtpButton = styled.button<{ disabled: boolean }>`
+const SubscribeButton = styled.button<{ disabled: boolean }>`
   padding: 10px 20px;
   font-size: 1rem;
   cursor: pointer;
@@ -154,10 +155,16 @@ const TermsandPrivacyContainer = styled.span`
 
 const PlanSelection: React.FC = () => {
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
-  const { selectedPlan, mediaContent, phoneNumber,isHeaderEnrichment} = useSelector((state: RootState) => state.user);
+  const { selectedPlan, phoneNumber,isHeaderEnrichment} = useSelector((state: RootState) => state.user);
+  const { mediaContent } = useSelector((state: RootState) => state.mediaContent);
   
   const configText = useSelector((state: RootState) => state.configText);
   const { lang } = useSelector((state: RootState) => state.lang);
+  const [showModal,setShowModal] = useState(false);
+  const [modalType,setModalType] = useState('error');
+  const [modalTitle, setModalTitle] = useState('')
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalSubMessage, setModalSubMessage] = useState('')
 
   const [plans, setPlans] = useState<any[]>([]);
 
@@ -178,7 +185,9 @@ const PlanSelection: React.FC = () => {
     }
   }, [plans, dispatch]);
   const checkSum = async () => {
-    const response = await getData(API_END_POINT.checkSubApi+phoneNumber)
+    try{
+      dispatch(startLoading())
+      const response = await getData(API_END_POINT.checkSubApi+phoneNumber)
     if (response.currentStatus === 'active') {
       const { refreshToken, token, userId } = response;
       navigate('/dashboard');
@@ -186,25 +195,54 @@ const PlanSelection: React.FC = () => {
       dispatch(setToken(token));
       dispatch(setRefreshToken(refreshToken));
       dispatch(setUserId(userId));
-    } else if (response.data.response.currentStatus === 'new') {
-      const res = await getData(API_END_POINT.subscribe + `?msisdn=${phoneNumber}&planId=${selectedPlan}`);
-      if (res.data.response.currentStatus === 'new') {
-        navigate('/dashboard');
-      }
+      dispatch(setFirstTimeModal(false))
     }
+
+    }catch(err:any){
+      dispatch(stopLoading());
+      console.log(err);
+        const message = err.response?.data?.message || 'An error occurred';
+        setModalTitle('Opps');
+        setModalMessage(message);
+        setModalSubMessage(' ');
+        setShowModal(true);
+    }
+    
   }
   const getLanguageData = async () => {
-    const response = await getData(API_END_POINT.allLanguage);
+    try{
+      const response = await getData(API_END_POINT.allLanguage);
     dispatch(setLanguages(response));
+    }catch(err:any){
+      dispatch(stopLoading());
+      console.log(err);
+        const message = err.response?.data?.message || 'An error occurred';
+        setModalTitle('Opps');
+        setModalMessage(message);
+        setModalSubMessage(' ');
+        setShowModal(true);
+    }
+    
   };
 
   const getSubscription = async () => {
-    dispatch(startLoading());
+    try{
+      dispatch(startLoading());
     const response = await getData(API_END_POINT.subscriptionPlans,{headers: {
       langCode: lang,
     }});
     setPlans(response);
     dispatch(stopLoading());
+    }catch(err:any){
+      dispatch(stopLoading());
+      console.log(err);
+        const message = err.response?.data?.message || 'An error occurred';
+        setModalTitle('Opps');
+        setModalMessage(message);
+        setModalSubMessage(' ');
+        setShowModal(true);
+    }
+    
   };
 
   const handleSelectPlan = (plan: string) => {
@@ -221,18 +259,50 @@ const PlanSelection: React.FC = () => {
     navigate('/enter-phoneno');
   }
 
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  const subscribeUser = async() =>{
+    try{
+      const res = await getData(API_END_POINT.subscribe + `?msisdn=${phoneNumber}&planId=${selectedPlan}`);
+      if (res.currentStatus === 'active') {
+        const { refreshToken, token, userId } = res;
+        navigate('/dashboard');
+        dispatch(stopLoading());
+        dispatch(setToken(token));
+        dispatch(setRefreshToken(refreshToken));
+        dispatch(setUserId(userId));
+        
+      }
+    }catch(err:any){
+      dispatch(stopLoading());
+      console.log(err);
+        const message = err.response?.data?.message || 'An error occurred';
+        setModalTitle('Opps');
+        setModalMessage(message);
+        setModalSubMessage(' ');
+        setShowModal(true);
+    }
+  }
+
+  const handleSubscribeButton = () =>{
+    isHeaderEnrichment ? subscribeUser() :moveToEnterPhonenoRoute()
+  }
+
   const isFormComplete = selectedPlan;
 
   return (
     <>
       {isLoading && <Loader />}
       <Container background={mediaContent.splashScreenBg}>
+      <Modal modalTitle={modalTitle} show={showModal} onClose={closeModal} message={modalMessage} subMessage={modalSubMessage} type={modalType}/>
         <LanguageDropdown />
         <CallSignatureHeader>
           <Logo src={mediaContent.logo} alt="Call Signature" />
           <Title>{configText.config.callSignature}</Title>
         </CallSignatureHeader>
-        <Subtitle>{configText.config.chooseTemplate}</Subtitle>
+        <Subtitle>{configText.config.chooseYourPlan}</Subtitle>
         <PlanContainer>
           {plans.map((plan) => (
             <PlanButton key={plan.planId} selected={selectedPlan === plan.planId} onClick={() => handleSelectPlan(plan.planId)}>
@@ -246,12 +316,12 @@ const PlanSelection: React.FC = () => {
           ))}
         </PlanContainer>
         <Disclaimer>
-          {configText.config.byRegistering+" "} <TermsandPrivacyContainer onClick={()=>navigate('/termsNconditions')}>{configText.config.termsNconditions}</TermsandPrivacyContainer> and <TermsandPrivacyContainer onClick={()=>navigate('/privacy-policy')}>{configText.config.privacyPolicy} </TermsandPrivacyContainer>  {" "+configText.config.ofThePlatform}
+          {configText.config.byRegistering+" "} <TermsandPrivacyContainer onClick={()=>navigate('/termsNconditions')}>{configText.config.termsNconditions}</TermsandPrivacyContainer> {configText.config.and} <TermsandPrivacyContainer onClick={()=>navigate('/privacy-policy')}>{configText.config.privacyPolicy} </TermsandPrivacyContainer>  {" "+configText.config.ofThePlatform}
         </Disclaimer>
-        <SendOtpButton onClick={moveToEnterPhonenoRoute} disabled={!isFormComplete}>
+        <SubscribeButton onClick={handleSubscribeButton} disabled={!isFormComplete}>
           {configText.config.subscribe}
-        </SendOtpButton>
-        <LoginLink>{configText.config.already_existing_user} <LoginLinkButton onClick={resetPlanBeforeMove}>{configText.config.click_here_to_login}</LoginLinkButton></LoginLink>
+        </SubscribeButton>
+        {!isHeaderEnrichment && <LoginLink>{configText.config.already_existing_user} <LoginLinkButton onClick={resetPlanBeforeMove}>{configText.config.click_here_to_login}</LoginLinkButton></LoginLink>}
       </Container>
     </>
   );

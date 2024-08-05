@@ -39,9 +39,7 @@ const SignatureTabs: React.FC = () => {
     const configText = useSelector((state: RootState) => state.configText);
     const { lang } = useSelector((state: RootState) => state.lang);
 
-    useEffect(()=>{
-        dispatch(setActiveTab(configText.config.signature))
-    },[lang,configText])
+    
     return (
         <div>
                     <TabsContainer>

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/images/logo.png';
 
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import Sidebar from '../../components/sidemenu/Sidebar';
 import Modal from '../../components/modal/Modal';
 import SignatrueTabs from '../../components/signatureTabs/SignatureTabs';
@@ -234,7 +234,7 @@ const EditSignature: React.FC = () => {
           <Logo src={logo} alt="Call Signature" />
           <Title>{configText.config.callSignature}</Title>
         </CallSignatureHeader>
-        <NotificationsIcon />
+        <AccountCircleRoundedIcon sx={{ fontSize: 30 }} onClick={() => navigate('/profile')} />
       </Header>
       <Content>
         <SignatrueTabs />
@@ -248,7 +248,7 @@ const EditSignature: React.FC = () => {
           <p>{flashMessageToShow.length}/100 {configText.config.characters}</p>
         </FlashMessageContainer>
         <ButtonContainer>
-          <Button onClick={handleSaveToTemplates}>{configText.config.saveToTemplates}</Button>
+          <Button onClick={handleSaveToTemplates}>{configText.config.save}</Button>
           <Button primary onClick={handleDone}>{configText.config.done}</Button>
         </ButtonContainer>
       </Content>

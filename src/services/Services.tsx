@@ -9,7 +9,7 @@ import { resetUserState } from "../redux/slices/UserTypeSlice";
 
 export const getData = async (endpoint: string, headers: any = {}) => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_}${endpoint}`, headers );
+      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}${endpoint}`, headers );
       return response.data.response || response.data;
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -19,7 +19,7 @@ export const getData = async (endpoint: string, headers: any = {}) => {
 
   export const postData = async (endpoint: string, data: any, headers: any = {}) => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_}${endpoint}`, data, headers);
+      const response = await axios.post(`${process.env.REACT_APP_BASE_URL}${endpoint}`, data, headers);
       return response.data.response || response.data;
     } catch (error) {
       console.error('Error posting data:', error);
@@ -30,7 +30,7 @@ export const getData = async (endpoint: string, headers: any = {}) => {
 
   export const deleteData = async (endpoint: string, headers: any = {}) => {
     try {
-      const response = await axios.delete(`${process.env.REACT_APP_}${endpoint}`, headers);
+      const response = await axios.delete(`${process.env.REACT_APP_BASE_URL}${endpoint}`, headers);
       return response.data.response || response.data;
     } catch (error) {
       console.error('Error deleting data:', error);

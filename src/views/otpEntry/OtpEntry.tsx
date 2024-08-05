@@ -134,7 +134,13 @@ align-self:flex-start;
 `;
 
 const OtpEntry: React.FC = () => {
-  const [otp, setOtp] = useState<string[]>(new Array(4).fill(''));
+
+const OTP_BOX_NO = Number(process.env.REACT_APP_OTP_BOX_NO);
+
+if (isNaN(OTP_BOX_NO)) {
+  throw new Error('REACT_APP_OTP_BOX_NO environment variable is not a valid number');
+}
+  const [otp, setOtp] = useState<string[]>(new Array(OTP_BOX_NO).fill(''));
   const [showModal,setShowModal] = useState(false);
   const [modalType,setModalType] = useState('error');
   const [modalTitle, setModalTitle] = useState('')
@@ -182,7 +188,7 @@ const OtpEntry: React.FC = () => {
   };
 
   const handleLogin = async () => {
-    if (otp.join('').length === 4) {
+    if (otp.join('').length === 6) {
       dispatch(startLoading());
       
       try {
@@ -197,6 +203,7 @@ const OtpEntry: React.FC = () => {
           dispatch(setToken(token));
           dispatch(setRefreshToken(refreshToken));
           dispatch(setUserId(userId));
+          dispatch(setFirstTimeModal(false))
         } else if (response.currentStatus === 'new') {
           try {
             const res = await getData(API_END_POINT.subscribe + `?msisdn=${phoneNumber}&planId=${selectedPlan}`,{headers: {
@@ -241,6 +248,13 @@ const OtpEntry: React.FC = () => {
         langCode: lang,
       }});
       dispatch(stopLoading());
+      const message = 'A new OTP has been sent to your registered mobile number.';
+      setModalTitle(configText.config.successful);
+      setModalType('success')
+      setModalMessage(message);
+      setModalSubMessage(' ');
+      setShowModal(true);
+      setOtp(new Array(6).fill(''));
     }catch(err:any){
       dispatch(stopLoading());
       console.log(err);
@@ -292,7 +306,7 @@ const OtpEntry: React.FC = () => {
             />
           ))}
         </OtpContainer>
-        <Disclaimer>{configText.config.sent_code + ' +91-'+phoneNumber + configText.config.verify_registration}</Disclaimer>
+        <Disclaimer>{configText.config.sent_code + ' +91-'+phoneNumber + ' '+configText.config.verify_registration}</Disclaimer>
         <Disclaimer>
           {configText.config.not_got_code} <ResendOtp onClick={handleResendOTP}>{configText.config.resend_code}</ResendOtp>
         </Disclaimer>

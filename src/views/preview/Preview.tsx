@@ -119,7 +119,9 @@ const Preview: React.FC = () => {
   const navigate = useNavigate();
   const { statusMessage, signatureMessage } = useSelector((state: RootState) => state.dashboard);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
-  const { userId, mediaContent} = useSelector((state: RootState) => state.user);
+  const { userId } = useSelector((state: RootState) => state.user);
+  const { mediaContent } = useSelector((state: RootState) => state.mediaContent);
+
   const configText = useSelector((state: RootState) => state.configText);
   
 

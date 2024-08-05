@@ -19,6 +19,7 @@ import { API_END_POINT } from '../../services/Constant';
 import { getData, postData } from '../../services/Services';
 import '../../assets/css/variables.css';
 import useJWTRefreshToken from '../../hooks/useJWTRefreshToken';
+import { setActiveTab } from '../../redux/slices/SignatureTabsSlice';
 
 const Container = styled.div`
   display: flex;
@@ -68,7 +69,7 @@ const FlashMessageContainer = styled.div`
   background: var(--flash-message-background-color);
   border-radius: 8px;
   padding: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   text-align: center;
 `;
 
@@ -111,7 +112,7 @@ const BusinessCardContainer = styled.div`
   background: var(--card-background-color);
   border-radius: 8px;
   padding: 20px;
-  max-height: 250px;
+  max-height: 350px;
   overflow-y: auto;
 `;
 
@@ -159,6 +160,7 @@ const Dashboard: React.FC = () => {
   const [updatedToken, setUpdatedToken] = React.useState(false);
   const refreshJWT = useJWTRefreshToken();
 
+ 
 
 
   const { statusMessage, signatureMessage, signatureId, statusId, isSignaturePublished, isStatusPublished } = useSelector((state: RootState) => state.dashboard);
@@ -184,6 +186,10 @@ const Dashboard: React.FC = () => {
     getTermsNcondition()
     if (firstTimeModal) showSucessSubscriber()
   }, [token, lang])
+
+  useEffect(()=>{
+    dispatch(setActiveTab(configText.config.signature))
+},[lang,configText])
 
   const getTermsNcondition = async () => {
     try {
@@ -221,7 +227,7 @@ const Dashboard: React.FC = () => {
 
   const getTemplate = async () => {
     try {
-      const response = await getData(API_END_POINT.getTemplates + userId, {
+      const response = await getData(API_END_POINT.getTemplates+`?langCode=${lang}` , {
         headers: {
           Authorization: `Bearer ${token}`,
           langCode: lang,
