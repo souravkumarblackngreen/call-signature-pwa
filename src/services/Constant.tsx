@@ -35,7 +35,7 @@ export const API_END_POINT={
     unsubscribe:"/billing/unsubscription",
     subscribe:"/billing/subscription",
     mediaContent:"/api/media-content?isIndividualSpecific=true",
-    updateSignature:"/signature/update",
+    updateSignature:"/signature/upsert",
     checkSubApi:"/billing/checkSub?msisdn=",
     profileUrl:"/user/profile",
     regexUrl:"/api/regex",
