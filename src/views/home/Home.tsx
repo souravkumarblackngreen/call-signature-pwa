@@ -34,7 +34,7 @@ const Container = styled.div`
   color: white;
   background-image: url(${background});
   background-size: cover;
-  background-position: center;
+  background-repeat:no-repeat;
 `;
 
 
