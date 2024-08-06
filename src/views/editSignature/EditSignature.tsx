@@ -249,7 +249,7 @@ const EditSignature: React.FC = () => {
         </FlashMessageContainer>
         <ButtonContainer>
           <Button onClick={handleSaveToTemplates}>{configText.config.save}</Button>
-          <Button primary onClick={handleDone}>{configText.config.done}</Button>
+          <Button primary onClick={handleDone}>{configText.config.back}</Button>
         </ButtonContainer>
       </Content>
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
