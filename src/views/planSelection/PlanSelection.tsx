@@ -161,6 +161,9 @@ const LoginLinkButton = styled.div`
     text-decoration: underline;
   }
 `;
+ const DisclaimerAnd = styled.span`
+  margin:0 4px;
+ `
 
 const TermsandPrivacyContainer = styled.span`
   margin-left: 5px;
@@ -332,7 +335,7 @@ const PlanSelection: React.FC = () => {
         </PlanContainer>
         <Disclaimer>
           {configText.config.byRegistering + ' '}
-          <TermsandPrivacyContainer onClick={() => navigate('/termsNconditions')}>{configText.config.termsNconditions}</TermsandPrivacyContainer> {configText.config.and}{' '}
+          <TermsandPrivacyContainer onClick={() => navigate('/termsNconditions')}>{configText.config.termsNconditions}</TermsandPrivacyContainer> <DisclaimerAnd>{configText.config.and}</DisclaimerAnd>{' '}
           <TermsandPrivacyContainer onClick={() => navigate('/privacy-policy')}>{configText.config.privacyPolicy} </TermsandPrivacyContainer> {' ' + configText.config.ofThePlatform}
         </Disclaimer>
         <SubscribeButton onClick={handleSubscribeButton} disabled={!isFormComplete}>
