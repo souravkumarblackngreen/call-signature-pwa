@@ -119,7 +119,7 @@ const PhoneNumberEntry: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isLoading = useSelector((state: RootState) => state.loader.isLoading);
-  const {  phoneNumber } = useSelector((state: RootState) => state.user);
+  const {  phoneNumber, regax } = useSelector((state: RootState) => state.user);
   const { lang } = useSelector((state: RootState) => state.lang);
   const configText = useSelector((state: RootState) => state.configText);
   const [showModal,setShowModal] = useState(false);
@@ -134,7 +134,9 @@ const PhoneNumberEntry: React.FC = () => {
  
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    if (/^\d{0,10}$/.test(value)) {
+    console.log(regax?.MOBILE_NO_REGEX_INDI)
+    const updatedRegex = new RegExp(regax?.MOBILE_NO_REGEX_INDI);
+    if (updatedRegex.test(value)) {
       dispatch(setPhoneNumber(value));
       setErrorMessage('');
     } else {
@@ -143,7 +145,7 @@ const PhoneNumberEntry: React.FC = () => {
   };
 
   const handleSendOtp = async () => {
-    if (phoneNumber.length !== 10) {
+    if (phoneNumber.length !== Number(regax?.MIN_MOBILE_NO_LENGTH)) {
       setErrorMessage(configText.config.validPhoneNumber||'Please enter a valid 10-digit phone number');
       return;
     }

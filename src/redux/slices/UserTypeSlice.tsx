@@ -1,4 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+
+interface Regax {
+  MIN_MOBILE_NO_LENGTH: string;
+  MOBILE_NO_REGEX_INDI:string;
+}
+
 interface UserType {
   user: string;
   token: string;
@@ -8,7 +15,7 @@ interface UserType {
   isHeaderEnrichment:boolean;
   phoneNumber:string;
   selectedPlan:string;
-  regax:object;
+  regax:Regax;
 }
 
 const initialState: UserType = {
@@ -21,6 +28,8 @@ const initialState: UserType = {
   phoneNumber:"",
   selectedPlan:"",
   regax:{
+    MIN_MOBILE_NO_LENGTH:'',
+    MOBILE_NO_REGEX_INDI:''
   }
 
 };
@@ -54,7 +63,7 @@ const userSlice = createSlice({
       setSelectedPlan:(state, action: PayloadAction<string>) => {
         state.selectedPlan = action.payload;
       },
-      setRegax:(state,action:PayloadAction<object>)=>{
+      setRegax:(state,action:PayloadAction<Regax>)=>{
         state.regax=action.payload
       },
     resetUserState: () => initialState,

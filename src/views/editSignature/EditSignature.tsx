@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/images/logo.png';
@@ -10,7 +10,6 @@ import SignatrueTabs from '../../components/signatureTabs/SignatureTabs';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setStatusMessage, setSignatureMessage } from '../../redux/slices/DashboardSlice';
-
 
 import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
@@ -114,7 +113,7 @@ const filteredWords = ['fraud', 'spam'];
 const EditSignature: React.FC = () => {
 
   const { statusMessage, signatureMessage, signatureId, statusId } = useSelector((state: RootState) => state.dashboard);
-  const { lang } = useSelector((state: RootState) => state.lang);
+  const { lang, languages } = useSelector((state: RootState) => state.lang);
   const { activeTab } = useSelector((state: RootState) => state.signatureTabs);
   const { token } = useSelector((state: RootState) => state.user);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -221,9 +220,14 @@ const EditSignature: React.FC = () => {
     setShowModal(false);
   };
 
+  const getCharactersAllowed = () => {
+    const language = languages.find(langs => langs.languageCode === lang);
+    return language ? language.charactersAllowed : 100;
+  };
 
+  const flashMessageToShow = activeTab === configText.config.signature ? signatureMessage : statusMessage;
+  const characterLimit = getCharactersAllowed();
 
-  const flashMessageToShow = activeTab === configText.config.signature ? signatureMessage : statusMessage
   return (
     <Container>
       {loader && <Loader />}
@@ -243,13 +247,13 @@ const EditSignature: React.FC = () => {
           <FlashMessageInput
             value={flashMessageToShow}
             onChange={handleInputChange}
-            maxLength={100}
+            maxLength={characterLimit}
           />
-          <p>{flashMessageToShow.length}/100 {configText.config.characters}</p>
+          <p>{flashMessageToShow.length}/{characterLimit} {configText.config.characters}</p>
         </FlashMessageContainer>
         <ButtonContainer>
-          <Button onClick={handleSaveToTemplates}>{configText.config.save}</Button>
-          <Button primary onClick={handleDone}>{configText.config.back}</Button>
+          <Button  onClick={handleDone}>{configText.config.back}</Button>
+          <Button primary onClick={handleSaveToTemplates}>{configText.config.save}</Button>   
         </ButtonContainer>
       </Content>
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />

@@ -227,6 +227,7 @@ if (isNaN(OTP_BOX_NO)) {
             setModalMessage(message);
             setModalSubMessage(' ');
             setShowModal(true);
+            setModalType('error')
           }
         }
       } catch (err:any) {
@@ -237,6 +238,7 @@ if (isNaN(OTP_BOX_NO)) {
         setModalMessage(message);
         setModalSubMessage(' ');
         setShowModal(true);
+        setModalType('error')
       }
     }
   };
@@ -263,6 +265,7 @@ if (isNaN(OTP_BOX_NO)) {
         setModalMessage(message);
         setModalSubMessage(' ');
         setShowModal(true);
+        setModalType('error')
     }
     
    

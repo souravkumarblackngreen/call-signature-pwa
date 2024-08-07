@@ -448,7 +448,7 @@ const Dashboard: React.FC = () => {
 
         </FlashMessageContainer>
         <BusinessCardContainer>
-          <BusinessCardTitle>{configText.config.templateBusinessCard}</BusinessCardTitle>
+          <BusinessCardTitle>{activeTab == configText.config.signature ? configText.config.templateBusinessCard : configText.config.templateStatusCards }</BusinessCardTitle>
           {templates?.map((template, index) => (
             <BusinessCard onClick={() => setCardMessage(template)}>
               <BusinessCardTitleText key={index}>{template}</BusinessCardTitleText>

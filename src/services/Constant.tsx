@@ -42,5 +42,4 @@ export const API_END_POINT={
     publishUrl:"/dashboard/signature-action/PUBLISH",
     unPublishUrl:"/dashboard/signature-action/UNPUBLISH",
     headerEnrichmentCheckAPI:"http://172.16.11.222:8099/header-augment-0.0.1-SNAPSHOT/v1/mobile/get-he-number"
-
 }
