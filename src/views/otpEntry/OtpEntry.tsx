@@ -309,7 +309,7 @@ if (isNaN(OTP_BOX_NO)) {
             />
           ))}
         </OtpContainer>
-        <Disclaimer>{configText.config.sent_code + ' +91-'+phoneNumber + ' '+configText.config.verify_registration}</Disclaimer>
+        <Disclaimer>{configText.config.sent_code + `+${process.env.REACT_APP_OTP_CountryCode}-` +phoneNumber + ' '+configText.config.verify_registration}</Disclaimer>
         <Disclaimer>
           {configText.config.not_got_code} <ResendOtp onClick={handleResendOTP}>{configText.config.resend_code}</ResendOtp>
         </Disclaimer>

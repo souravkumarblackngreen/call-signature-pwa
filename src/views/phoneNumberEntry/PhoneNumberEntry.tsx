@@ -145,10 +145,7 @@ const PhoneNumberEntry: React.FC = () => {
   };
 
   const handleSendOtp = async () => {
-    if (phoneNumber.length !== Number(regax?.MIN_MOBILE_NO_LENGTH)) {
-      setErrorMessage(configText.config.validPhoneNumber||'Please enter a valid 10-digit phone number');
-      return;
-    }
+   
     dispatch(startLoading());
     try {
       if (phoneNumber) {
