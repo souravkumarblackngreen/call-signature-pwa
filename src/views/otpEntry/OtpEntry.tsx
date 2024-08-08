@@ -188,7 +188,7 @@ if (isNaN(OTP_BOX_NO)) {
   };
 
   const handleLogin = async () => {
-    if (otp.join('').length === 6) {
+    if (otp.join('').length === OTP_BOX_NO) {
       dispatch(startLoading());
       
       try {
@@ -256,7 +256,7 @@ if (isNaN(OTP_BOX_NO)) {
       setModalMessage(message);
       setModalSubMessage(' ');
       setShowModal(true);
-      setOtp(new Array(6).fill(''));
+      setOtp(new Array(OTP_BOX_NO).fill(''));
     }catch(err:any){
       dispatch(stopLoading());
       console.log(err);
