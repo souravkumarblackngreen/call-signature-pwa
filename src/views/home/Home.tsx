@@ -58,7 +58,6 @@ const NextButton = styled.button`
   border: none;
   border-radius: 50%;
   background-color: var(--button-background-color-primary);
-  border:1px dotted;
   color: white;
   display: flex;
   align-items: center;

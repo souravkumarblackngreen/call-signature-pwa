@@ -19,7 +19,6 @@ const Container = styled.div`
   height: 100vh;
   background: #ffffff;
   color: #000000;
-  gap:100px;
 `;
 
 const Header = styled.div`
@@ -57,6 +56,7 @@ const FAQContainer = styled.div`
   display:flex;
   flex-direction:column;
   gap:10px;
+  margin-top:20px;
   
 `;
 

@@ -77,7 +77,7 @@ const PlanButton = styled.div<{ selected: boolean }>`
   background: ${(props) => (props.selected ? 'var(--button-background-color-primary)' : 'white')};
   color: ${(props) => (props.selected ? 'white' : 'var(--button-background-color-primary)')};
   border: 1px solid;
-  border-radius: 8px;
+  border-radius: 34px;
   padding: 20px;
   margin: 0 10px;
   cursor: pointer;
@@ -88,7 +88,7 @@ const PlanButton = styled.div<{ selected: boolean }>`
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  box-shadow: ${(props) => (!props.selected ? '0 4px 8px rgba(0, 0, 0, 0.1)' : '0px 0px 22px #fff')};
+  box-shadow: ${(props) => (!props.selected ? '0 4px 8px rgba(0, 0, 0, 0.1)' : '0px 0px 8px #fff')};
 
   @media (max-width: 768px) {
     width: 40%;

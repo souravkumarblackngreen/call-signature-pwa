@@ -64,3 +64,9 @@ export const getData = async (endpoint: string, headers: any = {}) => {
     // Navigate to the home or login page
     navigate("/");
   };
+
+  export const loadConfig = async () => {
+    const response = await fetch('/config.json');
+    const config = await response.json();
+    return config;
+  };
