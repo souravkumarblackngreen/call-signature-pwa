@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import {  setIsHeaderEnrichment, setPhoneNumber, setRegax } from '../../redux/slices/UserTypeSlice'
 
-import { getData,loadConfig, logoutfunc} from '../../services/Services'
+import { loadConfig, logoutfunc} from '../../services/Services'
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 import Loader from '../../components/loader/Loader';
 import axios from 'axios';
@@ -83,7 +83,7 @@ const Home: React.FC = () => {
   const [modalMessage, setModalMessage] = useState('');
   const [modalSubMessage, setModalSubMessage] = useState('')
 
-  // const { getData } = useCommonServices();
+  const { getData } = useCommonServices();
 
  
 

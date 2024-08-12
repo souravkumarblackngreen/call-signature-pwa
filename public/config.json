@@ -1,4 +1,4 @@
 {
-    "apiUrl": "http://172.16.11.222:5441/crbtSignature/v1",
+    "apiUrl": "http://172.16.11.222:5442/crbtSignature/v1",
     "otherConfig": "value"
 }
