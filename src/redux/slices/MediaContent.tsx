@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface MediaContent {
   
   mediaContent:MediaContentObj;
+  baseUrl:string;
   
 }
 interface MediaContentObj {
@@ -14,6 +15,7 @@ interface MediaContentObj {
 
 const initialState: MediaContent = {
   mediaContent:{logo:'',splashScreenBg:'',callScreen:'',notch:''},
+  baseUrl:'',
 };
 
 const userSlice = createSlice({
@@ -25,10 +27,13 @@ const userSlice = createSlice({
       setMediaContent:(state, action: PayloadAction<MediaContentObj>) => {
         state.mediaContent = action.payload;
       },
+      setBaseUrl:(state, action: PayloadAction<string>) => {
+        state.baseUrl = action.payload;
+      },
     resetUserState: () => initialState,
   },
 });
 
-export const { setMediaContent } =
+export const { setMediaContent, setBaseUrl } =
   userSlice.actions;
 export default userSlice.reducer;

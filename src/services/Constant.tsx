@@ -25,7 +25,7 @@ export const API_END_POINT={
     forgotPassword:"api/forgot-password?userContact=",
     privacyContent:"/api/privacy-content",
     heLoginApi:"/api/heLogin",
-    subscriptionPlans:"/api/individual-subscription-plans?planType=SIGNATURE",
+    subscriptionPlans:"/api/individual-subscription-plans?planType=SUBSCRIPTION",
     getTemplates:"/signature/get-templates",
     getFAQ:"/individual/get-faqs",
     sendOTP:"/otp/manage-Otp/SEND_OTP",

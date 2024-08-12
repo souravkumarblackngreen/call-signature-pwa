@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Home from './views/home/Home';
 import PlanSelection from './views/planSelection/PlanSelection';
@@ -13,11 +13,26 @@ import Preview from './views/preview/Preview';
 import FAQ from './views/faq/FAQ';
 import PhoneNumberEntry from './views/phoneNumberEntry/PhoneNumberEntry';
 import FilterKeywords from './views/filterKeywords/FilterKeywords';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './redux/store';
+import { setBaseUrl } from './redux/slices/MediaContent';
 
 const App: React.FC = () => {
   const { token } = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch();
+  useEffect(()=>{ 
+    getsomething()
+  },[])
+
+  
+  const getsomething=async()=>{
+    const response = await fetch('../../config.json');
+    const config = await response.json();
+    console.log(config)
+    dispatch(setBaseUrl(config.apiUrl))
+   
+    
+  }
   return (
     <Router>
       <Routes>

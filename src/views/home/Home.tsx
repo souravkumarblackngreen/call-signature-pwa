@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 
+
+
 import ArrowForwardSharpIcon from '@mui/icons-material/ArrowForwardSharp';
 import { API_END_POINT } from "../../services/Constant";
 import background from '../../assets/images/SplashScreenBg.png' // Replace with your background image path
@@ -11,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import {  setIsHeaderEnrichment, setPhoneNumber, setRegax } from '../../redux/slices/UserTypeSlice'
 
-import {getData, logoutfunc} from '../../services/Services'
+import { loadConfig, logoutfunc} from '../../services/Services'
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 import Loader from '../../components/loader/Loader';
 import axios from 'axios';
@@ -21,6 +23,7 @@ import { setConfigText } from '../../redux/slices/GloabalTextDataSlice';
 
 import Modal from '../../components/modal/Modal';
 import { setMediaContent } from '../../redux/slices/MediaContent';
+import useCommonServices from '../../services/useCommonService';
 
 const Container = styled.div`
   display: flex;
@@ -80,6 +83,8 @@ const Home: React.FC = () => {
   const [modalMessage, setModalMessage] = useState('');
   const [modalSubMessage, setModalSubMessage] = useState('')
 
+  const { getData } = useCommonServices();
+
  
 
  
@@ -87,6 +92,19 @@ const Home: React.FC = () => {
   useEffect(() => {
     handleLanguageChangeData();
   }, [lang]);
+
+
+  // useEffect(()=>{ 
+  //   getsomething()
+  // },[])
+
+  
+  // const getsomething=async()=>{
+  //   const response = await fetch('../../config.json');
+  //   const config = await response.json();
+  //   console.log(config)
+  // }
+ 
 
   const handleLanguageChangeData = async () => {
     dispatch(startLoading())
@@ -98,7 +116,7 @@ const Home: React.FC = () => {
       dispatch(startLoading())
       
     } catch (error:any) {
-      console.log(error);
+     
       dispatch(startLoading())
       const message = error.response?.data?.message || 'An error occurred during subscription';
             setModalTitle('Opps');

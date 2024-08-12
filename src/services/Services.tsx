@@ -7,6 +7,7 @@ import { resetProfileState } from "../redux/slices/ProfileSlice";
 import { resetSignatureTabsState } from "../redux/slices/SignatureTabsSlice";
 import { resetUserState } from "../redux/slices/UserTypeSlice";
 
+
 export const getData = async (endpoint: string, headers: any = {}) => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_BASE_URL}${endpoint}`, headers );
@@ -66,7 +67,7 @@ export const getData = async (endpoint: string, headers: any = {}) => {
   };
 
   export const loadConfig = async () => {
-    const response = await fetch('/config.json');
+    const response = await fetch('../config.json');
     const config = await response.json();
     return config;
   };
