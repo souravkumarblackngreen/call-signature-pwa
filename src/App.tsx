@@ -17,21 +17,37 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './redux/store';
 import { setBaseUrl } from './redux/slices/MediaContent';
 
+import { CircularProgress, Box } from '@mui/material';
+
 const App: React.FC = () => {
   const { token } = useSelector((state: RootState) => state.user);
+  const { baseUrl } = useSelector((state: RootState) => state.mediaContent);
   const dispatch = useDispatch();
   useEffect(()=>{ 
-    getsomething()
+    getConfig()
   },[])
 
   
-  const getsomething=async()=>{
+  const getConfig=async()=>{
     const response = await fetch('/cs-build/config.json');
     const config = await response.json();
     console.log(config)
     dispatch(setBaseUrl(config.apiUrl))
    
     
+  }
+
+  if (!baseUrl) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
   return (
     <Router>
