@@ -16,10 +16,11 @@ import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
-import { getData, postData } from '../../services/Services';
+// import { postData } from '../../services/Services';
 import '../../assets/css/variables.css';
 import useJWTRefreshToken from '../../hooks/useJWTRefreshToken';
 import { setActiveTab } from '../../redux/slices/SignatureTabsSlice';
+import useCommonServices from '../../services/useCommonService';
 
 const Container = styled.div`
   display: flex;
@@ -159,6 +160,7 @@ const Dashboard: React.FC = () => {
   const [modalTitle, setModalTitle] = useState('')
   const [updatedToken, setUpdatedToken] = React.useState(false);
   const refreshJWT = useJWTRefreshToken();
+  const { getData, postData } = useCommonServices();
 
  
 
@@ -194,13 +196,7 @@ const Dashboard: React.FC = () => {
   const getTermsNcondition = async () => {
     try {
       setLoader(true)
-      const response = await getData(API_END_POINT.privacyContent, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          langCode: lang,
-        },
-
-      })
+      const response = await getData(API_END_POINT.privacyContent,token)
       const { privacyPolicy, tearmsAndCondition } = response
       setLoader(false)
       dispatch(setPrivacy(privacyPolicy))
@@ -227,12 +223,7 @@ const Dashboard: React.FC = () => {
 
   const getTemplate = async () => {
     try {
-      const response = await getData(API_END_POINT.getTemplates+`?langCode=${lang}` , {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          langCode: lang,
-        },
-      })
+      const response = await getData(API_END_POINT.getTemplates+`?langCode=${lang}`,token)
       const { businessCard, statusCard } = response;
 
       setSignatureTemplates(businessCard);
@@ -254,12 +245,7 @@ const Dashboard: React.FC = () => {
 
   const getInfo = async () => {
     try {
-      const response = await getData(API_END_POINT.getInfo, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          langCode: lang,
-        },
-      })
+      const response = await getData(API_END_POINT.getInfo,token)
       preprocessData(response)
     } catch (error: any) {
 
@@ -339,12 +325,7 @@ const Dashboard: React.FC = () => {
 
 
     try {
-      await postData(actionUrl, valToPost, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          langCode: lang,
-        },
-      });
+      await postData(actionUrl, valToPost, token);
 
       activeTab === configText.config.signature ? dispatch(setIsSignaturePublished(value)) : dispatch(setIsStatusPublished(value))
       setModalType('success');

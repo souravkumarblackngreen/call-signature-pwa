@@ -8,10 +8,11 @@ import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 import { setToken, setRefreshToken, setUserId, setFirstTimeModal } from '../../redux/slices/UserTypeSlice';
 import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
-import { getData } from '../../services/Services';
+// import { getData } from '../../services/Services';
 import KeyboardArrowLeftSharpIcon from '@mui/icons-material/KeyboardArrowLeftSharp';
 import '../../assets/css/variables.css';
 import Modal from '../../components/modal/Modal';
+import useCommonServices from '../../services/useCommonService';
 
 const Container = styled.div<{ isLoading: boolean }>`
   display: flex;
@@ -155,6 +156,8 @@ if (isNaN(OTP_BOX_NO)) {
   const configText = useSelector((state: RootState) => state.configText);
   const { lang } = useSelector((state: RootState) => state.lang);
 
+  const { getData } = useCommonServices();
+
   const handleChange = (value: string, index: number) => {
     if (/^[0-9]$/.test(value)) {
       const newOtp = [...otp];
@@ -192,9 +195,7 @@ if (isNaN(OTP_BOX_NO)) {
       dispatch(startLoading());
       
       try {
-        const response = await getData(`${API_END_POINT.validateOTP}?msisdn=${phoneNumber}&otp=${otp.join('')}`,{headers: {
-          langCode: lang,
-        }});
+        const response = await getData(`${API_END_POINT.validateOTP}?msisdn=${phoneNumber}&otp=${otp.join('')}`);
         
         if (response.currentStatus === 'active') {
           const { refreshToken, token, userId } = response;
@@ -206,9 +207,7 @@ if (isNaN(OTP_BOX_NO)) {
           dispatch(setFirstTimeModal(false))
         } else if (response.currentStatus === 'new') {
           try {
-            const res = await getData(API_END_POINT.subscribe + `?msisdn=${phoneNumber}&planId=${selectedPlan}`,{headers: {
-              langCode: lang,
-            }});
+            const res = await getData(API_END_POINT.subscribe + `?msisdn=${phoneNumber}&planId=${selectedPlan}`);
             
             if (res.currentStatus === 'active') {
               const { refreshToken, token, userId } = res;
@@ -246,9 +245,7 @@ if (isNaN(OTP_BOX_NO)) {
   const handleResendOTP = async () => {
     dispatch(startLoading());
     try{
-      await getData(API_END_POINT.resendOTP + `?msisdn=${phoneNumber}`,{headers: {
-        langCode: lang,
-      }});
+      await getData(API_END_POINT.resendOTP + `?msisdn=${phoneNumber}`);
       dispatch(stopLoading());
       const message = 'A new OTP has been sent to your registered mobile number.';
       setModalTitle(configText.config.successful);

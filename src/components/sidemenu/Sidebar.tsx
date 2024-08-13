@@ -19,9 +19,10 @@ import { resetProfileState } from '../../redux/slices/ProfileSlice';
 import { resetSignatureTabsState } from '../../redux/slices/SignatureTabsSlice';
 import { resetDashboardState } from '../../redux/slices/DashboardSlice';
 import { resetUserState } from "../../redux/slices/UserTypeSlice"
-import { deleteData, getData } from '../../services/Services';
+
 import Loader from '../loader/Loader';
 import useJWTRefreshToken from '../../hooks/useJWTRefreshToken';
+import useCommonServices from '../../services/useCommonService';
 
 
 const SidebarContainer = styled.div<{ isOpen: boolean }>`
@@ -123,6 +124,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const refreshJWT = useJWTRefreshToken();
 
+  const { getData, deleteData } = useCommonServices();
+
+
   const toggleLanguageMenu = () => {
     setLanguageOpen(!isLanguageOpen);
   };
@@ -181,12 +185,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     dispatch(startLoading())
 
     try {
-      const response = await deleteData(`${API_END_POINT.unsubscribe}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          langCode: lang,
-        },
-      });
+      const response = await deleteData(`${API_END_POINT.unsubscribe}`,null , token);
 
       dispatch(stopLoading())
       if (response.statuscode == 200) {
@@ -218,12 +217,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const getMenu = async () => {
     dispatch(startLoading())
     try {
-      const response = await getData(API_END_POINT.sideMenu, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          langCode: lang,
-        },
-      });
+      const response = await getData(API_END_POINT.sideMenu,token);
       setMenuData(response);
       
       dispatch(stopLoading())

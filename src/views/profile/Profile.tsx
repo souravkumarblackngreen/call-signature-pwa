@@ -9,10 +9,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../../components/loader/Loader';
 
 import { setSubscriptionDate,setNextRenewal,setSubscriptionPlan,setPhoneNo} from '../../redux/slices/ProfileSlice';
-import { formatDate, getData } from '../../services/Services';
+import { formatDate } from '../../services/Services';
 import { API_END_POINT } from '../../services/Constant';
 import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 import '../../assets/css/variables.css';
+import useCommonServices from '../../services/useCommonService';
 
 const Container = styled.div`
   display: flex;
@@ -98,10 +99,11 @@ const Profile: React.FC = () => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { getData } = useCommonServices();
 
     const { SubscriptionPlan, SubscriptionDate ,NextRenewal ,PhoneNo} = useSelector((state: RootState) => state.profile);
     const { token } = useSelector((state: RootState) => state.user);
-    const { lang } = useSelector((state: RootState) => state.lang);
+    
     
     const isLoading = useSelector((state: RootState) => state.loader.isLoading);
     const configText = useSelector((state: RootState) => state.configText);
@@ -118,12 +120,7 @@ const Profile: React.FC = () => {
     const getUserProfile = async () => {
       dispatch(startLoading())
       try {
-        const response = await getData(API_END_POINT.profileUrl,{
-          headers: {
-            Authorization:  `Bearer ${token}`,
-            langCode: lang,
-        },
-        });
+        const response = await getData(API_END_POINT.profileUrl,token);
         
         const{
           planStartDate,

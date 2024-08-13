@@ -6,23 +6,21 @@ import { RootState } from "../redux/store";
 import { useNavigate } from "react-router-dom";
 
 import { setRefreshToken, setToken } from "../redux/slices/UserTypeSlice";
-import { getData, logoutfunc } from "../services/Services";
+import {  logoutfunc } from "../services/Services";
 import { API_END_POINT } from "../services/Constant";
+import useCommonServices from "../services/useCommonService";
 
 const useJWTRefreshToken = () => {
  
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { getData } = useCommonServices();
   const { refrToken } = useSelector((state: RootState) => state.user);
-  const { lang } = useSelector((state: RootState) => state.lang);
+  
 
   return async () => {
     try {
-      const response = await getData(API_END_POINT.refreshToken, {
-        headers: {
-        Authorization: `Bearer ${refrToken}`,
-        langCode: lang,
-      }});
+      const response = await getData(API_END_POINT.refreshToken, refrToken);
       const { token, refreshToken } = response;
         dispatch(setToken(token));
         dispatch(setRefreshToken(refreshToken));

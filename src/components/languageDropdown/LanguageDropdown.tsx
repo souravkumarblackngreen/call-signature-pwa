@@ -7,7 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setLanguage } from '../../redux/slices/LanguageSlice';
 import { API_END_POINT } from '../../services/Constant';
 import { setConfigText } from '../../redux/slices/GloabalTextDataSlice';
-import {getData} from '../../services/Services'
+import useCommonServices from '../../services/useCommonService';
+
 
 const DropdownContainer = styled.div`
   position: absolute;
@@ -24,6 +25,7 @@ const DropdownContainer = styled.div`
 const LanguageDropdown: React.FC = () => {
   
   const { lang,languages } = useSelector((state: RootState) => state.lang);
+  const { getData } = useCommonServices();
   const dispatch = useDispatch();
  
 

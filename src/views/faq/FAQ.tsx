@@ -9,8 +9,9 @@ import { useNavigate } from 'react-router-dom';
 import { API_END_POINT } from '../../services/Constant';
 import { RootState } from '../../redux/store';
 import { useSelector } from 'react-redux';
-import { getData } from '../../services/Services';
+
 import useJWTRefreshToken from '../../hooks/useJWTRefreshToken';
+import useCommonServices from '../../services/useCommonService';
 
 const Container = styled.div`
   display: flex;
@@ -99,6 +100,7 @@ interface FAQS {
 const FAQ: React.FC = () => {
 
   const navigate = useNavigate();
+  const { getData } = useCommonServices();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [isSidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [Faqs,setFaqs] = useState<FAQS[]>([])
@@ -118,12 +120,7 @@ const FAQ: React.FC = () => {
 
   const getFAQ = async()=>{
     try{
-      const response = await getData(API_END_POINT.getFAQ,{
-        headers: {
-          Authorization: `Bearer ${token}`,
-          langCode: lang,
-        },
-      })
+      const response = await getData(API_END_POINT.getFAQ,token)
       setFaqs(response.faqs)
     
     }
@@ -132,7 +129,7 @@ const FAQ: React.FC = () => {
         error.response.data.statuscode === 4001 ||
         error.response.data.statuscode === 4002
          
-      ) {
+      ) { 
 
         const refreshSuccess = await refreshJWT(); // Attempt to refresh the token
         

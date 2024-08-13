@@ -8,9 +8,10 @@ import { startLoading, stopLoading } from '../../redux/slices/LoaderSlice';
 import { setPhoneNumber } from '../../redux/slices/UserTypeSlice';
 import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
-import { getData } from '../../services/Services';
+// import { getData } from '../../services/Services';
 import '../../assets/css/variables.css';
 import Modal from '../../components/modal/Modal';
+import useCommonServices from '../../services/useCommonService';
 
 const Container = styled.div<{ isLoading: boolean }>`
   display: flex;
@@ -129,6 +130,8 @@ const PhoneNumberEntry: React.FC = () => {
   const [modalSubMessage, setModalSubMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('');
 
+  const { getData } = useCommonServices();
+
 
 
  
@@ -149,9 +152,7 @@ const PhoneNumberEntry: React.FC = () => {
     dispatch(startLoading());
     try {
       if (phoneNumber) {
-        const response = await getData(API_END_POINT.sendOTP + `?msisdn=${phoneNumber}`,{headers: {
-          langCode: lang,
-        }}); 
+        const response = await getData(API_END_POINT.sendOTP + `?msisdn=${phoneNumber}`); 
         if(response.statuscode == 200){
             navigate('/enter-otp');
             dispatch(stopLoading());

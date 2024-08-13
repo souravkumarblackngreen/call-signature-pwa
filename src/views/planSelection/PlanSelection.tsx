@@ -13,9 +13,10 @@ import Loader from '../../components/loader/Loader';
 import { RootState } from '../../redux/store';
 
 import { API_END_POINT } from "../../services/Constant";
-import { getData } from '../../services/Services';
+// import { getData } from '../../services/Services';
 import '../../assets/css/variables.css';
 import Modal from '../../components/modal/Modal';
+import useCommonServices from '../../services/useCommonService';
 
 const Container = styled.div<{ background: string }>`
   display: flex;
@@ -185,6 +186,8 @@ const PlanSelection: React.FC = () => {
   const [modalMessage, setModalMessage] = useState('');
   const [modalSubMessage, setModalSubMessage] = useState('');
 
+  const { getData } = useCommonServices();
+
   const [plans, setPlans] = useState<any[]>([]);
 
   const navigate = useNavigate();
@@ -246,11 +249,7 @@ const PlanSelection: React.FC = () => {
   const getSubscription = async () => {
     try {
       dispatch(startLoading());
-      const response = await getData(API_END_POINT.subscriptionPlans, {
-        headers: {
-          langCode: lang,
-        },
-      });
+      const response = await getData(API_END_POINT.subscriptionPlans);
       setPlans(response);
       dispatch(stopLoading());
     } catch (err: any) {

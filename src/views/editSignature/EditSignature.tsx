@@ -13,8 +13,9 @@ import { setStatusMessage, setSignatureMessage } from '../../redux/slices/Dashbo
 
 import Loader from '../../components/loader/Loader';
 import { API_END_POINT } from '../../services/Constant';
-import { postData } from '../../services/Services';
+// import { postData } from '../../services/Services';
 import useJWTRefreshToken from '../../hooks/useJWTRefreshToken';
+import useCommonServices from '../../services/useCommonService';
 
 const Container = styled.div`
   display: flex;
@@ -125,6 +126,8 @@ const EditSignature: React.FC = () => {
   const [modalSubMessage, setModalSubMessage] = useState('')
   const [updatedToken, setUpdatedToken] = React.useState(false);
   const refreshJWT = useJWTRefreshToken();
+  const {  postData } = useCommonServices();
+  
   const configText = useSelector((state: RootState) => state.configText);
 
   const navigate = useNavigate();
@@ -147,14 +150,7 @@ const EditSignature: React.FC = () => {
           signatureType: activeTab === configText.config.signature ? "BUSINESS_CARD" : "STATUS",
 
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            langCode: lang,
-            // Assuming the content type is JSON
-          },
-
-        },
+        token,
       );
 
       setLoader(false)
