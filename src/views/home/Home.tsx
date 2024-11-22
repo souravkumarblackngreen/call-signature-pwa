@@ -35,7 +35,7 @@ const Container = styled.div`
   background:var(--homeBackgroundColor);
   gap:30px;
   color: white;
-  background-image: url(${background});
+ 
   background-size: cover;
   background-repeat:no-repeat;
 `;

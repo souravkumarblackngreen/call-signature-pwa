@@ -31,7 +31,6 @@ const App: React.FC = () => {
   const getConfig=async()=>{
     const response = await fetch('/cs-build/config.json');
     const config = await response.json();
-    console.log(config)
     dispatch(setBaseUrl(config.apiUrl))
    
     
